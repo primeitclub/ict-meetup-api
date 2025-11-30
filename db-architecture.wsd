@@ -1,0 +1,211 @@
+@startuml
+entity "event_versions" {
+    * id : UUID [PK]
+    --
+    version_name : VARCHAR(50)
+    slug : VARCHAR(50)
+    version_number : DECIMAL(3,1)
+    status : VARCHAR(20)
+    start_date : DATE
+    end_date : DATE
+    is_current : BOOLEAN
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "hero_sections" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    heading : TEXT
+    paragraph : TEXT
+    background_image_url : TEXT
+    banner_image_url : TEXT
+    cta_text : VARCHAR(50)
+    cta_link : VARCHAR(255)
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "achievement_metrics" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    total_participants : INTEGER
+    social_media_reach : INTEGER
+    collaborations : INTEGER
+    additional_metrics : JSONB
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "about_sections" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    title : VARCHAR(255)
+    content : TEXT
+    image_url : TEXT
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "speakers" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    name : VARCHAR(255)
+    title : VARCHAR(50)
+    job_title : VARCHAR(255)
+    position : VARCHAR(255)
+    description : TEXT
+    image_url : TEXT
+    social_links : JSONB
+    display_order : INTEGER
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "events" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    title : VARCHAR(255)
+    description : TEXT
+    location : VARCHAR(255)
+    event_date : DATE
+    days : INT
+    start_time : TIME
+    end_time : TIME
+    category : VARCHAR(50)
+    seats_available : INTEGER
+    seats_registered : INTEGER
+    schedule_image_url : TEXT
+    additional_images : JSONB
+    display_order : INTEGER
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "event_speakers" {
+    * id : UUID [PK]
+    --
+    event_id : UUID [FK]
+    speaker_id : UUID [FK]
+    role : VARCHAR(100)
+    created_at : TIMESTAMP
+}
+
+entity "event_registrations" {
+    * id : UUID [PK]
+    --
+    event_id : UUID [FK]
+    user_name : VARCHAR(255)
+    contact_number : VARCHAR(20)
+    email : VARCHAR(255)
+    is_student : BOOLEAN
+    year : VARCHAR(20)
+    education_level : VARCHAR(50)
+    faculty : VARCHAR(255)
+    registration_date : TIMESTAMP
+    status : VARCHAR(20)
+    created_at : TIMESTAMP
+}
+
+entity "sponsors" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    name : VARCHAR(255)
+    tier : VARCHAR(50)
+    logo_url : TEXT
+    website_url : TEXT
+    display_order : INTEGER
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "gallery_items" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    image_url : TEXT
+    caption : TEXT
+    is_featured : BOOLEAN
+    display_order : INTEGER
+    created_at : TIMESTAMP
+}
+
+entity "gallery_settings" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    drive_link : TEXT
+    max_featured_images : INTEGER
+    created_at : TIMESTAMP
+}
+
+entity "team_members" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    name : VARCHAR(255)
+    category : VARCHAR(50)
+    designation : VARCHAR(100)
+    role : VARCHAR(100)
+    image_url : TEXT
+    social_links : JSONB
+    display_order : INTEGER
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "version_settings" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    primary_color : VARCHAR(7)
+    secondary_color : VARCHAR(7)
+    background_color : VARCHAR(7)
+    text_color : VARCHAR(7)
+    accent_color : VARCHAR(7)
+    font_family : VARCHAR(100)
+    heading_font : VARCHAR(100)
+    body_font : VARCHAR(100)
+    theme_mode : VARCHAR(20)
+    border_radius : VARCHAR(10)
+    button_style : JSONB
+    custom_css : TEXT
+    additional_settings : JSONB
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "audit_logs" {
+    * id : UUID [PK]
+    --
+    version_id : UUID [FK]
+    table_name : VARCHAR(50)
+    record_id : UUID
+    action : VARCHAR(20)
+    changed_by : VARCHAR(255)
+    changes : JSONB
+    created_at : TIMESTAMP
+}
+
+event_versions ||--o{ hero_sections
+event_versions ||--o{ achievement_metrics
+event_versions ||--o{ about_sections
+event_versions ||--o{ speakers
+event_versions ||--o{ events
+event_versions ||--o{ sponsors
+event_versions ||--o{ gallery_items
+event_versions ||--o{ gallery_settings
+event_versions ||--o{ team_members
+event_versions ||--o{ version_settings
+event_versions ||--o{ audit_logs
+
+events ||--o{ event_speakers
+speakers ||--o{ event_speakers
+events ||--o{ event_registrations
+@enduml
