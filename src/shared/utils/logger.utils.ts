@@ -1,5 +1,6 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+import { isProd } from '../config/env';
 
 const levels = {
       error: 0,
@@ -34,7 +35,7 @@ const transports = new DailyRotateFile({
       maxSize: '20m',
       maxFiles: '30d',
       format,
-      level: process.env.NODE_ENV === 'dev' ? 'debug' : 'info',
+      level: isProd ? 'info' : 'debug',
 });
 
 const consoleTransport = new winston.transports.Console({
@@ -42,7 +43,7 @@ const consoleTransport = new winston.transports.Console({
 });
 
 const logger = winston.createLogger({
-      level: process.env.NODE_ENV === 'dev' ? 'debug' : 'info',
+      level: isProd ? 'info' : 'debug',
       levels,
       format,
       transports: [consoleTransport, transports],
