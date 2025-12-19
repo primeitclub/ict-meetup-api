@@ -3,6 +3,8 @@ import cors from 'cors';
 import express from 'express';
 import connectDatabase from './shared/config/typeorm/db.config';
 import { envConfig } from './shared/config/env';
+import { logAudit } from './shared/utils/audit.logger';
+import { AuditLogType, AuditLogActionType, AuditLogScope } from './shared/constants/audit-log.enums';
 
 dotenv.config();
 
@@ -10,6 +12,24 @@ const app = express();
 
 app.use(express.json());
 app.use(cors())
+
+// route for audit logging
+// app.get('/test-audit', async (req, res) => {
+//   try {
+//     await logAudit({
+//       logType: AuditLogType.INFO,
+//       userId: 'test-user-id',
+//       logActionType: AuditLogActionType.CREATE,
+//       message: 'Test audit log message',
+//       versionId: 'test-version-id',
+//       scope: AuditLogScope.EVENTS,
+//       ipAddress: req.ip,
+//     });
+//     res.json({ message: 'Audit log created successfully' });
+//   } catch (error) {
+//     res.status(500).json({ error: 'Failed to create audit log' });
+//   }
+// });
 
 connectDatabase.initialize()
       .then(() => {

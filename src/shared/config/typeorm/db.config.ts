@@ -20,7 +20,7 @@ const connectDatabase = new DataSource({
       database: dbConfigOptions.database,
       synchronize: dbConfigOptions.synchronize,
       logging: dbConfigOptions.logging,
-      entities: [],  //Note: Add your entities here
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],  //Note: Add your entities here
       migrations: [__dirname + '/../migrations/*{.ts,.js}'],
 });
 export default connectDatabase;
