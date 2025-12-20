@@ -1,4 +1,5 @@
 import { DataSource } from "typeorm";
+import { User } from "../../../modules/user/entities/user.entity";
 
 const dbConfigOptions = {
       host: process.env.DB_HOST || 'localhost',
@@ -20,7 +21,7 @@ const connectDatabase = new DataSource({
       database: dbConfigOptions.database,
       synchronize: dbConfigOptions.synchronize,
       logging: dbConfigOptions.logging,
-      entities: [],  //Note: Add your entities here
+      entities: [User],
       migrations: [__dirname + '/../migrations/*{.ts,.js}'],
 });
 export default connectDatabase;
