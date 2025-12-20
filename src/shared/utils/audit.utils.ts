@@ -4,7 +4,7 @@ import {
   AuditLogType,
   AuditLogActionType,
   AuditLogScope,
-} from '../constants/audit-log.enums';
+} from '../constants/audit-log.constants';
 import logger from './logger.utils'; 
 
 interface AuditLogParams {

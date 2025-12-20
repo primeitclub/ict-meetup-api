@@ -8,7 +8,7 @@ import {
   AuditLogType,
   AuditLogActionType,
   AuditLogScope,
-} from '../../constants/audit-log.enums';
+} from '../../constants/audit-log.constants';
 
 @Entity({ name: 'audit_logs' })
 export class AuditLog extends BaseEntity {

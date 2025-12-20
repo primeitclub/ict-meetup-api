@@ -3,8 +3,8 @@ import cors from 'cors';
 import express from 'express';
 import connectDatabase from './shared/config/typeorm/db.config';
 import { envConfig } from './shared/config/env';
-import { logAudit } from './shared/utils/audit.logger';
-import { AuditLogType, AuditLogActionType, AuditLogScope } from './shared/constants/audit-log.enums';
+import { logAudit } from './shared/utils/audit.utils';
+import { AuditLogType, AuditLogActionType, AuditLogScope } from './shared/constants/audit-log.constants';
 
 dotenv.config();
 
@@ -18,10 +18,10 @@ app.use(cors())
 //   try {
 //     await logAudit({
 //       logType: AuditLogType.INFO,
-//       userId: 'test-user-id',
+//       userId: '00000000-0000-0000-0000-000000000000',
 //       logActionType: AuditLogActionType.CREATE,
 //       message: 'Test audit log message',
-//       versionId: 'test-version-id',
+//       versionId: '00000000-0000-0000-0000-000000000000',
 //       scope: AuditLogScope.EVENTS,
 //       ipAddress: req.ip,
 //     });
