@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ValidationError } from "../utils/error.utils";
+import { ValidationError } from "../error.utils";
 
 // Note: _ is used to indicate that the parameter is intentionally not used in the function body to avoid linting errors
 export const errorHandler = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
