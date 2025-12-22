@@ -1,4 +1,5 @@
 import { DataSource } from "typeorm";
+import { AuditLog } from "../../../modules/auditlogs/typeorm/audit-log.entity";
 
 const dbConfigOptions = {
       host: process.env.DB_HOST || 'localhost',
@@ -20,7 +21,7 @@ const connectDatabase = new DataSource({
       database: dbConfigOptions.database,
       synchronize: dbConfigOptions.synchronize,
       logging: dbConfigOptions.logging,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],  //Note: Add your entities here
+      entities: [AuditLog],  //Note: Add your entities here
       migrations: [__dirname + '/../migrations/*{.ts,.js}'],
 });
 export default connectDatabase;

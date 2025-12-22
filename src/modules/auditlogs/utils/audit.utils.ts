@@ -1,5 +1,5 @@
 import connectDatabase from '../../../shared/config/typeorm/db.config';
-import { AuditLog } from '../config/typeorm/audit-log.entity';
+import { AuditLog } from '../typeorm/audit-log.entity';
 import {
   AuditLogType,
   AuditLogActionType,
@@ -44,7 +44,7 @@ export const logAudit = async (params: AuditLogParams): Promise<void> => {
   } catch (e: any) {
     logger.error('Failed to create audit log', {
       module: 'AuditLogger',
-      errorMessage: e?.message,
+      systemMessage: e?.message,
       stack: e?.stack,
       params,
     });
