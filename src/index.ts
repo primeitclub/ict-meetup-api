@@ -3,8 +3,8 @@ import cors from 'cors';
 import express from 'express';
 import connectDatabase from './shared/config/typeorm/db.config';
 import { envConfig } from './shared/config/env';
-import { logAudit } from './shared/utils/audit.utils';
-import { AuditLogType, AuditLogActionType, AuditLogScope } from './shared/constants/audit-log.constants';
+import { logAudit } from './modules/auditlogs/utils/audit.utils';
+import { AuditLogType, AuditLogActionType, AuditLogScope } from './modules/auditlogs/constants/audit-log.constants';
 
 dotenv.config();
 

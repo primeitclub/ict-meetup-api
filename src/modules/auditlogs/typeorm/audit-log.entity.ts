@@ -3,12 +3,12 @@ import {
   Entity,
   Index,
 } from 'typeorm';
-import { BaseEntity } from './base-entity';
+import { BaseEntity } from '../../../shared/config/typeorm/base-entity';
 import {
   AuditLogType,
   AuditLogActionType,
   AuditLogScope,
-} from '../../constants/audit-log.constants';
+} from '../constants/audit-log.constants';
 
 @Entity({ name: 'audit_logs' })
 export class AuditLog extends BaseEntity {
