@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { AuditLog } from "../../../modules/auditlogs/typeorm/audit-log.entity";
+import { AuditLog } from "../../../modules/auditlogs/entities/audit-log.entity";
 
 const dbConfigOptions = {
       host: process.env.DB_HOST || 'localhost',

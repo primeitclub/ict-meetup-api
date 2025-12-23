@@ -1,11 +1,11 @@
-import connectDatabase from '../../../shared/config/typeorm/db.config';
-import { AuditLog } from '../typeorm/audit-log.entity';
+import connectDatabase from '../config/typeorm/db.config';
+import { AuditLog } from '../../modules/auditlogs/entities/audit-log.entity';
 import {
   AuditLogType,
   AuditLogActionType,
   AuditLogScope,
 } from '../constants/audit-log.constants';
-import logger from '../../../shared/utils/logger.utils'; 
+import logger from './logger.utils';
 
 interface AuditLogParams {
   logType: AuditLogType;
