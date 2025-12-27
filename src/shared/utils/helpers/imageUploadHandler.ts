@@ -9,7 +9,7 @@ import {
   ALLOWED_IMAGE_MIME_TYPES,
   MAX_IMAGE_SIZE,
 } from "../../constants/upload.constants";
-import { handleMulterError } from "../../validators/multerErrorHandler";
+import { handleMulterError } from "./multerErrorHandler";
 
 /* Helpers */
 const ensureDirectoryExists = (dirPath: string) => {
@@ -18,7 +18,7 @@ const ensureDirectoryExists = (dirPath: string) => {
   }
 };
 
-/* Multer Storage */
+/* Storage */
 const storage = (version: string, moduleName: string) =>
   multer.diskStorage({
     destination: (_req, _file, cb) => {
@@ -38,90 +38,87 @@ const storage = (version: string, moduleName: string) =>
     },
   });
 
-/* File Validation */
+/* File validation */
 const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
-  console.log("File received:", {
-    originalname: file.originalname,
-    mimetype: file.mimetype,
-  });
-
   const extension = path.extname(file.originalname).slice(1).toLowerCase();
 
   if (!ALLOWED_IMAGE_EXTENSIONS.includes(extension)) {
-    return cb(
-      new Error("Invalid file extension. Allowed: png, jpg, jpeg, webp")
-    );
+    return cb(new Error("Invalid file extension"));
   }
 
   if (!ALLOWED_IMAGE_MIME_TYPES.includes(file.mimetype)) {
-    return cb(new Error("Invalid MIME type. Only image files are allowed."));
+    return cb(new Error("Invalid MIME type"));
   }
 
   cb(null, true);
 };
 
+type UploadOptions =
+  | { fieldName: string; multiple?: false }
+  | { fieldName: string; multiple: true; maxCount: number };
+
 export const imageUploadHandler =
-  (version: string, moduleName: string) =>
+  (version: string, moduleName: string, options: UploadOptions) =>
   (req: Request, res: Response, next: NextFunction) => {
-    const upload = multer({
-      storage: storage(version, moduleName),
-      fileFilter,
-      limits: { fileSize: MAX_IMAGE_SIZE },
-    }).single("image");
+    const upload = options.multiple
+      ? multer({
+          storage: storage(version, moduleName),
+          fileFilter,
+          limits: { fileSize: MAX_IMAGE_SIZE },
+        }).array(options.fieldName, options.maxCount)
+      : multer({
+          storage: storage(version, moduleName),
+          fileFilter,
+          limits: { fileSize: MAX_IMAGE_SIZE },
+        }).single(options.fieldName);
 
     upload(req, res, async (err) => {
       if (err) {
         return next(handleMulterError(err));
       }
 
-      if (!req.file) {
-        return next(new Error("Image file is required"));
+      const files: Express.Multer.File[] = options.multiple
+        ? ((req.files as Express.Multer.File[]) || [])
+        : req.file
+        ? [req.file]
+        : [];
+
+      if (files.length === 0) {
+        return next(new Error(`${options.fieldName} file(s) are required`));
       }
 
-      const localFilePath = req.file.path;
-      const localUrl = `/public/assets/${version}/${moduleName}/${req.file.filename}`;
-
       try {
-        console.log("[UPLOAD] Local file stored successfully:", localFilePath);
+        const uploadedImages = [];
 
-        const cloudFolder = `assets/${version}/${moduleName}`;
+        for (const file of files) {
+          const cloudResult = await cloudinary.uploader.upload(file.path, {
+            folder: `assets/${version}/${moduleName}`,
+            resource_type: "image",
+          });
 
-        const cloudResult = await cloudinary.uploader.upload(localFilePath, {
-          folder: cloudFolder,
-          resource_type: "image",
-        });
+          uploadedImages.push({
+            localPath: file.path,
+            localUrl: `/public/assets/${version}/${moduleName}/${file.filename}`,
+            cloudUrl: cloudResult.secure_url,
+            publicId: cloudResult.public_id,
+          });
+        }
 
-        console.log("[UPLOAD] Cloudinary backup successful:", cloudResult.public_id);
-
-        req.body.image = {
-          localPath: localFilePath,
-          localUrl: localUrl,
-          cloudUrl: cloudResult.secure_url,
-          publicId: cloudResult.public_id,
-        };
+        req.body.uploadedImages = options.multiple
+          ? uploadedImages
+          : uploadedImages[0];
 
         next();
       } catch (error) {
-        console.error("[UPLOAD] Unexpected error during upload process:", error);
-
-       
-        try {
-          if (fs.existsSync(localFilePath)) {
-            fs.unlinkSync(localFilePath);
-            console.log("[CLEANUP] Locally stored file deleted due to unexpected error:", localFilePath);
-          }
-        } catch (cleanupError) {
-          console.error("[CLEANUP] Failed to delete local file:", cleanupError);
+        for (const file of files) {
+          if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
         }
 
-        req.body.image = {
-          localPath: null,
-          localUrl: null,
-          cloudUrl: null,
-          publicId: null,
-        };
-
-        return next(error instanceof Error ? error : new Error("Unexpected error occurred during upload"));
+        next(
+          error instanceof Error
+            ? error
+            : new Error("Unexpected error during image upload")
+        );
       }
     });
   };

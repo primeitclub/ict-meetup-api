@@ -36,16 +36,16 @@ app.use(cors())
 // app.use("/public", express.static("public"));
 // app.post(
 //   "/users/avatar",
-//   imageUploadHandler("v7", "users"),
+//   imageUploadHandler("v7", "users", { fieldName: "image" }),
 //   uploadUserAvatar
 // );
 
 
-app.use((err: Error, _req: any, res: any, _next: any) => {
-  res.status(400).json({
-    message: err.message,
-  });
-});
+// app.use((err: Error, _req: any, res: any, _next: any) => {
+//   res.status(400).json({
+//     message: err.message,
+//   });
+// });
 
 connectDatabase.initialize()
   .then(() => {

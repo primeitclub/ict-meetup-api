@@ -8,6 +8,9 @@ const envSchema = z.object({
       db_password: z.string().default('postgres'),
       db_database: z.string().default('ict-meetup'),
       node_env: z.enum(['dev', 'prod']).default('dev'),
+      cloudinary_cloud_name: z.string().optional(),
+      cloudinary_api_key: z.string().optional(),
+      cloudinary_api_secret: z.string().optional(),
 });
 export const envConfig = envSchema.parse(process.env);
 
