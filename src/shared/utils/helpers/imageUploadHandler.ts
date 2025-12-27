@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
-import cloudinary from "../../config/typeorm/cloudinary.config";
+import cloudinary from "../../config/cloudinary.config";
 import {
   ALLOWED_IMAGE_EXTENSIONS,
   ALLOWED_IMAGE_MIME_TYPES,
@@ -62,66 +62,66 @@ const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
 
 export const imageUploadHandler =
   (version: string, moduleName: string) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    const upload = multer({
-      storage: storage(version, moduleName),
-      fileFilter,
-      limits: { fileSize: MAX_IMAGE_SIZE },
-    }).single("image");
+    (req: Request, res: Response, next: NextFunction) => {
+      const upload = multer({
+        storage: storage(version, moduleName),
+        fileFilter,
+        limits: { fileSize: MAX_IMAGE_SIZE },
+      }).single("image");
 
-    upload(req, res, async (err) => {
-      if (err) {
-        return next(handleMulterError(err));
-      }
-
-      if (!req.file) {
-        return next(new Error("Image file is required"));
-      }
-
-      const localFilePath = req.file.path;
-      const localUrl = `/public/assets/${version}/${moduleName}/${req.file.filename}`;
-
-      try {
-        console.log("[UPLOAD] Local file stored successfully:", localFilePath);
-
-        const cloudFolder = `assets/${version}/${moduleName}`;
-
-        const cloudResult = await cloudinary.uploader.upload(localFilePath, {
-          folder: cloudFolder,
-          resource_type: "image",
-        });
-
-        console.log("[UPLOAD] Cloudinary backup successful:", cloudResult.public_id);
-
-        req.body.image = {
-          localPath: localFilePath,
-          localUrl: localUrl,
-          cloudUrl: cloudResult.secure_url,
-          publicId: cloudResult.public_id,
-        };
-
-        next();
-      } catch (error) {
-        console.error("[UPLOAD] Unexpected error during upload process:", error);
-
-       
-        try {
-          if (fs.existsSync(localFilePath)) {
-            fs.unlinkSync(localFilePath);
-            console.log("[CLEANUP] Locally stored file deleted due to unexpected error:", localFilePath);
-          }
-        } catch (cleanupError) {
-          console.error("[CLEANUP] Failed to delete local file:", cleanupError);
+      upload(req, res, async (err) => {
+        if (err) {
+          return next(handleMulterError(err));
         }
 
-        req.body.image = {
-          localPath: null,
-          localUrl: null,
-          cloudUrl: null,
-          publicId: null,
-        };
+        if (!req.file) {
+          return next(new Error("Image file is required"));
+        }
 
-        return next(error instanceof Error ? error : new Error("Unexpected error occurred during upload"));
-      }
-    });
-  };
+        const localFilePath = req.file.path;
+        const localUrl = `/public/assets/${version}/${moduleName}/${req.file.filename}`;
+
+        try {
+          console.log("[UPLOAD] Local file stored successfully:", localFilePath);
+
+          const cloudFolder = `assets/${version}/${moduleName}`;
+
+          const cloudResult = await cloudinary.uploader.upload(localFilePath, {
+            folder: cloudFolder,
+            resource_type: "image",
+          });
+
+          console.log("[UPLOAD] Cloudinary backup successful:", cloudResult.public_id);
+
+          req.body.image = {
+            localPath: localFilePath,
+            localUrl: localUrl,
+            cloudUrl: cloudResult.secure_url,
+            publicId: cloudResult.public_id,
+          };
+
+          next();
+        } catch (error) {
+          console.error("[UPLOAD] Unexpected error during upload process:", error);
+
+
+          try {
+            if (fs.existsSync(localFilePath)) {
+              fs.unlinkSync(localFilePath);
+              console.log("[CLEANUP] Locally stored file deleted due to unexpected error:", localFilePath);
+            }
+          } catch (cleanupError) {
+            console.error("[CLEANUP] Failed to delete local file:", cleanupError);
+          }
+
+          req.body.image = {
+            localPath: null,
+            localUrl: null,
+            cloudUrl: null,
+            publicId: null,
+          };
+
+          return next(error instanceof Error ? error : new Error("Unexpected error occurred during upload"));
+        }
+      });
+    };
