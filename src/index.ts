@@ -6,7 +6,8 @@ import { envConfig } from './shared/config/env';
 import { logAudit } from './shared/utils/audit.utils';
 import { AuditLogType, AuditLogActionType, AuditLogScope } from './shared/constants/audit-log.constants';
 import swaggerSpec from './shared/utils/swagger.utils';
-import swaggerUi from 'swagger-ui-express';import { imageUploadHandler } from './shared/utils/helpers/imageUploadHandler';
+import swaggerUi from 'swagger-ui-express';
+import { imageUploadHandler } from './shared/utils/helpers/imageUploadHandler';
 import { uploadUserAvatar } from './modules/user/controllers/user.controller';
 
 dotenv.config();

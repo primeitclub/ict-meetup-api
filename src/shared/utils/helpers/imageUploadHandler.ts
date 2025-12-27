@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
-import cloudinary from "../../config/typeorm/cloudinary.config";
+import cloudinary from "../../config/cloudinary.config";
 import {
   ALLOWED_IMAGE_EXTENSIONS,
   ALLOWED_IMAGE_MIME_TYPES,
@@ -72,10 +72,10 @@ export const imageUploadHandler =
           limits: { fileSize: MAX_IMAGE_SIZE },
         }).single(options.fieldName);
 
-    upload(req, res, async (err) => {
-      if (err) {
-        return next(handleMulterError(err));
-      }
+      upload(req, res, async (err) => {
+        if (err) {
+          return next(handleMulterError(err));
+        }
 
       const files: Express.Multer.File[] = options.multiple
         ? ((req.files as Express.Multer.File[]) || [])
