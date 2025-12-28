@@ -1,26 +1,41 @@
-import dotenv from 'dotenv';
-import cors from 'cors';
-import express from 'express';
-import connectDatabase from './shared/config/typeorm/db.config';
-import { envConfig } from './shared/config/env';
-import seedRouter from './modules/seed/seed.routes';
+import "reflect-metadata";
+import dotenv from "dotenv";
+import cors from "cors";
+import express from "express";
+import connectDatabase from "./shared/config/typeorm/db.config";
+import { envConfig } from "./shared/config/env";
+import seedRouter from "./modules/seed/seed.routes";
+import versionRouter from "./modules/event/routes/flagship-event-version.routes";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./shared/utils/swagger.utils";
+import { errorHandler } from "./shared/middlewares/error.middleware";
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
-app.use(cors())
-app.use('/api/seeds', seedRouter);
+app.use(
+  cors({
+    allowedHeaders: "*",
+  })
+);
 
-connectDatabase.initialize()
-      .then(() => {
-            console.log('Database connected successfully.');
-            const PORT = envConfig.port || 3000;
-            app.listen(PORT, () => {
-                  console.log(`Server is running on port ${PORT}`);
-            }); ``
-      })
-      .catch((error) => {
-            console.error('Error connecting to the database', error);
-      });
+app.use("/api/seeds", seedRouter);
+app.use("/api/event/versions", versionRouter);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+connectDatabase
+  .initialize()
+  .then(() => {
+    console.log("Database connected successfully.");
+    const PORT = envConfig.port || 3000;
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Error connecting to the database", error);
+  });
+
+app.use(errorHandler);

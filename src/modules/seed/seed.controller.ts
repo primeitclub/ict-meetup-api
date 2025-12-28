@@ -1,34 +1,38 @@
-import { Request, Response } from 'express';
-import { SeedService } from './seed.service';
+import { NextFunction, Request, Response } from "express";
+import { SeedService } from "./seed.service";
+import { responseHandler } from "../../shared/middlewares/response.middleware";
 
 export class SeedController {
-    private seedService: SeedService;
+  private seedService: SeedService;
 
-    constructor() {
-        this.seedService = new SeedService();
-    }
+  constructor() {
+    this.seedService = new SeedService();
+  }
 
-    seedStaticUsers = async (req: Request, res: Response) => {
-        try {
-            const result = await this.seedService.seedStaticUsers();
-            res.status(200).json({
-                message: 'Static user seeding process completed',
-                details: result
-            });
-        } catch (error) {
-            console.error('Seeding error:', error);
-            res.status(500).json({ error: 'Internal server error during seeding' });
-        }
+  seedStaticUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.seedService.seedStaticUsers();
+      return responseHandler(req, res, next)(
+        "Static user seeding process completed",
+        result,
+        200
+      );
+    } catch (error) {
+      next(error);
     }
+  };
 
-    seedCustomUser = async (req: Request, res: Response) => {
-        try {
-            const start = performance.now();
-            const userData = req.body;
-            const result = await this.seedService.seedUser(userData);
-            res.status(201).json(result);
-        } catch (error) {
-            res.status(400).json({ error: (error as any).message });
-        }
+  seedCustomUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userData = req.body;
+      const result = await this.seedService.seedUser(userData);
+      return responseHandler(req, res, next)(
+        "User created successfully",
+        result,
+        201
+      );
+    } catch (error) {
+      next(error);
     }
+  };
 }

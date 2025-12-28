@@ -1,0 +1,137 @@
+import { Router } from "express";
+import { FlagshipEventVersionController } from "../controllers/event.controller";
+
+const versionRouter = Router();
+const controller = new FlagshipEventVersionController();
+
+/**
+ * @swagger
+ * tags:
+ *   name: FlagshipEventVersions
+ *   description: API for managing flagship event versions
+ */
+
+/**
+ * @swagger
+ * /api/event/versions:
+ *   post:
+ *     summary: Create a new flagship event version
+ *     tags: [FlagshipEventVersions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [version_name, slug, version_number, start_date, end_date]
+ *             properties:
+ *               version_name: { type: string }
+ *               slug: { type: string }
+ *               version_number: { type: number }
+ *               start_date: { type: string, format: date }
+ *               end_date: { type: string, format: date }
+ *               status: { type: string, enum: [draft, active, archived] }
+ *     responses:
+ *       201:
+ *         description: Created
+ */
+versionRouter.post("/", controller.create);
+
+/**
+ * @swagger
+ * /api/event/versions:
+ *   get:
+ *     summary: Get all flagship event versions
+ *     tags: [FlagshipEventVersions]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+versionRouter.get("/", controller.getAll);
+
+/**
+ * @swagger
+ * /api/event/versions/current:
+ *   get:
+ *     summary: Get the current active version
+ *     tags: [FlagshipEventVersions]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+versionRouter.get("/current", controller.getCurrent);
+
+/**
+ * @swagger
+ * /api/event/versions/{id}:
+ *   get:
+ *     summary: Get version by ID
+ *     tags: [FlagshipEventVersions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, format: uuid }
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+versionRouter.get("/:id", controller.getById);
+
+/**
+ * @swagger
+ * /api/event/versions/slug/{slug}:
+ *   get:
+ *     summary: Get version by slug
+ *     tags: [FlagshipEventVersions]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+versionRouter.get("/slug/:slug", controller.getBySlug);
+
+/**
+ * @swagger
+ * /api/event/versions/{id}:
+ *   patch:
+ *     summary: Update a version
+ *     tags: [FlagshipEventVersions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, format: uuid }
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+versionRouter.patch("/:id", controller.update);
+
+/**
+ * @swagger
+ * /api/event/versions/{id}:
+ *   delete:
+ *     summary: Delete a version
+ *     tags: [FlagshipEventVersions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, format: uuid }
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+versionRouter.delete("/:id", controller.delete);
+
+export default versionRouter;
