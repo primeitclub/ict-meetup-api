@@ -9,7 +9,7 @@ import versionRouter from "./modules/event/routes/flagship-event-version.routes"
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./shared/utils/swagger.utils";
 import { errorHandler } from "./shared/middlewares/error.middleware";
-
+// ssd
 dotenv.config();
 
 const app = express();
