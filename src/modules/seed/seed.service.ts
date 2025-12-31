@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { User } from '../user/entities/user.entity';
 import connectDatabase from '../../shared/config/typeorm/db.config';
 import { staticUsers } from '../../seeds/static/users.seed';
+import { AppError } from '../../shared/utils/error.utils';
 
 export class SeedService {
     private userRepository: Repository<User>;
@@ -15,7 +16,7 @@ export class SeedService {
         const { email, password, role, name } = userData;
 
         if (!email || !password || !role || !name) {
-            throw new Error('Missing required user fields: name, email, role, password');
+            throw new AppError('Missing required user fields: name, email, role, password', 400);
         }
 
         const existingUser = await this.userRepository.findOne({ where: { email } });

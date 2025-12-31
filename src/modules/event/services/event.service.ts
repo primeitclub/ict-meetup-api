@@ -1,6 +1,5 @@
 import { Repository } from "typeorm";
 import connectDatabase from "../../../shared/config/typeorm/db.config";
-import { AuditLog } from "../entities/audit-log.entity";
 import { AppError } from "../../../shared/utils/error.utils";
 import logger from "../../../shared/utils/logger.utils";
 import {
@@ -10,12 +9,12 @@ import {
 
 export class FlagshipEventVersionService {
   private versionRepository: Repository<FlagshipEventVersion>;
-  private auditLogRepository: Repository<AuditLog>;
+  // private auditLogRepository: Repository<AuditLog>;
 
   constructor() {
     this.versionRepository =
       connectDatabase.getRepository(FlagshipEventVersion);
-    this.auditLogRepository = connectDatabase.getRepository(AuditLog);
+    // this.auditLogRepository = connectDatabase.getRepository(AuditLog);
   }
 
   private async createAuditLog(
@@ -26,15 +25,13 @@ export class FlagshipEventVersionService {
     changedBy: string,
     changes: any
   ) {
-    const auditLog = this.auditLogRepository.create({
-      version_id: versionId,
-      table_name: tableName,
-      record_id: recordId,
-      action,
-      changed_by: changedBy,
+
+    logger.info(`Audit Log: ${action} on ${tableName} by ${changedBy}`, {
+      module: "FlagshipEventVersionService",
+      versionId,
+      recordId,
       changes,
     });
-    await this.auditLogRepository.save(auditLog);
   }
 
   async create(data: Partial<FlagshipEventVersion>, userId: string) {
@@ -152,7 +149,7 @@ export class FlagshipEventVersionService {
     // archived -> active (only if no active exists)
 
     if (newStatus === EventVersionStatus.ACTIVE) {
-      // Archerve existing active version
+      // Archive existing active version
       const currentActive = await this.findCurrent();
       if (currentActive && currentActive.id !== version.id) {
         currentActive.status = EventVersionStatus.ARCHIVED;
