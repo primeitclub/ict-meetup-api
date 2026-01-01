@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError, ValidationError } from "../error.utils";
+import { AppError, ValidationError } from "../../utils/error.utils";
 import { z } from "zod";
 
 // Note: _ is used to indicate that the parameter is intentionally not used in the function body to avoid linting errors
