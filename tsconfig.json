@@ -1,8 +1,8 @@
 {
       "compilerOptions": {
         "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "node",
+        "module": "NodeNext", // esnext require the type to be module in package.json. so we use NodeNext for the module type for compatibility
+        "moduleResolution": "NodeNext",
         "lib": ["esnext"],
         "outDir": "./dist",
         "rootDir": "./src",
