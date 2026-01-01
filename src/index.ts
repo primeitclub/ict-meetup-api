@@ -5,11 +5,9 @@ import express, { Request, Response } from "express";
 import connectDatabase from "./shared/config/typeorm/db.config";
 import { envConfig } from "./shared/config/env";
 import seedRouter from "./modules/seed/seed.routes";
-import versionRouter from "./modules/event/routes/flagship-event-version.routes";
+import versionRouter from "./modules/flagship-event/routes/flagship-event.routes";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./shared/utils/swagger.utils";
-// ssdimport { logAudit } from './shared/utils/audit.utils';
-import { AuditLogType, AuditLogActionType, AuditLogScope } from './shared/constants/audit-log.constants';
 import { errorHandler } from "./shared/utils/helpers/error.helper";
 dotenv.config();
 

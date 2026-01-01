@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EventVersionStatus } from "../entities/event.entity";
+import { EventVersionStatus } from "../entities/flagship-event.entity";
 
 export const flagshipEventVersionSchema = z
   .object({
@@ -10,7 +10,7 @@ export const flagshipEventVersionSchema = z
       .max(50)
       .regex(/^[a-z0-9-]+$/, "Slug must be alphanumeric with hyphens"),
     version_number: z.number().min(0).max(99),
-    status: z.nativeEnum(EventVersionStatus).default(EventVersionStatus.DRAFT),
+    status: z.enum(EventVersionStatus).default(EventVersionStatus.DRAFT),
     start_date: z
       .string()
       .refine((val) => !isNaN(Date.parse(val)), {

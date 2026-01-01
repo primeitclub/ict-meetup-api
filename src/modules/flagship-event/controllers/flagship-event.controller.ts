@@ -2,10 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import {
   flagshipEventVersionSchema,
   updateFlagshipEventVersionSchema,
-} from "../validators/flagship-event-version.validator";
-import { responseHandler } from "../../../shared/middlewares/response.middleware";
+} from "../validators/flagship-event.validator";
 import { AppError } from "../../../shared/utils/error.utils";
-import { FlagshipEventVersionService } from "../services/event.service";
+import { FlagshipEventVersionService } from "../services/flagship-event.service";
+import { responseHandler } from "../../../shared/utils/helpers/response.helper";
+import { validateRequestBody } from "../../../shared/validators/request.validator";
 
 export class FlagshipEventVersionController {
   private service: FlagshipEventVersionService;
@@ -16,9 +17,9 @@ export class FlagshipEventVersionController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const validatedData = flagshipEventVersionSchema.parse(req.body);
+      validateRequestBody(flagshipEventVersionSchema)(req, res, next);
       const userId = (req as any).user?.id || "system"; // Default to system if auth handled elsewhere
-      const result = await this.service.create(validatedData, userId);
+      const result = await this.service.create(req.body, userId);
       return responseHandler(req, res, next)(
         "Flagship event version created successfully",
         result,
@@ -86,11 +87,11 @@ export class FlagshipEventVersionController {
 
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const validatedData = updateFlagshipEventVersionSchema.parse(req.body);
+      validateRequestBody(updateFlagshipEventVersionSchema)(req, res, next);
       const userId = (req as any).user?.id || "system";
       const result = await this.service.update(
         req.params.id,
-        validatedData,
+        req.body,
         userId
       );
       return responseHandler(req, res, next)(

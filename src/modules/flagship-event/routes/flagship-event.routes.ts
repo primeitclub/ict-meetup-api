@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { FlagshipEventVersionController } from "../controllers/event.controller";
+import { FlagshipEventVersionController } from "../controllers/flagship-event.controller";
 
 const versionRouter = Router();
 const controller = new FlagshipEventVersionController();

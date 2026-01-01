@@ -2,7 +2,8 @@ import { DataSource } from "typeorm";
 import { User } from "../../../modules/user/entities/user.entity";
 
 import dotenv from "dotenv";
-import { FlagshipEventVersion } from "../../../modules/event/entities/event.entity";
+import { FlagshipEventVersion } from "../../../modules/flagship-event/entities/flagship-event.entity";
+import { AuditLog } from "../../../modules/auditlogs/entities/audit-log.entity";
 
 dotenv.config();
 
@@ -25,7 +26,7 @@ const connectDatabase = new DataSource({
   database: dbConfigOptions.database,
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
-  entities: [],  //Note: Add your entities here
+  entities: [User, FlagshipEventVersion, AuditLog],  //Note: Add your entities here
   migrations: [__dirname + '/../migrations/*{.ts,.js}'],
 });
 export default connectDatabase;

@@ -5,7 +5,7 @@ import logger from "../../../shared/utils/logger.utils";
 import {
   EventVersionStatus,
   FlagshipEventVersion,
-} from "../entities/event.entity";
+} from "../entities/flagship-event.entity";
 
 export class FlagshipEventVersionService {
   private versionRepository: Repository<FlagshipEventVersion>;

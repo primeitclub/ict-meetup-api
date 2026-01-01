@@ -4,7 +4,8 @@ import { ValidationError } from "../utils/error.utils";
 export const validateRequestBody = (schema: z.ZodSchema) => {
       return (req: Request, _: Response, next: NextFunction) => {
             try {
-                  schema.parse(req.body);
+                  const validatedData = schema.parse(req.body);
+                  req.body = validatedData;
                   next();
             } catch (error) {
                   if (error instanceof z.ZodError) {
