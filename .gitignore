@@ -27,3 +27,9 @@ uploads/
 public/uploads/
 storage/
 media/
+
+# ==================== TypeORM Migrations ====================
+src/shared/config/typeorm/migrations/
+
+# ==================== Logs ====================
+logs/
