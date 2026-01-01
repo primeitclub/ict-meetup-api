@@ -17,7 +17,7 @@ const dbConfigOptions = {
 };
 
 const connectDatabase = new DataSource({
-  type: "postgres",
+  type: 'postgres',
   host: dbConfigOptions.host,
   port: dbConfigOptions.port,
   username: dbConfigOptions.username,
@@ -25,7 +25,7 @@ const connectDatabase = new DataSource({
   database: dbConfigOptions.database,
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
-  entities: [User, FlagshipEventVersion],
-  migrations: [__dirname + "/../migrations/*{.ts,.js}"],
+  entities: [],  //Note: Add your entities here
+  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
 });
 export default connectDatabase;

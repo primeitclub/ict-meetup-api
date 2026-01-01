@@ -16,8 +16,9 @@
         "experimentalDecorators": true,
         "allowSyntheticDefaultImports": true,
         "strictPropertyInitialization": false,
-        "allowImportingTsExtensions": true,
-        "noEmit": true
+        // to get the output in the dist folder during development,set these to false
+        "allowImportingTsExtensions":false,  
+        "noEmit": false
       },
       "include": [
         "src/**/*.ts"
