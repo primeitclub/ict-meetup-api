@@ -21,7 +21,7 @@ app.use(
 );
 
 app.use("/api/seeds", seedRouter);
-app.use("/api/event/versions", versionRouter);
+app.use("/api/flagship-event/versions", versionRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(errorHandler);
 connectDatabase.initialize()

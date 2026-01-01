@@ -8,7 +8,6 @@ export class SeedController {
   constructor() {
     this.seedService = new SeedService();
   }
-
   seedStaticUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.seedService.seedStaticUsers();

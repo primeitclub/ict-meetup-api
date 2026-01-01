@@ -27,6 +27,6 @@ const connectDatabase = new DataSource({
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
   entities: [User, FlagshipEventVersion, AuditLog],  //Note: Add your entities here
-  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+  migrations: [__dirname + '/../typeorm/migrations/*{.ts,.js}'],
 });
 export default connectDatabase;

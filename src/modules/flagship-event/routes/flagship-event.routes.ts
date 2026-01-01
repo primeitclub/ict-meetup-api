@@ -6,14 +6,7 @@ const controller = new FlagshipEventVersionController();
 
 /**
  * @swagger
- * tags:
- *   name: FlagshipEventVersions
- *   description: API for managing flagship event versions
- */
-
-/**
- * @swagger
- * /api/event/versions:
+ * /api/flagship-event/versions:
  *   post:
  *     summary: Create a new flagship event version
  *     tags: [FlagshipEventVersions]
@@ -39,7 +32,7 @@ versionRouter.post("/", controller.create);
 
 /**
  * @swagger
- * /api/event/versions:
+ * /api/flagship-event/versions:
  *   get:
  *     summary: Get all flagship event versions
  *     tags: [FlagshipEventVersions]
@@ -51,7 +44,7 @@ versionRouter.get("/", controller.getAll);
 
 /**
  * @swagger
- * /api/event/versions/current:
+ * /api/flagship-event/versions/current:
  *   get:
  *     summary: Get the current active version
  *     tags: [FlagshipEventVersions]
@@ -63,7 +56,7 @@ versionRouter.get("/current", controller.getCurrent);
 
 /**
  * @swagger
- * /api/event/versions/{id}:
+ * /api/flagship-event/versions/{id}:
  *   get:
  *     summary: Get version by ID
  *     tags: [FlagshipEventVersions]
@@ -80,7 +73,7 @@ versionRouter.get("/:id", controller.getById);
 
 /**
  * @swagger
- * /api/event/versions/slug/{slug}:
+ * /api/flagship-event/versions/slug/{slug}:
  *   get:
  *     summary: Get version by slug
  *     tags: [FlagshipEventVersions]
@@ -97,7 +90,7 @@ versionRouter.get("/slug/:slug", controller.getBySlug);
 
 /**
  * @swagger
- * /api/event/versions/{id}:
+ * /api/flagship-event/versions/{id}:
  *   patch:
  *     summary: Update a version
  *     tags: [FlagshipEventVersions]
@@ -119,7 +112,7 @@ versionRouter.patch("/:id", controller.update);
 
 /**
  * @swagger
- * /api/event/versions/{id}:
+ * /api/flagship-event/versions/{id}:
  *   delete:
  *     summary: Delete a version
  *     tags: [FlagshipEventVersions]
