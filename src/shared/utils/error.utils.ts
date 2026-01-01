@@ -5,7 +5,10 @@ export class AppError extends Error {
       constructor(message: string, statusCode: number) {
             super(message);
             this.statusCode = statusCode;
-            logger.error(message, { statusCode }, { module: 'AppError' });
+            // Only log if this is AppError directly, not a subclass
+            if (this.constructor === AppError) {
+                  logger.error(message, { module: 'AppError', systemMessage: "Application Error", meta: { statusCode: this.statusCode } });
+            }
       }
 }
 export class ValidationError extends AppError {
@@ -13,6 +16,6 @@ export class ValidationError extends AppError {
       constructor(message: string, details: z.ZodError[]) {
             super(message, 400);
             this.details = details;
-            logger.error(message, { details }, { module: 'ValidationError' });
+            logger.error(message, { module: 'ValidationError', systemMessage: "Validation Error", meta: { details: this.details } });
       }
 }

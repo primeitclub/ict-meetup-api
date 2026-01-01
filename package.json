@@ -7,13 +7,17 @@
     "dev": "tsx watch src",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typeorm": "tsx ./node_modules/typeorm/cli.js",
+    "typeorm:run-migrations": "tsx ./node_modules/typeorm/cli.js migration:run -d ./src/shared/config/typeorm/db.config.ts",
+    "typeorm:generate-migration": "tsx ./node_modules/typeorm/cli.js migration:generate ./src/shared/config/typeorm/migrations/$npm_config_name -d ./src/shared/config/typeorm/db.config.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
@@ -26,6 +30,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/node": "^24.10.1",

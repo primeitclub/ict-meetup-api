@@ -1,31 +1,39 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, Index } from "typeorm";
 import { BaseEntity } from "../../../shared/config/typeorm/base-entity";
 
 @Entity({
-      name: 'user',
+  name: "users",
 })
 export class User extends BaseEntity {
-      @Column({
-            length: 255,
-            unique: true,
-            nullable: false,
-      })
-      email: string;
+  @Column({
+    type: "varchar",
+    length: 255,
+    nullable: false,
+  })
+  name: string;
 
-      @Column({
-            length: 200,
-            nullable: false,
-            select: false,
-      })
-      password: string;
+  @Column({
+    type: "varchar",
+    length: 255,
+    unique: true,
+    nullable: false,
+  })
+  @Index()
+  email: string;
 
-      @Column({
-            length: 100,
-            nullable: false,
-      })
-      name: string;
+  @Column({
+    type: "varchar",
+    length: 255,
+    nullable: false,
+    select: false,
+  })
+  password: string;
 
-      @Column({ enum: ['superadmin', 'admin'], default: 'superadmin' })
-      role: 'superadmin' | 'admin';
-
+  @Column({
+    type: "varchar",
+    length: 50,
+    nullable: false,
+    default: "user",
+  })
+  role: string;
 }

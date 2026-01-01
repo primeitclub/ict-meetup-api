@@ -10,6 +10,14 @@ const options: swaggerJSDoc.Options = {
             },
       },
       tags: [
+            {
+                  name: "Seed",
+                  description: "Seed endpoints",
+            },
+            {
+                  name: "FlagshipEventVersions",
+                  description: "API for managing flagship event versions",
+            },
       ],
       apis: [process.cwd() + "/src/modules/**/*.routes.ts"],
 };

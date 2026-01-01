@@ -4,11 +4,13 @@ import { ValidationError } from "../utils/error.utils";
 export const validateRequestBody = (schema: z.ZodSchema) => {
       return (req: Request, _: Response, next: NextFunction) => {
             try {
-                  schema.parse(req.body);
+                  const validatedData = schema.parse(req.body);
+                  req.body = validatedData;
                   next();
             } catch (error) {
+                  console.log(error);
                   if (error instanceof z.ZodError) {
-                        throw new ValidationError('Invalid request body', (error as any).errors);
+                        throw new ValidationError('Invalid request body', JSON.parse(JSON.stringify(error.issues)));
                   }
                   next(error);
             }
@@ -22,7 +24,7 @@ export const validateRequestParams = (schema: z.ZodSchema) => {
                   next();
             } catch (error) {
                   if (error instanceof z.ZodError) {
-                        throw new ValidationError('Invalid request params', (error as any).errors);
+                        throw new ValidationError('Invalid request params', JSON.parse(JSON.stringify(error.issues)));
                   }
                   next(error);
             }
@@ -36,7 +38,7 @@ export const validateRequestQuery = (schema: z.ZodSchema) => {
                   next();
             } catch (error) {
                   if (error instanceof z.ZodError) {
-                        throw new ValidationError('Invalid request query', (error as any).errors);
+                        throw new ValidationError('Invalid request query', JSON.parse(JSON.stringify(error.issues)));
                   }
                   next(error);
             }
