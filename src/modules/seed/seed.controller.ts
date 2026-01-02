@@ -11,7 +11,7 @@ export class SeedController {
   seedStaticUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.seedService.seedStaticUsers();
-      responseHandler(req, res, next)(
+      responseHandler(res)(
         "Static user seeding process completed",
         result,
         200
@@ -25,7 +25,7 @@ export class SeedController {
     try {
       const userData = req.body;
       const result = await this.seedService.seedUser(userData);
-      responseHandler(req, res, next)(
+      responseHandler(res)(
         "User created successfully",
         result,
         201

@@ -1,12 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import {
-  flagshipEventVersionSchema,
-  updateFlagshipEventVersionSchema,
-} from "../validators/flagship-event.validator";
 import { AppError } from "../../../shared/utils/error.utils";
 import { FlagshipEventVersionService } from "../services/flagship-event.service";
 import { responseHandler } from "../../../shared/utils/helpers/response.helper";
-import { validateRequestBody } from "../../../shared/validators/request.validator";
 
 export class FlagshipEventVersionController {
   private service: FlagshipEventVersionService;
@@ -17,10 +12,9 @@ export class FlagshipEventVersionController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      validateRequestBody(flagshipEventVersionSchema)(req, res, next);
       const userId = (req as any).user?.id || "system"; // Default to system if auth handled elsewhere
       const result = await this.service.create(req.body, userId);
-      return responseHandler(req, res, next)(
+      return responseHandler(res)(
         "Flagship event version created successfully",
         result,
         201
@@ -33,7 +27,7 @@ export class FlagshipEventVersionController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.service.findAll();
-      return responseHandler(req, res, next)(
+      return responseHandler(res)(
         "Fetch all versions successfully",
         result,
         200
@@ -46,7 +40,7 @@ export class FlagshipEventVersionController {
   getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.service.findById(req.params.id);
-      return responseHandler(req, res, next)(
+      return responseHandler(res)(
         "Fetch version by id successfully",
         result,
         200
@@ -59,7 +53,7 @@ export class FlagshipEventVersionController {
   getBySlug = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.service.findBySlug(req.params.slug);
-      return responseHandler(req, res, next)(
+      return responseHandler(res)(
         "Fetch version by slug successfully",
         result,
         200
@@ -75,7 +69,7 @@ export class FlagshipEventVersionController {
       if (!result) {
         throw new AppError("No active flagship event version found", 404);
       }
-      return responseHandler(req, res, next)(
+      return responseHandler(res)(
         "Fetch current active version successfully",
         result,
         200
@@ -87,14 +81,13 @@ export class FlagshipEventVersionController {
 
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      validateRequestBody(updateFlagshipEventVersionSchema)(req, res, next);
       const userId = (req as any).user?.id || "system";
       const result = await this.service.update(
         req.params.id,
         req.body,
         userId
       );
-      return responseHandler(req, res, next)(
+      return responseHandler(res)(
         "Flagship event version updated successfully",
         result,
         200
@@ -108,7 +101,7 @@ export class FlagshipEventVersionController {
     try {
       const userId = (req as any).user?.id || "system";
       const result = await this.service.delete(req.params.id, userId);
-      return responseHandler(req, res, next)(result.message, null, 200);
+      return responseHandler(res)(result.message, null, 200);
     } catch (error) {
       next(error);
     }

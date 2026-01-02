@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { FlagshipEventVersionController } from "../controllers/flagship-event.controller";
+import { validateRequestBody } from "../../../shared/validators/request.validator";
+import { flagshipEventVersionSchema, updateFlagshipEventVersionSchema } from "../validators/flagship-event.validator";
 
 const versionRouter = Router();
 const controller = new FlagshipEventVersionController();
@@ -28,7 +30,7 @@ const controller = new FlagshipEventVersionController();
  *       201:
  *         description: Created
  */
-versionRouter.post("/", controller.create);
+versionRouter.post("/", validateRequestBody(flagshipEventVersionSchema), controller.create);
 
 /**
  * @swagger
@@ -108,7 +110,7 @@ versionRouter.get("/slug/:slug", controller.getBySlug);
  *       200:
  *         description: OK
  */
-versionRouter.patch("/:id", controller.update);
+versionRouter.patch("/:id", validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
 
 /**
  * @swagger
