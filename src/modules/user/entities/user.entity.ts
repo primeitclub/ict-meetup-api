@@ -1,5 +1,7 @@
-import { Column, Entity, Index } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { BaseEntity } from "../../../shared/config/typeorm/base-entity";
+import { RefreshToken } from "../../auth/entities/refresh-token.entity";
+import { AccessToken } from "../../auth/entities/access-token.entity";
 
 @Entity({
   name: "users",
@@ -18,7 +20,6 @@ export class User extends BaseEntity {
     unique: true,
     nullable: false,
   })
-  @Index()
   email: string;
 
   @Column({
@@ -36,4 +37,10 @@ export class User extends BaseEntity {
     default: "user",
   })
   role: string;
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshToken[];
+
+  @OneToMany(() => AccessToken, (accessToken) => accessToken.user)
+  accessTokens: AccessToken[];
 }

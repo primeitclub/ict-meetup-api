@@ -1,4 +1,5 @@
 import swaggerJSDoc from "swagger-jsdoc";
+import { envConfig } from "../config/env";
 
 const options: swaggerJSDoc.Options = {
       definition: {
@@ -19,7 +20,7 @@ const options: swaggerJSDoc.Options = {
                   description: "API for managing flagship event versions",
             },
       ],
-      apis: [process.cwd() + "/src/modules/**/*.routes.ts"],
+      apis: [process.cwd() + (envConfig.NODE_ENV === 'dev' ? "/modules/**/*.routes.js" : "/src/modules/**/*.routes.ts")],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
