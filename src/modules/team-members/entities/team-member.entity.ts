@@ -47,7 +47,7 @@ export class TeamMember {
   @Column({ name: 'image_url', type: 'varchar', nullable: true })
   imageUrl: string;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'json', nullable: true })
   socialLinks: Record<string, string>;
 
   @Column({ name: 'display_order', type: 'int', default: 0 })

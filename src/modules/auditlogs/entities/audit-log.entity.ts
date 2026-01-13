@@ -19,7 +19,7 @@ export class AuditLog extends BaseEntity {
   @Index()
   logType: AuditLogType;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', length: 36, nullable: true })
   @Index()
   userId: string | null;
 
@@ -33,7 +33,7 @@ export class AuditLog extends BaseEntity {
   @Column({ type: 'text' })
   message: string;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', length: 36, nullable: true })
   versionId: string | null;
 
   @Column({

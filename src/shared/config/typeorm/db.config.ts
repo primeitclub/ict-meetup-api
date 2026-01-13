@@ -6,21 +6,24 @@ import { FlagshipEventVersion } from "../../../modules/flagship-event/entities/f
 import { AuditLog } from "../../../modules/auditlogs/entities/audit-log.entity";
 import { Category } from "../../../modules/category/entities/category.entity";
 import { TeamMember } from "../../../modules/team-members/entities/team-member.entity";
+import { AccessToken } from "../../../modules/auth/entities/access-token.entity";
+import { RefreshToken } from "../../../modules/auth/entities/refresh-token.entity";
+import { envConfig } from "../env";
 
 dotenv.config();
 
 const dbConfigOptions = {
-  host: process.env.DB_HOST || "localhost",
-  port: Number(process.env.DB_PORT) || 5432,
-  username: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "password",
-  database: process.env.DB_NAME || "ict-meetup",
+  host: envConfig.DB_HOST,
+  port: envConfig.DB_PORT,
+  username: envConfig.DB_USERNAME,
+  password: envConfig.DB_PASSWORD,
+  database: envConfig.DB_DATABASE,
   synchronize: false,
   logging: false,
 };
 
 const connectDatabase = new DataSource({
-  type: 'postgres',
+  type: 'mysql',
   host: dbConfigOptions.host,
   port: dbConfigOptions.port,
   username: dbConfigOptions.username,
@@ -28,7 +31,7 @@ const connectDatabase = new DataSource({
   database: dbConfigOptions.database,
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
-  entities: [User, FlagshipEventVersion, AuditLog, Category, TeamMember],  //Note: Add your entities here
+  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember],  //Note: Add your entities here
   migrations: [__dirname + '/../typeorm/migrations/*{.ts,.js}'],
 });
 export default connectDatabase;
