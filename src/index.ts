@@ -11,6 +11,8 @@ import swaggerSpec from "./shared/utils/swagger.utils";
 import { errorHandler } from "./shared/utils/helpers/error.helper";
 import authRouter from "./modules/auth/routes/auth.routes";
 import cookieParser from "cookie-parser";
+import categoryRouter from "./modules/category/routes/category.routes";
+import teamMemberRouter from "./modules/team-members/routes/team-member.routes";
 dotenv.config();
 
 const app = express();
@@ -29,6 +31,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRouter);
 app.use("/api/seeds", seedRouter);
 app.use("/api/flagship-event/versions", versionRouter);
+app.use("/api/categories", categoryRouter);
+app.use("/api/team-members", teamMemberRouter);
 
 app.use(errorHandler);
 

@@ -4,6 +4,8 @@ import { User } from "../../../modules/user/entities/user.entity";
 import dotenv from "dotenv";
 import { FlagshipEventVersion } from "../../../modules/flagship-event/entities/flagship-event.entity";
 import { AuditLog } from "../../../modules/auditlogs/entities/audit-log.entity";
+import { Category } from "../../../modules/category/entities/category.entity";
+import { TeamMember } from "../../../modules/team-members/entities/team-member.entity";
 import { AccessToken } from "../../../modules/auth/entities/access-token.entity";
 import { RefreshToken } from "../../../modules/auth/entities/refresh-token.entity";
 import { envConfig } from "../env";
@@ -29,7 +31,7 @@ const connectDatabase = new DataSource({
   database: dbConfigOptions.database,
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
-  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken],  //Note: Add your entities here
+  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember],  //Note: Add your entities here
   migrations: [__dirname + '/../typeorm/migrations/*{.ts,.js}'],
 });
 export default connectDatabase;
