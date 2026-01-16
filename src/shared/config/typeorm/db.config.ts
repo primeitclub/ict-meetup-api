@@ -18,7 +18,7 @@ const dbConfigOptions = {
   username: envConfig.DB_USERNAME,
   password: envConfig.DB_PASSWORD,
   database: envConfig.DB_DATABASE,
-  synchronize: false,
+  synchronize: true,
   logging: false,
 };
 
