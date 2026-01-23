@@ -20,11 +20,11 @@ export enum AuditLogScope {
   HERO_SECTIONS = 'hero_sections',
   ACHIEVEMENT_METRICS = 'achievement_metrics',
   ABOUT_SECTIONS = 'about_sections',
-  SPEAKERS='speakers',
-  GALLERY_ITEMS='gallery_items',
-  TEAM_MEMBERS='team_members',
-  VERSION_SETTINGS='version_settings',
-  USERS='users',
+  SPEAKERS = 'speakers',
+  GALLERY_ITEMS = 'gallery_items',
+  TEAM_MEMBERS = 'team_members',
+  VERSION_SETTINGS = 'version_settings',
+  USERS = 'users',
 
 
 }

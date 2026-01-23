@@ -1,5 +1,6 @@
 @startuml
-entity "event_versions" {
+
+entity flagship_event_versions {
     * id : UUID [PK]
     --
     version_name : VARCHAR(50)
@@ -13,24 +14,45 @@ entity "event_versions" {
     updated_at : TIMESTAMP
 }
 
-entity "hero_sections" {
+entity asset_library {
+  * id : INTEGER [PK]
+  --
+  flagship_event_version_id : UUID [FK]
+  source_table : ENUM(hero_sections, gallery_sections)
+  source_table_id : UUID [FK]
+  max_image_upload : INTEGER
+  extra_options : JSONB
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity assets {
+  * id : INTEGER [PK]
+  --
+  asset_library_id : INTEGER [FK]
+  image_path : TEXT
+  image_url : TEXT
+  display_order : INTEGER
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+  deleted_at : TIMESTAMP
+}
+
+entity hero_sections {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
+    flagship_event_version_id : UUID [FK]
     heading : TEXT
     paragraph : TEXT
-    background_image_url : TEXT
-    banner_image_url : TEXT
-    cta_text : VARCHAR(50)
-    cta_link : VARCHAR(255)
+    extraOptions : JSONB
     created_at : TIMESTAMP
     updated_at : TIMESTAMP
 }
 
-entity "achievement_metrics" {
+entity achievement_metrics {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
+    flagship_event_version_id : UUID [FK]
     total_participants : INTEGER
     social_media_reach : INTEGER
     collaborations : INTEGER
@@ -39,37 +61,38 @@ entity "achievement_metrics" {
     updated_at : TIMESTAMP
 }
 
-entity "about_sections" {
+entity about_sections {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
+    flagship_event_version_id : UUID [FK]
     title : VARCHAR(255)
     content : TEXT
     image_url : TEXT
+    image_path : TEXT
     created_at : TIMESTAMP
     updated_at : TIMESTAMP
 }
 
-entity "speakers" {
+entity speakers {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
+    flagship_event_version_id : UUID [FK]
     name : VARCHAR(255)
-    title : VARCHAR(50)
     job_title : VARCHAR(255)
+    speaker_type : ENUM(panelist, judge, speaker)
     position : VARCHAR(255)
-    description : TEXT
-    image_url : TEXT
     social_links : JSONB
+    image_url : TEXT
+    image_path : TEXT
     display_order : INTEGER
     created_at : TIMESTAMP
     updated_at : TIMESTAMP
 }
 
-entity "events" {
+entity events {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
+    flagship_event_version_id : UUID [FK]
     title : VARCHAR(255)
     description : TEXT
     location : VARCHAR(255)
@@ -80,23 +103,24 @@ entity "events" {
     category : VARCHAR(50)
     seats_available : INTEGER
     seats_registered : INTEGER
-    schedule_image_url : TEXT
-    additional_images : JSONB
+    image_url : TEXT
+    image_path : TEXT
     display_order : INTEGER
+    fee_type : ENUM(paid, free)
+    fee : INTEGER
     created_at : TIMESTAMP
     updated_at : TIMESTAMP
 }
 
-entity "event_speakers" {
+entity event_speakers {
     * id : UUID [PK]
     --
     event_id : UUID [FK]
     speaker_id : UUID [FK]
-    role : VARCHAR(100)
     created_at : TIMESTAMP
 }
 
-entity "event_registrations" {
+entity event_registrations {
     * id : UUID [PK]
     --
     event_id : UUID [FK]
@@ -112,10 +136,10 @@ entity "event_registrations" {
     created_at : TIMESTAMP
 }
 
-entity "sponsors" {
+entity sponsors {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
+    flagship_event_version_id : UUID [FK]
     name : VARCHAR(255)
     tier : VARCHAR(50)
     logo_url : TEXT
@@ -125,45 +149,36 @@ entity "sponsors" {
     updated_at : TIMESTAMP
 }
 
-entity "gallery_items" {
+entity gallery_sections {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
-    image_url : TEXT
-    caption : TEXT
-    is_featured : BOOLEAN
-    display_order : INTEGER
+    flagship_event_version_id : UUID [FK]
+    title : VARCHAR(255)
+    description : TEXT
     created_at : TIMESTAMP
+    updated_at : TIMESTAMP
 }
 
-entity "gallery_settings" {
+entity team_members {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
-    drive_link : TEXT
-    max_featured_images : INTEGER
-    created_at : TIMESTAMP
-}
-
-entity "team_members" {
-    * id : UUID [PK]
-    --
-    version_id : UUID [FK]
+    flagship_event_version_id : UUID [FK]
     name : VARCHAR(255)
     category : VARCHAR(50)
     designation : VARCHAR(100)
     role : VARCHAR(100)
     image_url : TEXT
+    image_path : TEXT
     social_links : JSONB
     display_order : INTEGER
     created_at : TIMESTAMP
     updated_at : TIMESTAMP
 }
 
-entity "version_settings" {
+entity version_settings {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
+    flagship_event_version_id : UUID [FK]
     primary_color : VARCHAR(7)
     secondary_color : VARCHAR(7)
     background_color : VARCHAR(7)
@@ -181,31 +196,38 @@ entity "version_settings" {
     updated_at : TIMESTAMP
 }
 
-entity "audit_logs" {
+entity audit_logs {
     * id : UUID [PK]
     --
-    version_id : UUID [FK]
-    table_name : VARCHAR(50)
-    record_id : UUID
-    action : VARCHAR(20)
-    changed_by : VARCHAR(255)
-    changes : JSONB
-    created_at : TIMESTAMP
+    flagship_event_version_id : UUID [FK]
+    logType : ENUM(info, error)
+    userId : UUID
+    logActionType : ENUM(login, logout, create, update, delete, view)
+    message : VARCHAR(255)
+    scope : ENUM(events, event_speakers, sponsors, event_registrations, hero_sections, achievement_metrics, speakers, gallery_items, team_members, version_settings, about_sections)
+    ipAddress : VARCHAR(50)
 }
 
-event_versions ||--o{ hero_sections
-event_versions ||--o{ achievement_metrics
-event_versions ||--o{ about_sections
-event_versions ||--o{ speakers
-event_versions ||--o{ events
-event_versions ||--o{ sponsors
-event_versions ||--o{ gallery_items
-event_versions ||--o{ gallery_settings
-event_versions ||--o{ team_members
-event_versions ||--o{ version_settings
-event_versions ||--o{ audit_logs
+' RELATIONSHIPS
+flagship_event_versions ||--o{ hero_sections
+flagship_event_versions ||--o{ achievement_metrics
+flagship_event_versions ||--o{ about_sections
+flagship_event_versions ||--o{ speakers
+flagship_event_versions ||--o{ events
+flagship_event_versions ||--o{ sponsors
+flagship_event_versions ||--o{ gallery_sections
+flagship_event_versions ||--o{ team_members
+flagship_event_versions ||--o{ version_settings
+flagship_event_versions ||--o{ audit_logs
+flagship_event_versions ||--o{ asset_library
 
 events ||--o{ event_speakers
 speakers ||--o{ event_speakers
 events ||--o{ event_registrations
+
+' Asset Library Relationships
+hero_sections ||--o{ asset_library
+gallery_sections ||--o{ asset_library
+asset_library ||--o{ assets
+
 @enduml

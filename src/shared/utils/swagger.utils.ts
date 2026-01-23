@@ -19,6 +19,18 @@ const options: swaggerJSDoc.Options = {
                   name: "FlagshipEventVersions",
                   description: "API for managing flagship event versions",
             },
+            {
+                  name: "Teams",
+                  description: "API for managing teams",
+            },
+            {
+                  name: "Categories",
+                  description: "API for managing categories",
+            },
+            {
+                  name: "TeamMembers",
+                  description: "API for managing team members",
+            }
       ],
       apis: [process.cwd() + (envConfig.NODE_ENV === 'dev' ? "/modules/**/*.routes.js" : "/src/modules/**/*.routes.ts")],
 };
