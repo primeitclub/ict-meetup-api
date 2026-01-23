@@ -13,6 +13,7 @@ import authRouter from "./modules/auth/routes/auth.routes";
 import cookieParser from "cookie-parser";
 import categoryRouter from "./modules/category/routes/category.routes";
 import teamMemberRouter from "./modules/team-members/routes/team-member.routes";
+
 dotenv.config();
 
 const app = express();
