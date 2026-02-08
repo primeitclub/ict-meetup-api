@@ -9,6 +9,8 @@ import { TeamMember } from "../../../modules/team-members/entities/team-member.e
 import { AccessToken } from "../../../modules/auth/entities/access-token.entity";
 import { RefreshToken } from "../../../modules/auth/entities/refresh-token.entity";
 import { envConfig } from "../env";
+import { AssetLibrary } from "../../../modules/asset-library/entities/asset-library.entity";
+import { Asset } from "../../../modules/asset-library/entities/asset.entity";
 
 dotenv.config();
 
@@ -31,7 +33,7 @@ const connectDatabase = new DataSource({
   database: dbConfigOptions.database,
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
-  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember],  //Note: Add your entities here
+  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember, AssetLibrary, Asset ],  //Note: Add your entities here
   migrations: [__dirname + '/../typeorm/migrations/*{.ts,.js}'],
 });
 export default connectDatabase;

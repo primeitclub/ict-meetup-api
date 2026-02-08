@@ -13,6 +13,7 @@ import authRouter from "./modules/auth/routes/auth.routes";
 import cookieParser from "cookie-parser";
 import categoryRouter from "./modules/category/routes/category.routes";
 import teamMemberRouter from "./modules/team-members/routes/team-member.routes";
+import assetLibraryRouter from "./modules/asset-library/routes/asset-library.routes";
 dotenv.config();
 
 const app = express();
@@ -33,6 +34,9 @@ app.use("/api/seeds", seedRouter);
 app.use("/api/flagship-event/versions", versionRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/team-members", teamMemberRouter);
+app.use("/api/asset-library", assetLibraryRouter);
+
+
 
 app.use(errorHandler);
 
