@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1deb3
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jan 19, 2026 at 03:49 PM
--- Server version: 8.0.44-0ubuntu0.24.04.2
--- PHP Version: 8.3.6
+-- Host: 127.0.0.1
+-- Generation Time: Jan 20, 2026 at 03:59 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,8 +29,8 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `access_tokens` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedBy` varchar(36) DEFAULT NULL,
   `token` varchar(500) NOT NULL,
@@ -38,8 +38,8 @@ CREATE TABLE `access_tokens` (
   `userId` varchar(36) NOT NULL,
   `ipAddress` varchar(255) NOT NULL,
   `userAgent` varchar(255) NOT NULL,
-  `isRevoked` tinyint NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `isRevoked` tinyint(4) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -49,8 +49,8 @@ CREATE TABLE `access_tokens` (
 
 CREATE TABLE `audit_logs` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedBy` varchar(36) DEFAULT NULL,
   `logType` enum('info','error') NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE `audit_logs` (
   `versionId` varchar(36) DEFAULT NULL,
   `scope` enum('events','event_speakers','sponsors','event_registrations','hero_sections','achievement_metrics','about_sections','speakers','gallery_items','team_members','version_settings','users') NOT NULL,
   `ipAddress` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -72,9 +72,9 @@ CREATE TABLE `category` (
   `id` varchar(36) NOT NULL,
   `type` enum('teams','sponsors') NOT NULL,
   `name` varchar(100) NOT NULL,
-  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `created_at` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -84,8 +84,8 @@ CREATE TABLE `category` (
 
 CREATE TABLE `flagship_event_versions` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedBy` varchar(36) DEFAULT NULL,
   `version_name` varchar(50) NOT NULL,
@@ -94,8 +94,8 @@ CREATE TABLE `flagship_event_versions` (
   `status` enum('draft','active','archived') NOT NULL DEFAULT 'draft',
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
-  `is_current` tinyint NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `is_current` tinyint(4) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -104,17 +104,17 @@ CREATE TABLE `flagship_event_versions` (
 --
 
 CREATE TABLE `migrations` (
-  `id` int NOT NULL,
-  `timestamp` bigint NOT NULL,
+  `id` int(11) NOT NULL,
+  `timestamp` bigint(20) NOT NULL,
   `name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `migrations`
 --
 
 INSERT INTO `migrations` (`id`, `timestamp`, `name`) VALUES
-(1, 1768837673879, 'Change1768837673879');
+(1, 1768921004078, ' $npmConfigName1768921004078');
 
 -- --------------------------------------------------------
 
@@ -124,8 +124,8 @@ INSERT INTO `migrations` (`id`, `timestamp`, `name`) VALUES
 
 CREATE TABLE `refresh_tokens` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedBy` varchar(36) DEFAULT NULL,
   `token` varchar(500) NOT NULL,
@@ -133,8 +133,8 @@ CREATE TABLE `refresh_tokens` (
   `userId` varchar(36) NOT NULL,
   `ipAddress` varchar(255) NOT NULL,
   `userAgent` varchar(255) NOT NULL,
-  `isRevoked` tinyint NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `isRevoked` tinyint(4) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -151,11 +151,11 @@ CREATE TABLE `team_members` (
   `role` varchar(100) DEFAULT NULL,
   `image_path` varchar(255) DEFAULT NULL,
   `image_url` varchar(255) DEFAULT NULL,
-  `socialLinks` json DEFAULT NULL,
-  `display_order` int NOT NULL DEFAULT '0',
-  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `socialLinks` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`socialLinks`)),
+  `display_order` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -165,15 +165,15 @@ CREATE TABLE `team_members` (
 
 CREATE TABLE `users` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedBy` varchar(36) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` varchar(50) NOT NULL DEFAULT 'user'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -267,7 +267,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
@@ -277,20 +277,20 @@ ALTER TABLE `migrations`
 -- Constraints for table `access_tokens`
 --
 ALTER TABLE `access_tokens`
-  ADD CONSTRAINT `FK_343a101d109c86071f2b2fb43e7` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `FK_343a101d109c86071f2b2fb43e7` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
-  ADD CONSTRAINT `FK_610102b60fea1455310ccd299de` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `FK_610102b60fea1455310ccd299de` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `team_members`
 --
 ALTER TABLE `team_members`
-  ADD CONSTRAINT `FK_80c1bc4ded05bd07883fffb30c7` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `FK_b075a04749a5969dfa73f8e4db8` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_80c1bc4ded05bd07883fffb30c7` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_b075a04749a5969dfa73f8e4db8` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
