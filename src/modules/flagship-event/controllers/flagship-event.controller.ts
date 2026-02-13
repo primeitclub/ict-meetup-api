@@ -12,7 +12,7 @@ export class FlagshipEventVersionController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = (req as any).user?.id || "system"; // Default to system if auth handled elsewhere
+      const userId = req.user.userId;
       const result = await this.service.create(req.body, userId);
       return responseHandler(res)(
         "Flagship event version created successfully",
@@ -27,6 +27,13 @@ export class FlagshipEventVersionController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.service.findAll();
+      if (result.length === 0) {
+        return responseHandler(res)(
+          "No flagship event versions found",
+          [],
+          200
+        );
+      }
       return responseHandler(res)(
         "Fetch all versions successfully",
         result,
@@ -40,6 +47,13 @@ export class FlagshipEventVersionController {
   getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.service.findById(req.params.id);
+      if (!result) {
+        return responseHandler(res)(
+          "No flagship event version found",
+          null,
+          200
+        );
+      }
       return responseHandler(res)(
         "Fetch version by id successfully",
         result,
@@ -53,6 +67,13 @@ export class FlagshipEventVersionController {
   getBySlug = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.service.findBySlug(req.params.slug);
+      if (!result) {
+        return responseHandler(res)(
+          "No flagship event version found",
+          null,
+          200
+        );
+      }
       return responseHandler(res)(
         "Fetch version by slug successfully",
         result,
@@ -67,7 +88,11 @@ export class FlagshipEventVersionController {
     try {
       const result = await this.service.findCurrent();
       if (!result) {
-        throw new AppError("No active flagship event version found", 404);
+        return responseHandler(res)(
+          "No active flagship event version found",
+          null,
+          200
+        );
       }
       return responseHandler(res)(
         "Fetch current active version successfully",
@@ -81,7 +106,7 @@ export class FlagshipEventVersionController {
 
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = (req as any).user?.id || "system";
+      const userId = req.user.userId;
       const result = await this.service.update(
         req.params.id,
         req.body,
@@ -99,7 +124,7 @@ export class FlagshipEventVersionController {
 
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = (req as any).user?.id || "system";
+      const userId = req.user.userId;
       const result = await this.service.delete(req.params.id, userId);
       return responseHandler(res)(result.message, null, 200);
     } catch (error) {

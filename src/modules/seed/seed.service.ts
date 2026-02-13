@@ -39,13 +39,11 @@ export class SeedService {
 
     async seedStaticUsers() {
         const results = [];
-        console.log('Seeding static users...');
         for (const user of staticUsers) {
             try {
                 const result = await this.seedUser(user);
                 results.push(result);
             } catch (error) {
-                console.error(`Error seeding user ${user.email}:`, error);
                 results.push({ message: `Error seeding user ${user.email}`, status: 'failed', error: (error as any).message });
             }
         }

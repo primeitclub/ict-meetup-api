@@ -14,6 +14,8 @@ import cookieParser from "cookie-parser";
 import categoryRouter from "./modules/category/routes/category.routes";
 import teamMemberRouter from "./modules/team-members/routes/team-member.routes";
 import assetLibraryRouter from "./modules/asset-library/routes/asset-library.routes";
+import { startCronJobs } from "./shared/cron/cron";
+import { Request, Response } from "express";
 dotenv.config();
 
 const app = express();
@@ -21,13 +23,20 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    allowedHeaders: "*",
+    origin: "*",
+    credentials: true,
   })
 );
 
 app.use(cookieParser());
 
+
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use('/api-docs.json', (req: Request, res: Response) => {
+  res.json(swaggerSpec);
+});
 
 app.use("/api/auth", authRouter);
 app.use("/api/seeds", seedRouter);
@@ -35,7 +44,6 @@ app.use("/api/flagship-event/versions", versionRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/team-members", teamMemberRouter);
 app.use("/api/asset-library", assetLibraryRouter);
-
 
 
 app.use(errorHandler);
@@ -51,3 +59,6 @@ connectDatabase.initialize()
   .catch((error) => {
     console.error('Error connecting to the database', error);
   });
+
+// start cron jobs
+startCronJobs();

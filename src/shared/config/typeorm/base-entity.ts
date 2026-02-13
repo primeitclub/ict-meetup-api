@@ -43,5 +43,5 @@ export class BaseEntity {
             nullable: true,
             default: null,
       })
-      modifiedBy?: string;
+      modifiedById?: string;
 }

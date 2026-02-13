@@ -5,7 +5,7 @@ import { LoginDto } from "../dto/auth.dto";
 import { responseHandler } from "../../../shared/utils/helpers/response.helper";
 import { TokenPayload } from "../interfaces/auth.interface";
 import { AppError } from "../../../shared/utils/error.utils";
-import parseExpiryToMs, { clearCookie, setCookie } from "../../../shared/utils/common.utils";
+import { parseExpiryToMs, clearCookie, setCookie } from "../../../shared/utils/common.utils";
 import { envConfig } from "../../../shared/config/env";
 
 export class AuthController {

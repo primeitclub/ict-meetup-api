@@ -20,7 +20,7 @@ const dbConfigOptions = {
   username: envConfig.DB_USERNAME,
   password: envConfig.DB_PASSWORD,
   database: envConfig.DB_DATABASE,
-  synchronize: true,
+  synchronize: false,
   logging: false,
 };
 
@@ -33,7 +33,7 @@ const connectDatabase = new DataSource({
   database: dbConfigOptions.database,
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
-  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember, AssetLibrary, Asset ],  //Note: Add your entities here
+  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember, AssetLibrary, Asset],  //Note: Add your entities here
   migrations: [__dirname + '/../typeorm/migrations/*{.ts,.js}'],
 });
 export default connectDatabase;

@@ -18,7 +18,8 @@
         "strictPropertyInitialization": false,
         // to get the output in the dist folder during development,set these to false
         "allowImportingTsExtensions":false,  
-        "noEmit": false
+        "noEmit": false,
+        "typeRoots": ["./node_modules/@types", "./src/shared/types"]
       },
       "include": [
         "src/**/*.ts"

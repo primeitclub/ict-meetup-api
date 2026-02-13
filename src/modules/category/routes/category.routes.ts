@@ -7,6 +7,7 @@ import {
   categoryIdParamSchema,
   categoryQuerySchema,
 } from '../validators/category.validator';
+import { authenticate } from '../../../shared/middlewares/auth.middleware';
 
 const router = Router();
 const controller = new CategoryController();
@@ -31,7 +32,7 @@ const controller = new CategoryController();
  *       201:
  *         description: Created
  */
-router.post('/',validateRequestBody(createCategorySchema),controller.create);
+router.post('/', authenticate, validateRequestBody(createCategorySchema), controller.create);
 
 /**
  * @swagger
@@ -47,7 +48,7 @@ router.post('/',validateRequestBody(createCategorySchema),controller.create);
  *       200:
  *         description: OK
  */
-router.get('/',validateRequestQuery(categoryQuerySchema),controller.getAll);
+router.get('/', authenticate, validateRequestQuery(categoryQuerySchema), controller.getAll);
 
 /**
  * @swagger
@@ -64,7 +65,7 @@ router.get('/',validateRequestQuery(categoryQuerySchema),controller.getAll);
  *       200:
  *         description: OK
  */
-router.get('/:id',controller.getById);
+router.get('/:id', authenticate, controller.getById);
 
 /**
  * @swagger
@@ -89,7 +90,7 @@ router.get('/:id',controller.getById);
  *       200:
  *         description: OK
  */
-router.put('/:id',validateRequestBody(updateCategorySchema),controller.update
+router.put('/:id', authenticate, validateRequestBody(updateCategorySchema), controller.update
 );
 
 /**
@@ -107,6 +108,6 @@ router.put('/:id',validateRequestBody(updateCategorySchema),controller.update
  *       200:
  *         description: OK
  */
-router.delete('/:id',controller.delete);
+router.delete('/:id', authenticate, controller.delete);
 
 export default router;

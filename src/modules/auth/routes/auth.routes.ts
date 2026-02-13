@@ -22,7 +22,7 @@ const authController = new AuthController();
  *             required: [email, password]
  *             properties:
  *               email: { type: string, format: email }
- *               password: { type: string }
+ *               password: {next-auth.csrf-token type: string }
  *     responses:
  *       200:
  *         description: Login successful

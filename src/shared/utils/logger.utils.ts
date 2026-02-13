@@ -24,7 +24,10 @@ const format = winston.format.combine(
       winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
       winston.format.colorize({ all: true }),
       winston.format.printf(({ timestamp, message, module, systemMessage, level, meta }) => {
-            return `[${timestamp}] [${level}] [${module}] [${systemMessage}] ${message} ${meta ? `[${JSON.stringify(meta)}]` : ''}`;
+            const moduleStr = module ? ` [${module}]` : '';
+            const systemStr = systemMessage ? ` [${systemMessage}]` : '';
+            const metaStr = meta ? ` [${JSON.stringify(meta)}]` : '';
+            return `[${timestamp}] [${level}]${moduleStr}${systemStr} ${message}${metaStr}`;
       }),
 );
 

@@ -55,6 +55,7 @@ export class FlagshipEventVersionService {
       ...data,
       status: EventVersionStatus.DRAFT,
       is_current: false,
+      createdById: userId,
     });
 
     const savedVersion = await this.versionRepository.save(newVersion);
@@ -125,6 +126,7 @@ export class FlagshipEventVersionService {
     }
 
     Object.assign(version, data);
+    version.modifiedById = userId;
     const updatedVersion = await this.versionRepository.save(version);
 
     await this.createAuditLog(
