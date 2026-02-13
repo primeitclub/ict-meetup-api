@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken";
 import { AccessToken } from "../entities/access-token.entity";
 import { RefreshToken } from "../entities/refresh-token.entity";
 import { TokenPayload } from "../interfaces/auth.interface";
-import parseExpiryToMs from "../../../shared/utils/common.utils";
+import { parseExpiryToMs, parseExpiryToSeconds } from "../../../shared/utils/common.utils";
 
 export class AuthService {
       private accessTokenRepository: Repository<AccessToken>;
@@ -59,11 +59,11 @@ export class AuthService {
       }
 
       private async generateAccessToken(payload: TokenPayload) {
-            return jwt.sign(payload, envConfig.JWT_ACCESS_SECRET as jwt.Secret, { expiresIn: parseExpiryToMs(envConfig.JWT_ACCESS_EXPIRY) });
+            return jwt.sign(payload, envConfig.JWT_ACCESS_SECRET as jwt.Secret, { expiresIn: parseExpiryToSeconds(envConfig.JWT_ACCESS_EXPIRY) });
       }
 
       private async generateRefreshToken(payload: TokenPayload) {
-            return jwt.sign(payload, envConfig.JWT_REFRESH_SECRET as jwt.Secret, { expiresIn: parseExpiryToMs(envConfig.JWT_REFRESH_EXPIRY) });
+            return jwt.sign(payload, envConfig.JWT_REFRESH_SECRET as jwt.Secret, { expiresIn: parseExpiryToSeconds(envConfig.JWT_REFRESH_EXPIRY) });
       }
 
       private async generateTokens(payload: TokenPayload) {
@@ -79,6 +79,12 @@ export class AuthService {
       }
 
       public async refreshToken(refreshToken: string, ipAddress: string, userAgent: string) {
+            try {
+                  jwt.verify(refreshToken, envConfig.JWT_REFRESH_SECRET);
+            } catch (error) {
+                  throw new AppError("Invalid refresh token", 401);
+            }
+
             const storedToken = await this.refreshTokenRepository.findOne({
                   where: {
                         token: refreshToken,
@@ -90,7 +96,6 @@ export class AuthService {
             if (!storedToken) {
                   throw new AppError("Invalid refresh token", 401);
             }
-
             // Check if token has expired
             if (new Date() > storedToken.expiresAt) {
                   // Revoke the expired token
@@ -122,7 +127,7 @@ export class AuthService {
             await this.accessTokenRepository.save({
                   userId: storedToken.user.id,
                   token: tokens.accessToken,
-                  expiresAt: new Date(Date.now() + envConfig.JWT_ACCESS_EXPIRY as any),
+                  expiresAt: new Date(Date.now() + parseExpiryToMs(envConfig.JWT_ACCESS_EXPIRY)),
                   ipAddress,
                   userAgent,
             });
@@ -131,7 +136,7 @@ export class AuthService {
             await this.refreshTokenRepository.save({
                   userId: storedToken.user.id,
                   token: tokens.refreshToken,
-                  expiresAt: new Date(Date.now() + envConfig.JWT_REFRESH_EXPIRY as any),
+                  expiresAt: new Date(Date.now() + parseExpiryToMs(envConfig.JWT_REFRESH_EXPIRY)),
                   ipAddress,
                   userAgent,
             });

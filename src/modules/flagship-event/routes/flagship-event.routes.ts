@@ -2,6 +2,7 @@ import { Router } from "express";
 import { FlagshipEventVersionController } from "../controllers/flagship-event.controller";
 import { validateRequestBody } from "../../../shared/validators/request.validator";
 import { flagshipEventVersionSchema, updateFlagshipEventVersionSchema } from "../validators/flagship-event.validator";
+import { authenticate } from "../../../shared/middlewares/auth.middleware";
 
 const versionRouter = Router();
 const controller = new FlagshipEventVersionController();
@@ -18,19 +19,40 @@ const controller = new FlagshipEventVersionController();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [version_name, slug, version_number, start_date, end_date]
+ *             required:
+ *               - version_name
+ *               - slug
+ *               - version_number
+ *               - start_date
+ *               - end_date
  *             properties:
- *               version_name: { type: string }
- *               slug: { type: string }
- *               version_number: { type: number }
- *               start_date: { type: string, format: date }
- *               end_date: { type: string, format: date }
- *               status: { type: string, enum: [draft, active, archived] }
+ *               version_name:
+ *                 type: string
+ *               slug:
+ *                 type: string
+ *               version_number:
+ *                 type: number
+ *               start_date:
+ *                 type: string
+ *                 format: date
+ *               end_date:
+ *                 type: string
+ *                 format: date
+ *               status:
+ *                 type: string
+ *                 enum:
+ *                   - draft
+ *                   - active
+ *                   - archived
+ *               tagline:
+ *                 type: string
+ *               is_current:
+ *                 type: boolean
  *     responses:
  *       201:
  *         description: Created
  */
-versionRouter.post("/", validateRequestBody(flagshipEventVersionSchema), controller.create);
+versionRouter.post("/", authenticate, validateRequestBody(flagshipEventVersionSchema), controller.create);
 
 /**
  * @swagger

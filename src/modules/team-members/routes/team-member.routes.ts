@@ -7,6 +7,7 @@ import {
   teamMemberIdParamSchema,
   teamMemberQuerySchema,
 } from '../validators/team-member.validator';
+import { authenticate } from '../../../shared/middlewares/auth.middleware';
 
 const router = Router();
 
@@ -39,7 +40,7 @@ const controller = new TeamMemberController();
  *       201:
  *         description: Created
  */
-router.post('/',validateRequestBody(createTeamMemberSchema),controller.create);
+router.post('/', authenticate, validateRequestBody(createTeamMemberSchema), controller.create);
 
 /**
  * @swagger
@@ -58,7 +59,7 @@ router.post('/',validateRequestBody(createTeamMemberSchema),controller.create);
  *       200:
  *         description: OK
  */
-router.get('/',validateRequestQuery(teamMemberQuerySchema),controller.getAll);
+router.get('/', validateRequestQuery(teamMemberQuerySchema), controller.getAll);
 
 /**
  * @swagger
@@ -75,7 +76,7 @@ router.get('/',validateRequestQuery(teamMemberQuerySchema),controller.getAll);
  *       200:
  *         description: OK
  */
-router.get( '/:id',controller.getById);
+router.get('/:id', controller.getById);
 
 /**
  * @swagger
@@ -107,7 +108,7 @@ router.get( '/:id',controller.getById);
  *       200:
  *         description: OK
  */
-router.put('/:id',validateRequestBody(updateTeamMemberSchema),controller.update);
+router.put('/:id', authenticate, validateRequestBody(updateTeamMemberSchema), controller.update);
 
 /**
  * @swagger
@@ -124,6 +125,6 @@ router.put('/:id',validateRequestBody(updateTeamMemberSchema),controller.update)
  *       200:
  *         description: OK
  */
-router.delete('/:id',controller.delete);
+router.delete('/:id', authenticate, controller.delete);
 
 export default router;

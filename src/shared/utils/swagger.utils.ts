@@ -30,9 +30,14 @@ const options: swaggerJSDoc.Options = {
             {
                   name: "TeamMembers",
                   description: "API for managing team members",
+            },
+            {
+                  name: "Asset Libraries",
+                  description: "API for managing asset libraries",
             }
+
       ],
-      apis: [process.cwd() + (envConfig.NODE_ENV === 'dev' ? "/modules/**/*.routes.js" : "/src/modules/**/*.routes.ts")],
+      apis: [process.cwd() + (envConfig.NODE_ENV === 'dev' || envConfig.NODE_ENV === 'prod' ? "/modules/**/*.routes.js" : "/src/modules/**/*.routes.ts")],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
