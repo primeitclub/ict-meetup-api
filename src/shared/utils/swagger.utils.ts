@@ -37,7 +37,7 @@ const options: swaggerJSDoc.Options = {
             }
 
       ],
-      apis: [process.cwd() + (envConfig.NODE_ENV === 'dev' ? "/modules/**/*.routes.js" : "/src/modules/**/*.routes.ts")],
+      apis: [process.cwd() + (envConfig.NODE_ENV === 'dev' || envConfig.NODE_ENV === 'prod' ? "/modules/**/*.routes.js" : "/src/modules/**/*.routes.ts")],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

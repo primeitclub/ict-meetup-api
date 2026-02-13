@@ -17,7 +17,7 @@ export function parseExpiryToMs(expiry: string) {
       return parseExpiryToSeconds(expiry) * 1000;
 }
 
-export function setCookie(name: string, value: string, options: CookieOptions = { httpOnly: true, secure: envConfig.NODE_ENV === 'prod', sameSite: 'strict' }) {
+export function setCookie(name: string, value: string, options: CookieOptions = { httpOnly: true, secure: envConfig.NODE_ENV === 'prod' || envConfig.NODE_ENV === 'dev', sameSite: 'strict' }) {
       return {
             name,
             value,

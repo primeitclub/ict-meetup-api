@@ -8,7 +8,7 @@ const envSchema = z.object({
       DB_USERNAME: z.string().default('root'),
       DB_PASSWORD: z.string().default(''),
       DB_DATABASE: z.string().default('primeitc_ictmeetup_dev'),
-      NODE_ENV: z.enum(['dev', 'prod']).default('dev'),
+      NODE_ENV: z.enum(['dev', 'prod', 'local']).default('dev'),
       JWT_ACCESS_SECRET: z.string().default('secret'),
       JWT_REFRESH_SECRET: z.string().default('refresh-secret'),
       JWT_ACCESS_EXPIRY: z.string().default('15m'),
