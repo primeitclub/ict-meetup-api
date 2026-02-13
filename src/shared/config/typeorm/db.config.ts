@@ -20,8 +20,8 @@ const dbConfigOptions = {
   username: envConfig.DB_USERNAME,
   password: envConfig.DB_PASSWORD,
   database: envConfig.DB_DATABASE,
-  synchronize: false,
-  logging: false,
+  synchronize: envConfig.NODE_ENV === 'local',
+  logging: envConfig.NODE_ENV === 'local',
 };
 
 const connectDatabase = new DataSource({
