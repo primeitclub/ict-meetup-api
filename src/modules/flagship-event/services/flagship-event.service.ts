@@ -9,23 +9,20 @@ import {
 
 export class FlagshipEventVersionService {
   private versionRepository: Repository<FlagshipEventVersion>;
-  // private auditLogRepository: Repository<AuditLog>;
 
   constructor() {
     this.versionRepository =
       connectDatabase.getRepository(FlagshipEventVersion);
-    // this.auditLogRepository = connectDatabase.getRepository(AuditLog);
   }
 
   private async createAuditLog(
-    versionId: string | null | undefined,
+    versionId: string | null,
     tableName: string,
-    recordId: string | null | undefined,
+    recordId: string | null,
     action: string,
     changedBy: string,
     changes: any
   ) {
-
     logger.info(`Audit Log: ${action} on ${tableName} by ${changedBy}`, {
       module: "FlagshipEventVersionService",
       versionId,
@@ -34,12 +31,16 @@ export class FlagshipEventVersionService {
     });
   }
 
+  /**
+   * Create a new flagship event version
+   * Respects client-provided status and is_current
+   */
   async create(data: Partial<FlagshipEventVersion>, userId: string) {
     logger.info(`Creating new flagship event version: ${data.version_name}`, {
       module: "FlagshipEventVersionService",
     });
 
-    // Check if slug or version_number already exists
+    // Check for duplicate slug or version_number
     const existing = await this.versionRepository.findOne({
       where: [{ slug: data.slug }, { version_number: data.version_number }],
     });
@@ -51,12 +52,18 @@ export class FlagshipEventVersionService {
       );
     }
 
+    // Use client-provided values if present, fallback to defaults
     const newVersion = this.versionRepository.create({
       ...data,
-      status: EventVersionStatus.DRAFT,
-      is_current: false,
+      status: data.status ?? EventVersionStatus.DRAFT,
+      is_current: data.is_current ?? false,
       createdById: userId,
     });
+
+    // Handle activation if status is ACTIVE
+    if (newVersion.status === EventVersionStatus.ACTIVE) {
+      await this.handleStatusTransition(newVersion, EventVersionStatus.ACTIVE);
+    }
 
     const savedVersion = await this.versionRepository.save(newVersion);
 
@@ -83,17 +90,13 @@ export class FlagshipEventVersionService {
 
   async findById(id: string) {
     const version = await this.versionRepository.findOne({ where: { id } });
-    if (!version) {
-      throw new AppError("Flagship event version not found", 404);
-    }
+    if (!version) throw new AppError("Flagship event version not found", 404);
     return version;
   }
 
   async findBySlug(slug: string) {
     const version = await this.versionRepository.findOne({ where: { slug } });
-    if (!version) {
-      throw new AppError("Flagship event version not found", 404);
-    }
+    if (!version) throw new AppError("Flagship event version not found", 404);
     return version;
   }
 
@@ -103,6 +106,10 @@ export class FlagshipEventVersionService {
     });
   }
 
+  /**
+   * Update a version
+   * Handles status transitions automatically
+   */
   async update(
     id: string,
     data: Partial<FlagshipEventVersion>,
@@ -120,13 +127,14 @@ export class FlagshipEventVersionService {
 
     const oldState = { ...version };
 
-    // Validate state transitions
+    // Handle status transition if status changes
     if (data.status && data.status !== version.status) {
       await this.handleStatusTransition(version, data.status);
     }
 
     Object.assign(version, data);
-    version.modifiedById = userId;
+    version.modifiedBy = userId;
+
     const updatedVersion = await this.versionRepository.save(version);
 
     await this.createAuditLog(
@@ -141,17 +149,15 @@ export class FlagshipEventVersionService {
     return updatedVersion;
   }
 
+  /**
+   * Handles status transitions
+   * Ensures only one active version exists
+   */
   private async handleStatusTransition(
     version: FlagshipEventVersion,
     newStatus: EventVersionStatus
   ) {
-    // draft -> active
-    // active -> archived
-    // draft -> archived
-    // archived -> active (only if no active exists)
-
     if (newStatus === EventVersionStatus.ACTIVE) {
-      // Archive existing active version
       const currentActive = await this.findCurrent();
       if (currentActive && currentActive.id !== version.id) {
         currentActive.status = EventVersionStatus.ARCHIVED;
@@ -161,15 +167,21 @@ export class FlagshipEventVersionService {
           module: "FlagshipEventVersionService",
         });
       }
+      version.status = EventVersionStatus.ACTIVE;
       version.is_current = true;
     } else if (
-      newStatus === EventVersionStatus.ARCHIVED ||
-      newStatus === EventVersionStatus.DRAFT
+      newStatus === EventVersionStatus.DRAFT ||
+      newStatus === EventVersionStatus.ARCHIVED
     ) {
       version.is_current = false;
+      version.status = newStatus;
     }
   }
 
+  /**
+   * Delete a version
+   * Cannot delete active versions
+   */
   async delete(id: string, userId: string) {
     const version = await this.findById(id);
 

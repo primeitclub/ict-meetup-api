@@ -132,7 +132,7 @@ versionRouter.get("/slug/:slug", controller.getBySlug);
  *       200:
  *         description: OK
  */
-versionRouter.patch("/:id", validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
+versionRouter.patch("/:id", authenticate, validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
 
 /**
  * @swagger
@@ -149,6 +149,6 @@ versionRouter.patch("/:id", validateRequestBody(updateFlagshipEventVersionSchema
  *       200:
  *         description: OK
  */
-versionRouter.delete("/:id", controller.delete);
+versionRouter.delete("/:id",authenticate, controller.delete);
 
 export default versionRouter;

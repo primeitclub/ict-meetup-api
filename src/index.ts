@@ -14,6 +14,7 @@ import cookieParser from "cookie-parser";
 import categoryRouter from "./modules/category/routes/category.routes";
 import teamMemberRouter from "./modules/team-members/routes/team-member.routes";
 import assetLibraryRouter from "./modules/asset-library/routes/asset-library.routes";
+import createUploadRouter  from "./modules/upload/routes/upload.routes"; 
 import { startCronJobs } from "./shared/cron/cron";
 import { Request, Response } from "express";
 dotenv.config();
@@ -44,6 +45,7 @@ app.use("/api/flagship-event/versions", versionRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/team-members", teamMemberRouter);
 app.use("/api/asset-library", assetLibraryRouter);
+app.use("/api/upload",createUploadRouter);
 
 
 app.use(errorHandler);

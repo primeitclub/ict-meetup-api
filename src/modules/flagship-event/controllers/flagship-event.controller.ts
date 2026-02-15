@@ -12,7 +12,7 @@ export class FlagshipEventVersionController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.user!.userId;
       const result = await this.service.create(req.body, userId);
       return responseHandler(res)(
         "Flagship event version created successfully",
@@ -106,7 +106,7 @@ export class FlagshipEventVersionController {
 
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.user!.userId;
       const result = await this.service.update(
         req.params.id,
         req.body,
@@ -124,7 +124,7 @@ export class FlagshipEventVersionController {
 
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.user!.userId;
       const result = await this.service.delete(req.params.id, userId);
       return responseHandler(res)(result.message, null, 200);
     } catch (error) {
