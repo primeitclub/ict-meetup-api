@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
+import { BaseEntity } from '../../../shared/config/typeorm/base-entity';
 
 export enum CategoryType {
   TEAMS = 'teams',
@@ -13,9 +14,7 @@ export enum CategoryType {
 }
 
 @Entity({ name: 'category' })
-export class Category {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class Category extends BaseEntity {
 
   @Index()
   @Column({
@@ -27,9 +26,7 @@ export class Category {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  @Column({ name: 'display_order', type: 'int', default: 0 })
+  displayOrder: number;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
 }

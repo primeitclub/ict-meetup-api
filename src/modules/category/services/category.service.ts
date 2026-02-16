@@ -1,5 +1,4 @@
-import { Repository } from 'typeorm';
-import connectDatabase from '../../../shared/config/typeorm/db.config';
+import { DataSource, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { Category, CategoryType } from '../entities/category.entity';
@@ -8,8 +7,8 @@ import { CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
 export class CategoryService {
   private categoryRepository: Repository<Category>;
 
-  constructor() {
-    this.categoryRepository = connectDatabase.getRepository(Category);
+  constructor(dataSource: DataSource) {
+    this.categoryRepository = dataSource.getRepository(Category);
   }
 
   private async createAuditLog(
@@ -90,7 +89,7 @@ export class CategoryService {
 
     const oldState = { ...category };
 
-    
+
     if (data.name || data.type) {
       const checkType = data.type || category.type;
       const checkName = data.name || category.name;

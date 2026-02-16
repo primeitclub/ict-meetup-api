@@ -1,15 +1,14 @@
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import bcrypt from 'bcrypt';
 import { User } from '../user/entities/user.entity';
-import connectDatabase from '../../shared/config/typeorm/db.config';
 import { staticUsers } from '../../seeds/static/users.seed';
 import { AppError } from '../../shared/utils/error.utils';
 
 export class SeedService {
     private userRepository: Repository<User>;
 
-    constructor() {
-        this.userRepository = connectDatabase.getRepository(User);
+    constructor(dataSource: DataSource) {
+        this.userRepository = dataSource.getRepository(User);
     }
 
     async seedUser(userData: any) {

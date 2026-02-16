@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { DataSource } from 'typeorm';
 import { CategoryService } from '../services/category.service';
 import { responseHandler } from '../../../shared/utils/helpers/response.helper';
 import { CategoryType } from '../entities/category.entity';
@@ -6,8 +7,8 @@ import { CategoryType } from '../entities/category.entity';
 export class CategoryController {
   private service: CategoryService;
 
-  constructor() {
-    this.service = new CategoryService();
+  constructor(dataSource: DataSource) {
+    this.service = new CategoryService(dataSource);
   }
 
   create = async (req: Request, res: Response, next: NextFunction) => {

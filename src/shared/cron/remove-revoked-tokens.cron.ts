@@ -1,5 +1,4 @@
-import { LessThan, Repository } from "typeorm";
-import connectDatabase from "../config/typeorm/db.config";
+import { DataSource, LessThan, Repository } from "typeorm";
 import { AccessToken } from "../../modules/auth/entities/access-token.entity";
 import { RefreshToken } from "../../modules/auth/entities/refresh-token.entity";
 import logger from "../utils/logger.utils";
@@ -8,9 +7,9 @@ class RemoveRevokedTokensCron {
       private accessTokenRepository: Repository<AccessToken>;
       private refreshTokenRepository: Repository<RefreshToken>;
 
-      constructor() {
-            this.accessTokenRepository = connectDatabase.getRepository(AccessToken);
-            this.refreshTokenRepository = connectDatabase.getRepository(RefreshToken);
+      constructor(dataSource: DataSource) {
+            this.accessTokenRepository = dataSource.getRepository(AccessToken);
+            this.refreshTokenRepository = dataSource.getRepository(RefreshToken);
       }
 
       async run() {
@@ -42,4 +41,4 @@ class RemoveRevokedTokensCron {
       }
 }
 
-export const cleanTokens = () => new RemoveRevokedTokensCron().run();
+export const cleanTokens = (dataSource: DataSource) => new RemoveRevokedTokensCron(dataSource).run();

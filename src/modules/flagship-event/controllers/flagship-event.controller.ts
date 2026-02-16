@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { DataSource } from "typeorm";
 import { AppError } from "../../../shared/utils/error.utils";
 import { FlagshipEventVersionService } from "../services/flagship-event.service";
 import { responseHandler } from "../../../shared/utils/helpers/response.helper";
@@ -6,8 +7,8 @@ import { responseHandler } from "../../../shared/utils/helpers/response.helper";
 export class FlagshipEventVersionController {
   private service: FlagshipEventVersionService;
 
-  constructor() {
-    this.service = new FlagshipEventVersionService();
+  constructor(dataSource: DataSource) {
+    this.service = new FlagshipEventVersionService(dataSource);
   }
 
   create = async (req: Request, res: Response, next: NextFunction) => {

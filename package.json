@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "typeorm:run-migrations": "npm run typeorm migration:run -- -d ./src/shared/config/typeorm/db.config.ts",

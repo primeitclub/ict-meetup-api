@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { DataSource } from "typeorm";
 import { AuthService } from "../services/auth.service";
 import { LoginDto } from "../dto/auth.dto";
 
@@ -10,8 +11,8 @@ import { envConfig } from "../../../shared/config/env";
 
 export class AuthController {
       private authService: AuthService;
-      constructor() {
-            this.authService = new AuthService();
+      constructor(dataSource: DataSource) {
+            this.authService = new AuthService(dataSource);
       }
 
       login = async (req: Request, res: Response, next: NextFunction) => {

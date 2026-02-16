@@ -8,14 +8,12 @@ import { createAssetLibraryController } from '../controllers/asset-library.contr
 import { createAssetController } from '../controllers/asset.controller';
 import { validateCreateAssetLibrary, validateUpdateAssetLibrary, validateAssetLibraryId } from '../validators/asset-library.validator';
 import { validateCreateAsset, validateUpdateAsset, validateAssetId } from '../validators/asset.validator';
-import { authenticate } from '../../../shared/middlewares/auth.middleware';
-import connectDatabase from '../../../shared/config/typeorm/db.config';
+import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
 
 const createAssetLibraryRouter = (dataSource: DataSource) => {
   const router = Router();
+  const authenticate = createAuthenticate(dataSource);
 
-
-  
   const assetLibraryRepository = new AssetLibraryRepository(dataSource);
   const assetRepository = new AssetRepository(dataSource);
   const assetLibraryService = new AssetLibraryService(assetLibraryRepository);
@@ -217,7 +215,4 @@ const createAssetLibraryRouter = (dataSource: DataSource) => {
   return router;
 };
 
-const dataSource = connectDatabase;
-const router = createAssetLibraryRouter(dataSource);
-
-export default router;
+export default createAssetLibraryRouter;
