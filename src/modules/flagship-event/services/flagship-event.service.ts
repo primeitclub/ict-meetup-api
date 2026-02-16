@@ -133,7 +133,7 @@ export class FlagshipEventVersionService {
     }
 
     Object.assign(version, data);
-    version.modifiedBy = userId;
+    version.modifiedById = userId;
 
     const updatedVersion = await this.versionRepository.save(version);
 

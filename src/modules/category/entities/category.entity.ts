@@ -10,6 +10,8 @@ import {
 export enum CategoryType {
   TEAMS = 'teams',
   SPONSORS = 'sponsors',
+  SPEAKERS = 'speakers',
+  EVENTS = 'events',
 }
 
 @Entity({ name: 'category' })
