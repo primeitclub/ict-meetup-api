@@ -1,4 +1,4 @@
-import connectDatabase from '../config/typeorm/db.config';
+import { DataSource } from 'typeorm';
 import { AuditLog } from '../../modules/auditlogs/entities/audit-log.entity';
 import {
   AuditLogType,
@@ -17,9 +17,9 @@ interface AuditLogParams {
   ipAddress?: string;
 }
 
-export const logAudit = async (params: AuditLogParams): Promise<void> => {
+export const logAudit = async (dataSource: DataSource, params: AuditLogParams): Promise<void> => {
   try {
-    const auditRepo = connectDatabase.getRepository(AuditLog);
+    const auditRepo = dataSource.getRepository(AuditLog);
 
     const auditLog = auditRepo.create({
       logType: params.logType,

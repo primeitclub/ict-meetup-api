@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
+import { DataSource } from "typeorm";
 import { SeedService } from "./seed.service";
 import { responseHandler } from "../../shared/utils/helpers/response.helper";
 
 export class SeedController {
   private seedService: SeedService;
 
-  constructor() {
-    this.seedService = new SeedService();
+  constructor(dataSource: DataSource) {
+    this.seedService = new SeedService(dataSource);
   }
   seedStaticUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {

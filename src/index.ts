@@ -4,12 +4,12 @@ import cors from "cors";
 import express from "express";
 import connectDatabase from "./shared/config/typeorm/db.config";
 import { envConfig } from "./shared/config/env";
-import seedRouter from "./modules/seed/seed.routes";
-import versionRouter from "./modules/flagship-event/routes/flagship-event.routes";
+import createSeedRouter from "./modules/seed/seed.routes";
+import createVersionRouter from "./modules/flagship-event/routes/flagship-event.routes";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./shared/utils/swagger.utils";
 import { errorHandler } from "./shared/utils/helpers/error.helper";
-import authRouter from "./modules/auth/routes/auth.routes";
+import createAuthRouter from "./modules/auth/routes/auth.routes";
 import cookieParser from "cookie-parser";
 import categoryRouter from "./modules/category/routes/category.routes";
 import teamMemberRouter from "./modules/team-members/routes/team-member.routes";
@@ -31,8 +31,6 @@ app.use(
 
 app.use(cookieParser());
 
-
-
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api-docs.json', (req: Request, res: Response) => {
@@ -53,14 +51,25 @@ app.use(errorHandler);
 connectDatabase.initialize()
   .then(() => {
     console.log('Database connected successfully.');
+
+    // Register routes AFTER DB is initialized — safe to create repositories
+    app.use("/api/auth", createAuthRouter(connectDatabase));
+    app.use("/api/seeds", createSeedRouter(connectDatabase));
+    app.use("/api/flagship-event/versions", createVersionRouter(connectDatabase));
+    app.use("/api/categories", createCategoryRouter(connectDatabase));
+    app.use("/api/team-members", createTeamMemberRouter(connectDatabase));
+    app.use("/api/asset-library", createAssetLibraryRouter(connectDatabase));
+
+    app.use(errorHandler);
+
+    // Start cron jobs after DB is ready
+    startCronJobs(connectDatabase);
+
     const PORT = envConfig.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
-    }); ``
+    });
   })
   .catch((error) => {
     console.error('Error connecting to the database', error);
   });
-
-// start cron jobs
-startCronJobs();

@@ -1,5 +1,4 @@
-import { Repository } from "typeorm";
-import connectDatabase from "../../../shared/config/typeorm/db.config";
+import { DataSource, Repository } from "typeorm";
 import { AppError } from "../../../shared/utils/error.utils";
 import logger from "../../../shared/utils/logger.utils";
 import {
@@ -10,9 +9,8 @@ import {
 export class FlagshipEventVersionService {
   private versionRepository: Repository<FlagshipEventVersion>;
 
-  constructor() {
-    this.versionRepository =
-      connectDatabase.getRepository(FlagshipEventVersion);
+  constructor(dataSource: DataSource) {
+    this.versionRepository = dataSource.getRepository(FlagshipEventVersion);
   }
 
   private async createAuditLog(

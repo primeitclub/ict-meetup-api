@@ -1,15 +1,16 @@
-import { Repository } from 'typeorm';
-import connectDatabase from '../../../shared/config/typeorm/db.config';
+import { DataSource, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { TeamMember } from '../entities/team-member.entity';
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from '../dto/team-member.dto';
 
 export class TeamMemberService {
+  private dataSource: DataSource;
   private teamMemberRepository: Repository<TeamMember>;
 
-  constructor() {
-    this.teamMemberRepository = connectDatabase.getRepository(TeamMember);
+  constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
+    this.teamMemberRepository = dataSource.getRepository(TeamMember);
   }
 
   private async createAuditLog(
@@ -32,14 +33,14 @@ export class TeamMemberService {
     });
 
 
-    const versionExists = await connectDatabase
+    const versionExists = await this.dataSource
       .getRepository('FlagshipEventVersion')
       .findOne({ where: { id: data.versionId } });
     if (!versionExists) {
       throw new AppError('Flagship event version not found', 404);
     }
 
-    const categoryExists = await connectDatabase
+    const categoryExists = await this.dataSource
       .getRepository('Category')
       .findOne({ where: { id: data.categoryId } });
     if (!categoryExists) {
@@ -101,7 +102,7 @@ export class TeamMemberService {
 
     const oldState = { ...teamMember };
     if (data.versionId) {
-      const versionExists = await connectDatabase
+      const versionExists = await this.dataSource
         .getRepository('FlagshipEvent')
         .findOne({ where: { id: data.versionId } });
       if (!versionExists) {
@@ -110,7 +111,7 @@ export class TeamMemberService {
     }
 
     if (data.categoryId) {
-      const categoryExists = await connectDatabase
+      const categoryExists = await this.dataSource
         .getRepository('Category')
         .findOne({ where: { id: data.categoryId } });
       if (!categoryExists) {

@@ -1,6 +1,5 @@
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { User } from "../../user/entities/user.entity";
-import connectDatabase from "../../../shared/config/typeorm/db.config";
 import { LoginDto } from "../dto/auth.dto";
 import { AppError } from "../../../shared/utils/error.utils";
 import bcrypt from "bcrypt";
@@ -16,10 +15,10 @@ export class AuthService {
       private refreshTokenRepository: Repository<RefreshToken>;
       private userRepository: Repository<User>;
 
-      constructor() {
-            this.accessTokenRepository = connectDatabase.getRepository(AccessToken);
-            this.refreshTokenRepository = connectDatabase.getRepository(RefreshToken);
-            this.userRepository = connectDatabase.getRepository(User);
+      constructor(dataSource: DataSource) {
+            this.accessTokenRepository = dataSource.getRepository(AccessToken);
+            this.refreshTokenRepository = dataSource.getRepository(RefreshToken);
+            this.userRepository = dataSource.getRepository(User);
       }
 
       public async login(data: LoginDto) {

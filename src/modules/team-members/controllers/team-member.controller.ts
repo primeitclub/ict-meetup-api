@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
+import { DataSource } from 'typeorm';
 import { TeamMemberService } from '../services/team-member.service';
 import { responseHandler } from '../../../shared/utils/helpers/response.helper';
 
 export class TeamMemberController {
   private service: TeamMemberService;
 
-  constructor() {
-    this.service = new TeamMemberService();
+  constructor(dataSource: DataSource) {
+    this.service = new TeamMemberService(dataSource);
   }
 
   create = async (req: Request, res: Response, next: NextFunction) => {
