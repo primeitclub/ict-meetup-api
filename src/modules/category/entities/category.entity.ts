@@ -11,6 +11,8 @@ import { BaseEntity } from '../../../shared/config/typeorm/base-entity';
 export enum CategoryType {
   TEAMS = 'teams',
   SPONSORS = 'sponsors',
+  SPEAKERS = 'speakers',
+  EVENTS = 'events',
 }
 
 @Entity({ name: 'category' })

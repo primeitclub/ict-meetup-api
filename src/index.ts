@@ -11,9 +11,10 @@ import swaggerSpec from "./shared/utils/swagger.utils";
 import { errorHandler } from "./shared/utils/helpers/error.helper";
 import createAuthRouter from "./modules/auth/routes/auth.routes";
 import cookieParser from "cookie-parser";
-import createCategoryRouter from "./modules/category/routes/category.routes";
-import createTeamMemberRouter from "./modules/team-members/routes/team-member.routes";
-import createAssetLibraryRouter from "./modules/asset-library/routes/asset-library.routes";
+import categoryRouter from "./modules/category/routes/category.routes";
+import teamMemberRouter from "./modules/team-members/routes/team-member.routes";
+import assetLibraryRouter from "./modules/asset-library/routes/asset-library.routes";
+import createUploadRouter  from "./modules/upload/routes/upload.routes"; 
 import { startCronJobs } from "./shared/cron/cron";
 import { Request, Response } from "express";
 dotenv.config();
@@ -35,6 +36,17 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs.json', (req: Request, res: Response) => {
   res.json(swaggerSpec);
 });
+
+app.use("/api/auth", authRouter);
+app.use("/api/seeds", seedRouter);
+app.use("/api/flagship-event/versions", versionRouter);
+app.use("/api/categories", categoryRouter);
+app.use("/api/team-members", teamMemberRouter);
+app.use("/api/asset-library", assetLibraryRouter);
+app.use("/api/upload",createUploadRouter);
+
+
+app.use(errorHandler);
 
 connectDatabase.initialize()
   .then(() => {
