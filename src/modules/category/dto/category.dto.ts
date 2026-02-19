@@ -1,18 +1,18 @@
-import { CategoryType } from '../entities/category.entity';
-
 export interface CreateCategoryDto {
-  type: CategoryType;
+  type: string;
   name: string;
+  displayOrder: number;
 }
 
 export interface UpdateCategoryDto {
-  type?: CategoryType;
+  type?: string;
   name?: string;
+  displayOrder?: number;
 }
 
 export interface CategoryResponseDto {
   id: string;
-  type: CategoryType;
+  type: string;
   name: string;
   createdAt: Date;
   updatedAt: Date;

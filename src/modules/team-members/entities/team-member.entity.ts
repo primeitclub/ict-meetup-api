@@ -10,12 +10,11 @@ import {
 } from 'typeorm';
 import { Category } from '../../category/entities/category.entity';
 import { FlagshipEventVersion } from '../../flagship-event/entities/flagship-event.entity';
+import { BaseEntity } from '../../../shared/config/typeorm/base-entity';
+import { Designation } from '../../designation/entities/designation.entity';
 
 @Entity({ name: 'team_members' })
-export class TeamMember {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class TeamMember extends BaseEntity {
   @Index()
   @Column({ name: 'version_id', type: 'uuid' })
   versionId: string;
@@ -35,9 +34,6 @@ export class TeamMember {
   @Column({ type: 'varchar', length: 150 })
   name: string;
 
-  @Column({ type: 'varchar', length: 150, nullable: true })
-  designation: string;
-
   @Column({ type: 'varchar', length: 100, nullable: true })
   role: string;
 
@@ -50,12 +46,15 @@ export class TeamMember {
   @Column({ type: 'json', nullable: true })
   socialLinks: Record<string, string>;
 
-  @Column({ name: 'display_order', type: 'int', default: 0 })
-  displayOrder: number;
+  @Column({ name: 'designation_order', type: 'int', default: 0 })
+  designationOrder: number;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  @Index()
+  @Column({ name: 'designation_id', type: 'uuid' })
+  designationId: string;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  @ManyToOne(() => Designation, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'designation_id' })
+  designation: Designation;
+
 }

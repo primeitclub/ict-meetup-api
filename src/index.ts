@@ -42,11 +42,11 @@ connectDatabase.initialize()
 
     // Register routes AFTER DB is initialized — safe to create repositories
     app.use("/api/auth", createAuthRouter(connectDatabase));
-    app.use("/api/seeds", createSeedRouter(connectDatabase));
     app.use("/api/flagship-event/versions", createVersionRouter(connectDatabase));
     app.use("/api/categories", createCategoryRouter(connectDatabase));
     app.use("/api/team-members", createTeamMemberRouter(connectDatabase));
     app.use("/api/asset-library", createAssetLibraryRouter(connectDatabase));
+    app.use("/api/seeds", createSeedRouter(connectDatabase));
 
     app.use(errorHandler);
 

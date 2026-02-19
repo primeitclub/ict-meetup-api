@@ -8,20 +8,17 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '../../../shared/config/typeorm/base-entity';
 
-export enum CategoryType {
-  TEAMS = 'teams',
-  SPONSORS = 'sponsors',
-}
+
 
 @Entity({ name: 'category' })
 export class Category extends BaseEntity {
 
   @Index()
   @Column({
-    type: 'enum',
-    enum: CategoryType,
+    type: 'varchar',
+    length: 50,
   })
-  type: CategoryType;
+  type: string;
 
   @Column({ type: 'varchar', length: 100 })
   name: string;

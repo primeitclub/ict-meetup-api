@@ -11,6 +11,7 @@ import { RefreshToken } from "../../../modules/auth/entities/refresh-token.entit
 import { envConfig } from "../env";
 import { AssetLibrary } from "../../../modules/asset-library/entities/asset-library.entity";
 import { Asset } from "../../../modules/asset-library/entities/asset.entity";
+import { Designation } from "../../../modules/designation/entities/designation.entity";
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ const dbConfigOptions = {
   password: envConfig.DB_PASSWORD,
   database: envConfig.DB_DATABASE,
   synchronize: envConfig.NODE_ENV === 'local',
-  logging: envConfig.NODE_ENV === 'local',
+  logging: false,
 };
 
 const connectDatabase = new DataSource({
@@ -33,7 +34,7 @@ const connectDatabase = new DataSource({
   database: dbConfigOptions.database,
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
-  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember, AssetLibrary, Asset],  //Note: Add your entities here
+  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember, AssetLibrary, Asset, Designation],  //Note: Add your entities here
   migrations: [__dirname + '/../typeorm/migrations/*{.ts,.js}'],
 });
 export default connectDatabase;

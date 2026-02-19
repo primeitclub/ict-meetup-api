@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { CategoryService } from '../services/category.service';
 import { responseHandler } from '../../../shared/utils/helpers/response.helper';
-import { CategoryType } from '../entities/category.entity';
 
 export class CategoryController {
   private service: CategoryService;
@@ -28,7 +27,7 @@ export class CategoryController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { type } = req.query;
-      const result = await this.service.findAll(type as CategoryType);
+      const result = await this.service.findAll(type as string);
       return responseHandler(res)(
         'Categories fetched successfully',
         result,
@@ -73,8 +72,8 @@ export class CategoryController {
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any).user?.id || 'system';
-      const result = await this.service.delete(req.params.id, userId);
-      return responseHandler(res)(result.message, null, 200);
+      await this.service.delete(req.params.id, userId);
+      return responseHandler(res)('Category deleted successfully', null, 200);
     } catch (error) {
       next(error);
     }

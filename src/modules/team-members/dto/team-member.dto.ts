@@ -2,24 +2,24 @@ export interface CreateTeamMemberDto {
   versionId: string;
   categoryId: string;
   name: string;
-  designation?: string;
+  designationId: string;
   role?: string;
   imagePath?: string;
   imageUrl?: string;
   socialLinks?: Record<string, string>;
-  displayOrder?: number;
+  designationOrder?: number;
 }
 
 export interface UpdateTeamMemberDto {
   versionId?: string;
   categoryId?: string;
   name?: string;
-  designation?: string;
+  designationId?: string;
   role?: string;
   imagePath?: string;
   imageUrl?: string;
   socialLinks?: Record<string, string>;
-  displayOrder?: number;
+  designationOrder?: number;
 }
 
 export interface TeamMemberResponseDto {
@@ -27,12 +27,15 @@ export interface TeamMemberResponseDto {
   versionId: string;
   categoryId: string;
   name: string;
-  designation?: string;
+  designation: {
+    id: string;
+    name: string;
+  };
   role?: string;
   imagePath?: string;
   imageUrl?: string;
   socialLinks?: Record<string, string>;
-  displayOrder: number;
+  designationOrder: number;
   createdAt: Date;
   updatedAt: Date;
   category?: {

@@ -1,7 +1,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
-import { Category, CategoryType } from '../entities/category.entity';
+import { Category } from '../entities/category.entity';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
 
 export class CategoryService {
@@ -31,17 +31,20 @@ export class CategoryService {
     });
 
     const existing = await this.categoryRepository.findOne({
-      where: { name: data.name, type: data.type },
+      where: { name: data.name, type: data.type, displayOrder: data.displayOrder },
     });
 
     if (existing) {
       throw new AppError(
-        `Category with name '${data.name}' and type '${data.type}' already exists`,
+        `Category with name '${data.name}' and type '${data.type}' and display order '${data.displayOrder}' already exists`,
         400
       );
     }
-
-    const newCategory = this.categoryRepository.create(data);
+    const payload = {
+      ...data,
+      createdById: userId
+    }
+    const newCategory = this.categoryRepository.create(payload);
     const savedCategory = await this.categoryRepository.save(newCategory);
 
     await this.createAuditLog(
@@ -55,7 +58,7 @@ export class CategoryService {
     return savedCategory;
   }
 
-  async findAll(type?: CategoryType): Promise<Category[]> {
+  async findAll(type: string): Promise<Category[]> {
     logger.debug('Fetching all categories', {
       module: 'CategoryService',
       type,
@@ -64,7 +67,7 @@ export class CategoryService {
     const where = type ? { type } : {};
     return await this.categoryRepository.find({
       where,
-      order: { createdAt: 'DESC' },
+      order: { displayOrder: 'ASC' },
     });
   }
 
@@ -94,17 +97,20 @@ export class CategoryService {
       const checkType = data.type || category.type;
       const checkName = data.name || category.name;
       const existing = await this.categoryRepository.findOne({
-        where: { name: checkName, type: checkType },
+        where: { name: checkName, type: checkType, displayOrder: data.displayOrder },
       });
       if (existing && existing.id !== id) {
         throw new AppError(
-          `Category with name '${checkName}' and type '${checkType}' already exists`,
+          `Category with name '${checkName}' and type '${checkType}' and display order '${data.displayOrder}' already exists`,
           400
         );
       }
     }
-
-    Object.assign(category, data);
+    const payload = {
+      ...data,
+      modifiedById: userId
+    }
+    Object.assign(category, payload);
     const updatedCategory = await this.categoryRepository.save(category);
 
     await this.createAuditLog(
@@ -118,7 +124,7 @@ export class CategoryService {
     return updatedCategory;
   }
 
-  async delete(id: string, userId: string): Promise<{ message: string }> {
+  async delete(id: string, userId: string): Promise<void> {
     const category = await this.findById(id);
 
     logger.warn(`Deleting category: ${id}`, {
@@ -135,6 +141,6 @@ export class CategoryService {
       { deleted_category: category }
     );
 
-    return { message: 'Category deleted successfully' };
+    return;
   }
 }

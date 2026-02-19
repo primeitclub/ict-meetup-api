@@ -9,35 +9,26 @@ const options: swaggerJSDoc.Options = {
                   version: "1.0.0",
                   description: 'API Documentation for ICT Meetup App',
             },
+            tags: [
+                  {
+                        name: "Auth",
+                        description: "API for managing authentication",
+                  },
+                  {
+                        name: "FlagshipEventVersions",
+                        description: "API for managing flagship event versions",
+                  },
+                  {
+                        name: "TeamMembers",
+                        description: "API for managing team members",
+                  },
+                  {
+                        name: "Seed",
+                        description: "Seed endpoints",
+                  },
+            ],
       },
-      tags: [
-            {
-                  name: "Seed",
-                  description: "Seed endpoints",
-            },
-            {
-                  name: "FlagshipEventVersions",
-                  description: "API for managing flagship event versions",
-            },
-            {
-                  name: "Teams",
-                  description: "API for managing teams",
-            },
-            {
-                  name: "Categories",
-                  description: "API for managing categories",
-            },
-            {
-                  name: "TeamMembers",
-                  description: "API for managing team members",
-            },
-            {
-                  name: "Asset Libraries",
-                  description: "API for managing asset libraries",
-            }
-
-      ],
-      apis: [process.cwd() + (envConfig.NODE_ENV === 'dev' || envConfig.NODE_ENV === 'prod' ? "/modules/**/*.routes.js" : "/src/modules/**/*.routes.ts")],
+      apis: ["./src/modules/**/*.routes.ts", "./dist/modules/**/*.routes.js"],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
