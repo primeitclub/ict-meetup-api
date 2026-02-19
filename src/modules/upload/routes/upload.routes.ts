@@ -1,10 +1,11 @@
 import { Router } from 'express';
+import { DataSource } from 'typeorm';
 import { createUploadController } from '../controllers/upload.controller';
-import { authenticate } from '../../../shared/middlewares/auth.middleware';
+import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
 
-const createUploadRouter = () => {
+const createUploadRouter = (dataSource: DataSource) => {
   const router = Router();
-
+  const authenticate = createAuthenticate(dataSource);
   const uploadController = createUploadController();
 
   /**
@@ -102,6 +103,4 @@ const createUploadRouter = () => {
   return router;
 };
 
-const router = createUploadRouter();
-
-export default router;
+export default createUploadRouter;
