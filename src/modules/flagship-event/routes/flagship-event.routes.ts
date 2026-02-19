@@ -115,44 +115,44 @@ const createVersionRouter = (dataSource: DataSource) => {
        */
       versionRouter.get("/slug/:slug", controller.getBySlug);
 
-      /**
-       * @swagger
-       * /api/flagship-event/versions/{id}:
-       *   patch:
-       *     summary: Update a version
-       *     tags: [FlagshipEventVersions]
-       *     parameters:
-       *       - in: path
-       *         name: id
-       *         required: true
-       *         schema: { type: string, format: uuid }
-       *     requestBody:
-       *       content:
-       *         application/json:
-       *           schema:
-       *             type: object
-       *     responses:
-       *       200:
-       *         description: OK
-       */
-      versionRouter.patch("/:id", validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
+/**
+ * @swagger
+ * /api/flagship-event/versions/{id}:
+ *   patch:
+ *     summary: Update a version
+ *     tags: [FlagshipEventVersions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, format: uuid }
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+versionRouter.patch("/:id", authenticate, validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
 
-      /**
-       * @swagger
-       * /api/flagship-event/versions/{id}:
-       *   delete:
-       *     summary: Delete a version
-       *     tags: [FlagshipEventVersions]
-       *     parameters:
-       *       - in: path
-       *         name: id
-       *         required: true
-       *         schema: { type: string, format: uuid }
-       *     responses:
-       *       200:
-       *         description: OK
-       */
-      versionRouter.delete("/:id", controller.delete);
+/**
+ * @swagger
+ * /api/flagship-event/versions/{id}:
+ *   delete:
+ *     summary: Delete a version
+ *     tags: [FlagshipEventVersions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, format: uuid }
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+versionRouter.delete("/:id",authenticate, controller.delete);
 
       return versionRouter;
 };

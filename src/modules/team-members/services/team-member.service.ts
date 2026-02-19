@@ -100,7 +100,11 @@ export class TeamMemberService {
     return await this.teamMemberRepository.find({
       where,
       relations: ['category', 'flagshipEvent', 'designation'],
-      order: { designationOrder: 'ASC', createdAt: 'DESC' },
+      order: {
+        category: { displayOrder: 'ASC' },
+        designationOrder: 'ASC',
+        createdAt: 'DESC',
+      },
     });
   }
 

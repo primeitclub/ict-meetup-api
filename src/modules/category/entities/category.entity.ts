@@ -7,9 +7,6 @@ import {
   Index,
 } from 'typeorm';
 import { BaseEntity } from '../../../shared/config/typeorm/base-entity';
-
-
-
 @Entity({ name: 'category' })
 export class Category extends BaseEntity {
 
