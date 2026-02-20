@@ -50,6 +50,21 @@ export class TeamMemberService {
       throw new AppError('Category not found', 404);
     }
 
+    if (categoryExists.type !== 'teams') {
+      throw new AppError('Only categories of type "teams" can be assigned to team members', 400);
+    }
+
+    const designationOrderExists = await this.teamMemberRepository.findOne({
+      where: {
+        categoryId: data.categoryId,
+        designationOrder: data.designationOrder || 0
+      }
+    });
+
+    if (designationOrderExists) {
+      throw new AppError(`A member with designation order ${data.designationOrder || 0} already exists in this category`, 400);
+    }
+
     const designationExists = await this.dataSource
       .getRepository(Designation)
       .findOne({ where: { id: data.designationId } });
@@ -96,10 +111,39 @@ export class TeamMemberService {
     const where: any = {};
     if (query?.versionId) where.versionId = query.versionId;
     if (query?.categoryId) where.categoryId = query.categoryId;
+    where.category = { type: 'teams' };
 
     return await this.teamMemberRepository.find({
       where,
       relations: ['category', 'flagshipEvent', 'designation'],
+      select: {
+        id: true,
+        // versionId: true,
+        // categoryId: true,
+        name: true,
+        role: true,
+        imagePath: true,
+        imageUrl: true,
+        socialLinks: true as any,
+        designationOrder: true,
+        createdAt: true,
+        updatedAt: true,
+        // designationId: true,
+        category: {
+          id: true,
+          type: true,
+          name: true,
+          displayOrder: true,
+        },
+        designation: {
+          id: true,
+          name: true,
+        },
+        flagshipEvent: {
+          id: true,
+          version_name: true,
+        },
+      },
       order: {
         category: { displayOrder: 'ASC' },
         designationOrder: 'ASC',
@@ -146,6 +190,9 @@ export class TeamMemberService {
       if (!categoryExists) {
         throw new AppError('Category not found', 404);
       }
+      if (categoryExists.type !== 'teams') {
+        throw new AppError('Only categories of type "teams" can be assigned to team members', 400);
+      }
     }
 
     if (data.designationId) {
@@ -157,19 +204,37 @@ export class TeamMemberService {
       }
     }
 
-    if (data.name) {
-      const existing = await this.teamMemberRepository.findOne({
-        where: {
-          name: data.name,
-          categoryId: data.categoryId || teamMember.categoryId,
-        },
-      });
+    if (data.name || data.designationOrder || data.categoryId) {
+      const categoryId = data.categoryId || teamMember.categoryId;
+      const designationOrder = data.designationOrder !== undefined ? data.designationOrder : teamMember.designationOrder;
 
-      if (existing && existing.id !== id) {
-        throw new AppError(
-          `Team member with name '${data.name}' already exists in this category`,
-          400
-        );
+      // 1. Check unique name in category
+      if (data.name || data.categoryId) {
+        const nameMatch = await this.teamMemberRepository.findOne({
+          where: {
+            name: data.name || teamMember.name,
+            categoryId,
+          },
+        });
+        if (nameMatch && nameMatch.id !== id) {
+          throw new AppError(
+            `Team member with name '${data.name || teamMember.name}' already exists in this category`,
+            400
+          );
+        }
+      }
+
+      // 2. Check unique designationOrder in category
+      if (data.designationOrder !== undefined || data.categoryId) {
+        const orderMatch = await this.teamMemberRepository.findOne({
+          where: {
+            categoryId,
+            designationOrder
+          }
+        });
+        if (orderMatch && orderMatch.id !== id) {
+          throw new AppError(`A member with designation order ${designationOrder} already exists in this category`, 400);
+        }
       }
     }
 
