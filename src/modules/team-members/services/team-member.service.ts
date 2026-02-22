@@ -6,35 +6,26 @@ import { CreateTeamMemberDto, UpdateTeamMemberDto } from '../dto/team-member.dto
 import { Category } from '../../category/entities/category.entity';
 import { FlagshipEventVersion } from '../../flagship-event/entities/flagship-event.entity';
 import { Designation } from '../../designation/entities/designation.entity';
+import { AuditLogService } from '../../auditlogs/services/audit-log.service';
+import { AuditLogActionType, AuditLogScope, AuditLogType } from '../../../shared/constants/audit-log.constants';
 
 export class TeamMemberService {
   private dataSource: DataSource;
   private teamMemberRepository: Repository<TeamMember>;
+  private auditLogService: AuditLogService;
 
   constructor(dataSource: DataSource) {
     this.dataSource = dataSource;
     this.teamMemberRepository = dataSource.getRepository(TeamMember);
+    this.auditLogService = new AuditLogService(dataSource);
   }
 
-  private async createAuditLog(
-    tableName: string,
-    recordId: string | null | undefined,
-    action: string,
-    changedBy: string,
-    changes: any
-  ) {
-    logger.info(`Audit Log: ${action} on ${tableName} by ${changedBy}`, {
-      module: 'TeamMemberService',
-      recordId,
-      changes,
-    });
-  }
+
 
   async create(data: CreateTeamMemberDto, userId: string): Promise<TeamMember> {
     logger.info(`Creating new team member: ${data.name}`, {
       module: 'TeamMemberService',
     });
-
 
     const versionExists = await this.dataSource
       .getRepository(FlagshipEventVersion)
@@ -83,13 +74,7 @@ export class TeamMemberService {
 
       const savedTeamMember = await this.teamMemberRepository.save(teamMember);
 
-      await this.createAuditLog(
-        'team_members',
-        savedTeamMember.id,
-        'CREATE',
-        userId,
-        savedTeamMember
-      );
+
 
       return savedTeamMember;
     } catch (error: any) {
@@ -245,18 +230,10 @@ export class TeamMemberService {
 
     const updatedTeamMember = await this.teamMemberRepository.save(teamMember);
 
-    await this.createAuditLog(
-      'team_members',
-      updatedTeamMember.id,
-      'UPDATE',
-      userId,
-      { before: oldState, after: updatedTeamMember }
-    );
-
     return updatedTeamMember;
   }
 
-  async delete(id: string, userId: string): Promise<{ message: string }> {
+  async delete(id: string): Promise<{ versionId: string }> {
     const teamMember = await this.findById(id);
 
     logger.warn(`Deleting team member: ${id}`, {
@@ -264,15 +241,6 @@ export class TeamMemberService {
     });
 
     await this.teamMemberRepository.remove(teamMember);
-
-    await this.createAuditLog(
-      'team_members',
-      id,
-      'DELETE',
-      userId,
-      { deleted_team_member: teamMember }
-    );
-
-    return { message: 'Team member deleted successfully' };
+    return { versionId: teamMember.versionId };
   }
 }

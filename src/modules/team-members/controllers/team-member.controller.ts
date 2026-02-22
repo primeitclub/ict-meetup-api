@@ -4,12 +4,20 @@ import { TeamMemberService } from '../services/team-member.service';
 import { responseHandler } from '../../../shared/utils/helpers/response.helper';
 import { CategoryService } from '../../category/services/category.service';
 import { DesignationService } from '../../designation/services/designation.service';
+import { AuditLogService } from '../../auditlogs/services/audit-log.service';
+import { AuditLogActionType, AuditLogScope, AuditLogType } from '../../../shared/constants/audit-log.constants';
+import logger from '../../../shared/utils/logger.utils';
 
-export class TeamMemberController {
+import { BaseController } from '../../../shared/base/base.controller';
+
+export class TeamMemberController extends BaseController {
   private service: TeamMemberService;
   private serviceForCategory: CategoryService;
   private serviceForDesignation: DesignationService;
+  protected moduleName = 'TeamMemberService';
+
   constructor(dataSource: DataSource) {
+    super(dataSource);
     this.service = new TeamMemberService(dataSource);
     this.serviceForCategory = new CategoryService(dataSource);
     this.serviceForDesignation = new DesignationService(dataSource);
@@ -19,6 +27,15 @@ export class TeamMemberController {
     try {
       const userId = req.user.id || 'system';
       const result = await this.service.create(req.body, userId);
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.CREATE,
+        `Team member ${result.id} created`,
+        result.versionId,
+        AuditLogScope.TEAM_MEMBERS,
+        req.ip,
+        userId
+      );
       return responseHandler(res)(
         'Team member created successfully',
         result,
@@ -70,6 +87,15 @@ export class TeamMemberController {
         req.body,
         userId
       );
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.UPDATE,
+        `Team member ${result.id} updated successfully`,
+        result.versionId,
+        AuditLogScope.TEAM_MEMBERS,
+        req.ip,
+        userId
+      );
       return responseHandler(res)(
         'Team member updated successfully',
         result,
@@ -83,8 +109,18 @@ export class TeamMemberController {
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any).user?.id || 'system';
-      const result = await this.service.delete(req.params.id, userId);
-      return responseHandler(res)(result.message, null, 200);
+
+      const result = await this.service.delete(req.params.id);
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.DELETE,
+        `Team member ${req.params.id} deleted successfully`,
+        result.versionId,
+        AuditLogScope.TEAM_MEMBERS,
+        req.ip,
+        userId
+      );
+      return responseHandler(res)('Team member deleted successfully', null, 200);
     } catch (error) {
       next(error);
     }
@@ -94,6 +130,15 @@ export class TeamMemberController {
     try {
       const userId = req.user.id || 'system';
       const result = await this.serviceForCategory.create(req.body, userId);
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.CREATE,
+        `Category ${result.id} created successfully`,
+        req.body.versionId,
+        AuditLogScope.TEAM_MEMBERS,
+        req.ip,
+        userId
+      );
       return responseHandler(res)(
         'Category created successfully',
         result,
@@ -112,6 +157,15 @@ export class TeamMemberController {
         req.body,
         userId
       );
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.UPDATE,
+        `Category ${result.id} updated successfully`,
+        req.body.versionId,
+        AuditLogScope.TEAM_MEMBERS,
+        req.ip,
+        userId
+      );
       return responseHandler(res)(
         'Category updated successfully',
         result,
@@ -125,7 +179,17 @@ export class TeamMemberController {
   deleteForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any).user?.id || 'system';
+      const { versionId } = req.query as any;
       await this.serviceForCategory.delete(req.params.id, userId);
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.DELETE,
+        `Category ${req.params.id} deleted successfully`,
+        versionId,
+        AuditLogScope.TEAM_MEMBERS,
+        req.ip,
+        userId
+      );
       return responseHandler(res)('Category deleted successfully', null, 200);
     } catch (error) {
       next(error);
@@ -153,6 +217,15 @@ export class TeamMemberController {
     try {
       const userId = req.user.id || 'system';
       const result = await this.serviceForDesignation.create(req.body, userId);
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.CREATE,
+        `Designation ${result.id} created successfully`,
+        req.body.versionId,
+        AuditLogScope.TEAM_MEMBERS,
+        req.ip,
+        userId
+      );
       return responseHandler(res)(
         'Designation created successfully',
         result,
@@ -171,6 +244,15 @@ export class TeamMemberController {
         req.body,
         userId
       );
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.UPDATE,
+        `Designation ${req.params.id} updated successfully`,
+        req.body.versionId,
+        AuditLogScope.TEAM_MEMBERS,
+        req.ip,
+        userId
+      );
       return responseHandler(res)(
         'Designation updated successfully',
         result,
@@ -184,7 +266,17 @@ export class TeamMemberController {
   deleteForDesignation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user.id || 'system';
+      const { versionId } = req.query as any;
       await this.serviceForDesignation.delete(req.params.id, userId);
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.DELETE,
+        `Designation ${req.params.id} deleted successfully`,
+        versionId,
+        AuditLogScope.TEAM_MEMBERS,
+        req.ip,
+        userId
+      );
       return responseHandler(res)('Designation deleted successfully', null, 200);
     } catch (error) {
       next(error);

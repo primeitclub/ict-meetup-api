@@ -13,22 +13,6 @@ export class FlagshipEventVersionService {
     this.versionRepository = dataSource.getRepository(FlagshipEventVersion);
   }
 
-  private async createAuditLog(
-    versionId: string | null,
-    tableName: string,
-    recordId: string | null,
-    action: string,
-    changedBy: string,
-    changes: any
-  ) {
-    logger.info(`Audit Log: ${action} on ${tableName} by ${changedBy}`, {
-      module: "FlagshipEventVersionService",
-      versionId,
-      recordId,
-      changes,
-    });
-  }
-
   /**
    * Create a new flagship event version
    * Respects client-provided status and is_current
@@ -64,15 +48,6 @@ export class FlagshipEventVersionService {
     }
 
     const savedVersion = await this.versionRepository.save(newVersion);
-
-    await this.createAuditLog(
-      savedVersion.id,
-      "flagship_event_versions",
-      savedVersion.id,
-      "CREATE",
-      userId,
-      savedVersion
-    );
 
     return savedVersion;
   }
@@ -135,15 +110,6 @@ export class FlagshipEventVersionService {
 
     const updatedVersion = await this.versionRepository.save(version);
 
-    await this.createAuditLog(
-      updatedVersion.id,
-      "flagship_event_versions",
-      updatedVersion.id,
-      "UPDATE",
-      userId,
-      { before: oldState, after: updatedVersion }
-    );
-
     return updatedVersion;
   }
 
@@ -192,15 +158,6 @@ export class FlagshipEventVersionService {
     });
 
     await this.versionRepository.remove(version);
-
-    await this.createAuditLog(
-      null,
-      "flagship_event_versions",
-      id,
-      "DELETE",
-      userId,
-      { deleted_version: version }
-    );
 
     return { message: "Version deleted successfully" };
   }

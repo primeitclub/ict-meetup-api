@@ -1,11 +1,8 @@
 export class DesignationDto {
+      versionId: string;
       name: string;
-      displayOrder: number;
 }
 
-export class CreateDesignationDTO extends DesignationDto {
-}
+export class CreateDesignationDTO extends DesignationDto { }
 
-export class UpdateDesignationDTO extends DesignationDto {
-
-}
+export class UpdateDesignationDTO extends DesignationDto { }

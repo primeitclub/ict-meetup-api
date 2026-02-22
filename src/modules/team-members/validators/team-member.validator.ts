@@ -24,6 +24,7 @@ export const teamMemberQuerySchema = z.object({
 
 
 export const createTeamCategorySchema = z.object({
+  versionId: z.uuid(),
   type: z.string(),
   name: z.string().min(1).max(150),
   displayOrder: z.number().int().min(1).max(15).default(1),
@@ -40,6 +41,7 @@ export const teamCategoryQuerySchema = z.object({
 });
 
 export const createTeamMemberDesignationSchema = z.object({
+  versionId: z.uuid(),
   name: z.string().min(1).max(150),
 });
 

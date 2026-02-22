@@ -54,20 +54,20 @@ export class AuthService {
                   userAgent: data.userAgent,
             });
 
-            return tokens;
+            return { ...tokens, userId: user.id };
       }
 
       private async generateAccessToken(payload: TokenPayload) {
             return jwt.sign(payload, envConfig.JWT_ACCESS_SECRET as jwt.Secret, { expiresIn: parseExpiryToSeconds(envConfig.JWT_ACCESS_EXPIRY) });
       }
 
-      private async generateRefreshToken(payload: TokenPayload) {
-            return jwt.sign(payload, envConfig.JWT_REFRESH_SECRET as jwt.Secret, { expiresIn: parseExpiryToSeconds(envConfig.JWT_REFRESH_EXPIRY) });
+      private async generateRefreshToken(payload: TokenPayload, customExpiry?: string) {
+            return jwt.sign(payload, envConfig.JWT_REFRESH_SECRET as jwt.Secret, { expiresIn: parseExpiryToSeconds(customExpiry || envConfig.JWT_REFRESH_EXPIRY) });
       }
 
-      private async generateTokens(payload: TokenPayload) {
+      private async generateTokens(payload: TokenPayload, customExpiry?: string): Promise<{ accessToken: string; refreshToken: string }> {
             const accessToken = await this.generateAccessToken(payload);
-            const refreshToken = await this.generateRefreshToken(payload);
+            const refreshToken = await this.generateRefreshToken(payload, customExpiry);
             return { accessToken, refreshToken };
       }
 
@@ -77,7 +77,7 @@ export class AuthService {
             return { message: 'Logged out successfully' };
       }
 
-      public async refreshToken(refreshToken: string, ipAddress: string, userAgent: string) {
+      public async refreshToken(refreshToken: string, ipAddress: string, userAgent: string, customExpiry?: string) {
             try {
                   jwt.verify(refreshToken, envConfig.JWT_REFRESH_SECRET);
             } catch (error) {
@@ -135,11 +135,11 @@ export class AuthService {
             await this.refreshTokenRepository.save({
                   userId: storedToken.user.id,
                   token: tokens.refreshToken,
-                  expiresAt: new Date(Date.now() + parseExpiryToMs(envConfig.JWT_REFRESH_EXPIRY)),
+                  expiresAt: new Date(Date.now() + parseExpiryToMs(customExpiry || envConfig.JWT_REFRESH_EXPIRY)),
                   ipAddress,
                   userAgent,
             });
 
-            return tokens;
+            return { ...tokens, userId: storedToken.user.id };
       }
 }

@@ -95,10 +95,23 @@ const createAuthRouter = (dataSource: DataSource) => {
 
       /**
        * @swagger
-       * /api/auth/refresh-token:
+       * /api/auth/refresh-token/{expiry}:
        *   post:
-       *     summary: Refresh a token
+       *     summary: Refresh a token (Supports optional expiry in path, query, or body for testing)
        *     tags: [Auth]
+       *     parameters:
+       *       - in: path
+       *         name: expiry
+       *         schema:
+       *           type: string
+       *         required: false
+       *         description: The custom expiry time for the new refresh token (e.g., '10s', '1m', '1h')
+       *       - in: query
+       *         name: expiry
+       *         schema:
+       *           type: string
+       *         required: false
+       *         description: The custom expiry time for the new refresh token
        *     responses:
        *       200:
        *         description: Refresh token successful
@@ -110,24 +123,11 @@ const createAuthRouter = (dataSource: DataSource) => {
        *                 message: { type: string }
        *       401:
        *         description: Unauthorized
-       *         content:
-       *           application/json:
-       *             schema:
-       *               type: object
-       *               properties:
-       *                 message: { type: string }
-       *                 error: { type: string }
        *       500:
        *         description: Internal server error
-       *         content:
-       *           application/json:
-       *             schema:
-       *               type: object
-       *               properties:
-       *                 message: { type: string }
-       *                 error: { type: string }
        */
       authRouter.post("/refresh-token", authController.refreshToken);
+      authRouter.post("/refresh-token/:expiry", authController.refreshToken);
 
       return authRouter;
 };

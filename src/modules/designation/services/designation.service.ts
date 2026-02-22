@@ -54,8 +54,9 @@ export class DesignationService {
                               throw new AppError('Designation already exists', 400);
                         }
                   }
+                  const { versionId, ...updateData } = data;
                   const payload = {
-                        ...data,
+                        ...updateData,
                         modifiedById: userId
                   }
                   const designation = await this.designationRepository.update(id, payload);
@@ -78,7 +79,7 @@ export class DesignationService {
                   if (!existingDesignation) {
                         throw new AppError('Designation not found', 404);
                   }
-                  const resignation = await this.designationRepository.delete(id);
+                  const designation = await this.designationRepository.delete(id);
                   await this.createAuditLog(
                         'designations',
                         id,
@@ -86,7 +87,7 @@ export class DesignationService {
                         userId,
                         existingDesignation
                   );
-                  return resignation;
+                  return designation;
             } catch (error) {
                   throw error;
             }

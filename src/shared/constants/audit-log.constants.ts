@@ -10,9 +10,11 @@ export enum AuditLogActionType {
   UPDATE = 'update',
   DELETE = 'delete',
   VIEW = 'view',
+  REFRESH = 'refresh',
 }
 
 export enum AuditLogScope {
+  FLAGSHIP_EVENT = 'flagship_event',
   EVENTS = 'events',
   EVENT_SPEAKERS = 'event_speakers',
   SPONSORS = 'sponsors',

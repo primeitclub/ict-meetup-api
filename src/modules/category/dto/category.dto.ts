@@ -1,10 +1,12 @@
 export interface CreateCategoryDto {
+  versionId: string;
   type: string;
   name: string;
   displayOrder: number;
 }
 
 export interface UpdateCategoryDto {
+  versionId: string;
   type?: string;
   name?: string;
   displayOrder?: number;
