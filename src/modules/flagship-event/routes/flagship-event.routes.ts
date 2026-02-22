@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { DataSource } from "typeorm";
 import { FlagshipEventVersionController } from "../controllers/flagship-event.controller";
-import { validateRequestBody } from "../../../shared/validators/request.validator";
-import { flagshipEventVersionSchema, updateFlagshipEventVersionSchema } from "../validators/flagship-event.validator";
+import { validateRequestBody, validateRequestQuery } from "../../../shared/validators/request.validator";
+import { flagshipEventVersionSchema, updateFlagshipEventVersionSchema, flagshipEventQuerySchema } from "../validators/flagship-event.validator";
 import { createAuthenticate } from "../../../shared/middlewares/auth.middleware";
 
 const createVersionRouter = (dataSource: DataSource) => {
@@ -63,11 +63,27 @@ const createVersionRouter = (dataSource: DataSource) => {
        *   get:
        *     summary: Get all flagship event versions
        *     tags: [FlagshipEventVersions]
+       *     parameters:
+       *       - in: query
+       *         name: page
+       *         schema: { type: number }
+       *       - in: query
+       *         name: limit
+       *         schema: { type: number }
+       *       - in: query
+       *         name: search
+       *         schema: { type: string }
+       *       - in: query
+       *         name: sortBy
+       *         schema: { type: string }
+       *       - in: query
+       *         name: sortOrder
+       *         schema: { type: string }
        *     responses:
        *       200:
        *         description: OK
        */
-      versionRouter.get("/", controller.getAll);
+      versionRouter.get("/", validateRequestQuery(flagshipEventQuerySchema), controller.getAll);
 
       /**
        * @swagger
@@ -115,44 +131,44 @@ const createVersionRouter = (dataSource: DataSource) => {
        */
       versionRouter.get("/slug/:slug", controller.getBySlug);
 
-/**
- * @swagger
- * /api/flagship-event/versions/{id}:
- *   patch:
- *     summary: Update a version
- *     tags: [FlagshipEventVersions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string, format: uuid }
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       200:
- *         description: OK
- */
-versionRouter.patch("/:id", authenticate, validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
+      /**
+       * @swagger
+       * /api/flagship-event/versions/{id}:
+       *   patch:
+       *     summary: Update a version
+       *     tags: [FlagshipEventVersions]
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *     requestBody:
+       *       content:
+       *         application/json:
+       *           schema:
+       *             type: object
+       *     responses:
+       *       200:
+       *         description: OK
+       */
+      versionRouter.patch("/:id", authenticate, validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
 
-/**
- * @swagger
- * /api/flagship-event/versions/{id}:
- *   delete:
- *     summary: Delete a version
- *     tags: [FlagshipEventVersions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string, format: uuid }
- *     responses:
- *       200:
- *         description: OK
- */
-versionRouter.delete("/:id",authenticate, controller.delete);
+      /**
+       * @swagger
+       * /api/flagship-event/versions/{id}:
+       *   delete:
+       *     summary: Delete a version
+       *     tags: [FlagshipEventVersions]
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *     responses:
+       *       200:
+       *         description: OK
+       */
+      versionRouter.delete("/:id", authenticate, controller.delete);
 
       return versionRouter;
 };

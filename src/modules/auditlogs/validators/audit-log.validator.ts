@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { AuditLogType, AuditLogActionType, AuditLogScope } from '../../../shared/constants/audit-log.constants';
+import { paginationShape } from '../../../shared/validators/pagination.validator';
 
 // export const createAuditLogSchema = z.object({
 //       logType: z.enum(AuditLogType),
@@ -17,6 +18,5 @@ export const auditLogQuerySchema = z.object({
       logActionType: z.enum(AuditLogActionType).optional(),
       scope: z.enum(AuditLogScope).optional(),
       versionId: z.uuid().optional(),
-      page: z.coerce.number().int().positive().default(1),
-      limit: z.coerce.number().int().positive().default(10),
+      ...paginationShape
 });

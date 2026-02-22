@@ -5,7 +5,7 @@ import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 
 export class AssetService implements IAssetService {
-  constructor(private readonly assetRepository: IAssetRepository) {}
+  constructor(private readonly assetRepository: IAssetRepository) { }
 
   private async createAuditLog(
     tableName: string,
@@ -26,9 +26,9 @@ export class AssetService implements IAssetService {
       module: 'AssetService',
     });
 
-    
+
     const activeAssetsCount = await this.assetRepository.countByLibrary(assetLibraryId);
-  
+
 
     const newAsset = Object.assign(new Asset(), {
       ...data,

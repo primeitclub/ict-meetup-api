@@ -17,6 +17,7 @@ import createAssetLibraryRouter from "./modules/asset-library/routes/asset-libra
 import createUploadRouter from "./modules/upload/routes/upload.routes";
 import { startCronJobs } from "./shared/cron/cron";
 import { Request, Response } from "express";
+import createAuditLogRouter from "./modules/auditlogs/routes/audit-log.routes";
 dotenv.config();
 
 const app = express();
@@ -51,6 +52,7 @@ connectDatabase.initialize()
     app.use("/api/asset-library", createAssetLibraryRouter(connectDatabase));
     app.use("/api/seeds", createSeedRouter(connectDatabase));
     app.use("/api/upload", createUploadRouter(connectDatabase));
+    app.use("/api/audit-logs", createAuditLogRouter(connectDatabase));
 
     app.use(errorHandler);
 

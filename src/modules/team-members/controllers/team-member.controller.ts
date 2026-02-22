@@ -4,10 +4,7 @@ import { TeamMemberService } from '../services/team-member.service';
 import { responseHandler } from '../../../shared/utils/helpers/response.helper';
 import { CategoryService } from '../../category/services/category.service';
 import { DesignationService } from '../../designation/services/designation.service';
-import { AuditLogService } from '../../auditlogs/services/audit-log.service';
 import { AuditLogActionType, AuditLogScope, AuditLogType } from '../../../shared/constants/audit-log.constants';
-import logger from '../../../shared/utils/logger.utils';
-
 import { BaseController } from '../../../shared/base/base.controller';
 
 export class TeamMemberController extends BaseController {
@@ -48,10 +45,9 @@ export class TeamMemberController extends BaseController {
 
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { versionId } = req.query as any;
-      const result = await this.service.findAll({ versionId });
-      if (!result.length) {
-        return responseHandler(res)('Team members not found', null, 200);
+      const result = await this.service.findAll(req.query as any);
+      if (!result.items.length) {
+        return responseHandler(res)('Team members not found', result, 200);
       }
       return responseHandler(res)(
         'Team members fetched successfully',
@@ -198,10 +194,9 @@ export class TeamMemberController extends BaseController {
 
   getAllForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { type } = req.query as any;
-      const result = await this.serviceForCategory.findAll(type);
-      if (!result.length) {
-        return responseHandler(res)('Categories not found', null, 200);
+      const result = await this.serviceForCategory.findAll(req.query as any);
+      if (!result.items.length) {
+        return responseHandler(res)('Categories not found', result, 200);
       }
       return responseHandler(res)(
         'Categories fetched successfully',
@@ -285,9 +280,9 @@ export class TeamMemberController extends BaseController {
 
   getAllForDesignation = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.serviceForDesignation.findAll();
-      if (!result) {
-        return responseHandler(res)('Designations not found', null, 200);
+      const result = await this.serviceForDesignation.findAll(req.query as any);
+      if (!result.items.length) {
+        return responseHandler(res)('Designations not found', result, 200);
       }
       return responseHandler(res)(
         'Designations fetched successfully',

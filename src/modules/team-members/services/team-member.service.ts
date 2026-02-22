@@ -87,7 +87,7 @@ export class TeamMemberService {
     }
   }
 
-  async findAll(query?: { versionId?: string; categoryId?: string }): Promise<TeamMember[]> {
+  async findAll(query: any = {}): Promise<any> {
     logger.debug('Fetching team members', {
       module: 'TeamMemberService',
       query,
@@ -98,7 +98,10 @@ export class TeamMemberService {
     if (query?.categoryId) where.categoryId = query.categoryId;
     where.category = { type: 'teams' };
 
-    return await this.teamMemberRepository.find({
+    const { page = 1, limit = 10 } = query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [items, total] = await this.teamMemberRepository.findAndCount({
       where,
       relations: ['category', 'flagshipEvent', 'designation'],
       select: {
@@ -134,7 +137,19 @@ export class TeamMemberService {
         designationOrder: 'ASC',
         createdAt: 'DESC',
       },
+      skip,
+      take: Number(limit),
     });
+
+    return {
+      items,
+      meta: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / Number(limit)),
+      }
+    };
   }
 
   async findById(id: string): Promise<TeamMember> {
@@ -158,7 +173,6 @@ export class TeamMemberService {
       module: 'TeamMemberService',
     });
 
-    const oldState = { ...teamMember };
     if (data.versionId) {
       const versionExists = await this.dataSource
         .getRepository(FlagshipEventVersion)

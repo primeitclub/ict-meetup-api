@@ -93,10 +93,23 @@ export class DesignationService {
             }
       }
 
-      findAll = async () => {
+      findAll = async (query: any = {}) => {
             try {
-                  const designations = await this.designationRepository.find();
-                  return designations;
+                  const { page = 1, limit = 10 } = query;
+                  const skip = (Number(page) - 1) * Number(limit);
+                  const [items, total] = await this.designationRepository.findAndCount({
+                        skip,
+                        take: Number(limit),
+                  });
+                  return {
+                        items,
+                        meta: {
+                              total,
+                              page: Number(page),
+                              limit: Number(limit),
+                              totalPages: Math.ceil(total / Number(limit)),
+                        }
+                  };
             } catch (error) {
                   throw error;
             }

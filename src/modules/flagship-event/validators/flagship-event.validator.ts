@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { EventVersionStatus } from "../entities/flagship-event.entity";
+import { paginationShape } from "../../../shared/validators/pagination.validator";
 
 const baseFlagshipEventVersionSchema = z.object({
   version_name: z.string().min(1).max(50),
@@ -47,3 +48,7 @@ export const updateFlagshipEventVersionSchema = baseFlagshipEventVersionSchema
       path: ["start_date"],
     }
   );
+
+export const flagshipEventQuerySchema = z.object({
+  ...paginationShape
+});

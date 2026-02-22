@@ -58,17 +58,32 @@ export class CategoryService {
     return savedCategory;
   }
 
-  async findAll(type: string): Promise<Category[]> {
+  async findAll(query: any = {}): Promise<any> {
     logger.debug('Fetching all categories', {
       module: 'CategoryService',
-      type,
+      query,
     });
 
+    const { type, page = 1, limit = 10 } = query;
     const where = type ? { type } : {};
-    return await this.categoryRepository.find({
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [items, total] = await this.categoryRepository.findAndCount({
       where,
       order: { displayOrder: 'ASC' },
+      skip,
+      take: Number(limit),
     });
+
+    return {
+      items,
+      meta: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / Number(limit)),
+      }
+    };
   }
 
   async findById(id: string): Promise<Category> {

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { paginationShape } from '../../../shared/validators/pagination.validator';
 
 export const createTeamMemberSchema = z.object({
   versionId: z.uuid(),
@@ -20,6 +21,7 @@ export const teamMemberIdParamSchema = z.object({
 
 export const teamMemberQuerySchema = z.object({
   versionId: z.uuid(),
+  ...paginationShape
 });
 
 
@@ -38,6 +40,7 @@ export const teamCategoryIdParamSchema = z.object({
 
 export const teamCategoryQuerySchema = z.object({
   type: z.string().optional(),
+  ...paginationShape
 });
 
 export const createTeamMemberDesignationSchema = z.object({
@@ -51,4 +54,6 @@ export const teamMemberDesignationIdParamSchema = z.object({
   id: z.uuid(),
 });
 
-export const teamMemberDesignationQuerySchema = z.object({});
+export const teamMemberDesignationQuerySchema = z.object({
+  ...paginationShape
+});

@@ -38,11 +38,11 @@ export class FlagshipEventVersionController extends BaseController {
 
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.service.findAll();
-      if (result.length === 0) {
+      const result = await this.service.findAll(req.query);
+      if (result.items.length === 0) {
         return responseHandler(res)(
           "No flagship event versions found",
-          [],
+          result,
           200
         );
       }

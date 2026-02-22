@@ -52,13 +52,30 @@ export class FlagshipEventVersionService {
     return savedVersion;
   }
 
-  async findAll() {
+  async findAll(query: any = {}) {
     logger.debug("Fetching all flagship event versions", {
       module: "FlagshipEventVersionService",
+      query,
     });
-    return await this.versionRepository.find({
+
+    const { page = 1, limit = 10 } = query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [items, total] = await this.versionRepository.findAndCount({
       order: { version_number: "DESC" },
+      skip,
+      take: Number(limit),
     });
+
+    return {
+      items,
+      meta: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / Number(limit)),
+      }
+    };
   }
 
   async findById(id: string) {
@@ -97,8 +114,6 @@ export class FlagshipEventVersionService {
     logger.info(`Updating flagship event version: ${id}`, {
       module: "FlagshipEventVersionService",
     });
-
-    const oldState = { ...version };
 
     // Handle status transition if status changes
     if (data.status && data.status !== version.status) {

@@ -59,6 +59,21 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       - in: query
    *         name: versionId
    *         schema: { type: string, format: uuid }
+   *       - in: query
+   *         name: page
+   *         schema: { type: number }
+   *       - in: query
+   *         name: limit
+   *         schema: { type: number }
+   *       - in: query
+   *         name: search
+   *         schema: { type: string }
+   *       - in: query
+   *         name: sortBy
+   *         schema: { type: string }
+   *       - in: query
+   *         name: sortOrder
+   *         schema: { type: string }
    *     responses:
    *       200:
    *         description: OK
@@ -94,6 +109,22 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *   get:
    *     summary: Get all team categories
    *     tags: [TeamMembers]
+   *     parameters: 
+   *       - in: query
+   *         name: page
+   *         schema: { type: number }
+   *       - in: query
+   *         name: limit
+   *         schema: { type: number }
+   *       - in: query
+   *         name: search
+   *         schema: { type: string }
+   *       - in: query
+   *         name: sortBy
+   *         schema: { type: string }
+   *       - in: query
+   *         name: sortOrder
+   *         schema: { type: string }
    *     responses:
    *       200:
    *         description: OK
@@ -171,6 +202,22 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *   get:
    *     summary: Get all team member designations
    *     tags: [TeamMembers]
+   *     parameters: 
+   *       - in: query
+   *         name: page
+   *         schema: { type: number }
+   *       - in: query
+   *         name: limit
+   *         schema: { type: number }
+   *       - in: query
+   *         name: search
+   *         schema: { type: string }
+   *       - in: query
+   *         name: sortBy
+   *         schema: { type: string }
+   *       - in: query
+   *         name: sortOrder
+   *         schema: { type: string }
    *     responses:  
    *       200:
    *         description: OK

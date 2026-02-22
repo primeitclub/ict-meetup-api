@@ -75,7 +75,7 @@ export class AuthController extends BaseController {
       refreshToken = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const refreshToken = req.cookies.refresh_token;
-                  const expiry = req.params.expiry || req.query.expiry || req.body.expiry;
+                  const expiry = req.query.expiry || req.body.expiry;
 
                   if (!refreshToken) {
                         throw new AppError('Refresh token not found', 401);
