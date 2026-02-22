@@ -92,8 +92,9 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *         application/json:
    *           schema:
    *             type: object
-   *             required: [type, name]
+   *             required: [versionId, type, name]
    *             properties:
+   *               versionId: { type: string, format: uuid }
    *               type: { type: string }
    *               name: { type: string, minLength: 1, maxLength: 150 }
    *               displayOrder: { type: integer, minimum: 1, maximum: 15, default: 1 }
@@ -187,9 +188,10 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *         application/json:
    *           schema:
    *             type: object
-   *             required: [name]
+   *             required: [name, versionId]
    *             properties:
    *               name: { type: string, minLength: 1, maxLength: 150 }
+   *               versionId: { type: string, format: uuid }
    *     responses:
    *       201:
    *         description: Created

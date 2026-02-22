@@ -18,6 +18,12 @@ const createAuditLogRouter = (dataSource: DataSource) => {
        *     tags: [Audit Logs]
        *     parameters:
        *       - in: query
+       *         name: versionId
+       *         schema:
+       *           type: string
+       *         required: true
+       *         description: The version ID
+       *       - in: query
        *         name: page
        *         schema:
        *           type: number

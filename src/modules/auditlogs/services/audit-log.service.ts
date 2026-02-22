@@ -58,7 +58,9 @@ export class AuditLogService {
                   limit = 10
             } = query;
 
-            const skip = (page - 1) * limit;
+            const pageNum = Number(page);
+            const limitNum = Number(limit);
+            const skip = (pageNum - 1) * limitNum;
 
             const queryBuilder = this.auditLogRepository.createQueryBuilder('auditLog');
 
@@ -91,7 +93,7 @@ export class AuditLogService {
             queryBuilder
                   .orderBy('auditLog.createdAt', 'DESC')
                   .skip(skip)
-                  .take(limit);
+                  .take(limitNum);
 
             const [items, total] = await queryBuilder.getManyAndCount();
 
@@ -99,9 +101,9 @@ export class AuditLogService {
                   items,
                   meta: {
                         total,
-                        page,
-                        limit,
-                        totalPages: Math.ceil(total / limit),
+                        page: pageNum,
+                        limit: limitNum,
+                        totalPages: Math.ceil(total / limitNum),
                   },
             };
       }

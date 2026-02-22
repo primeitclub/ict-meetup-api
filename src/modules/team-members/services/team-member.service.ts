@@ -6,23 +6,19 @@ import { CreateTeamMemberDto, UpdateTeamMemberDto } from '../dto/team-member.dto
 import { Category } from '../../category/entities/category.entity';
 import { FlagshipEventVersion } from '../../flagship-event/entities/flagship-event.entity';
 import { Designation } from '../../designation/entities/designation.entity';
-import { AuditLogService } from '../../auditlogs/services/audit-log.service';
-import { AuditLogActionType, AuditLogScope, AuditLogType } from '../../../shared/constants/audit-log.constants';
 
 export class TeamMemberService {
   private dataSource: DataSource;
   private teamMemberRepository: Repository<TeamMember>;
-  private auditLogService: AuditLogService;
 
   constructor(dataSource: DataSource) {
     this.dataSource = dataSource;
     this.teamMemberRepository = dataSource.getRepository(TeamMember);
-    this.auditLogService = new AuditLogService(dataSource);
   }
 
 
 
-  async create(data: CreateTeamMemberDto, userId: string): Promise<TeamMember> {
+  async create(data: CreateTeamMemberDto): Promise<TeamMember> {
     logger.info(`Creating new team member: ${data.name}`, {
       module: 'TeamMemberService',
     });
