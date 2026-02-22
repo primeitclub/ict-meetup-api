@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { AppError, ValidationError } from "../../utils/error.utils";
 import { z } from "zod";
+import logger from "../logger.utils";
 
 // Note: _ is used to indicate that the parameter is intentionally not used in the function body to avoid linting errors
 export const errorHandler = (
@@ -31,8 +32,7 @@ export const errorHandler = (
       message: err.message,
     });
   }
-
-  console.error("Unhandled Error:", err);
+  logger.error("Unhandled Error:", err);
   return res.status(500).json({
     status: "error",
     message: "Internal server error",
