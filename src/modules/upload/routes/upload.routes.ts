@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { DataSource } from 'typeorm';
-import { createUploadController } from '../controllers/upload.controller';
+// import { createUploadController } from '../controllers/upload.controller';
 import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
 
 const createUploadRouter = (dataSource: DataSource) => {
   const router = Router();
   const authenticate = createAuthenticate(dataSource);
-  const uploadController = createUploadController();
+  // const uploadController = createUploadController();
 
   // /**
   //  * @swagger
@@ -48,7 +48,7 @@ const createUploadRouter = (dataSource: DataSource) => {
   //  *       401:
   //  *         description: Unauthorized
   //  */
-  router.post('/:version/:moduleName', authenticate, uploadController.uploadSingle);
+  // router.post('/:version/:moduleName', authenticate, uploadController.uploadSingle);
 
   // /**
   //  * @swagger
@@ -98,7 +98,7 @@ const createUploadRouter = (dataSource: DataSource) => {
   //  *       401:
   //  *         description: Unauthorized
   //  */
-  router.post('/:version/:moduleName/multiple', authenticate, uploadController.uploadMultiple);
+  // router.post('/:version/:moduleName/multiple', authenticate, uploadController.uploadMultiple);
 
   return router;
 };

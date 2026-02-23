@@ -10,7 +10,11 @@ import {
   MAX_IMAGE_SIZE,
 } from "../../constants/upload.constants";
 import { handleMulterError } from "./multerError.helper";
+import { AppError } from "../error.utils";
+import { FlagshipEventVersionService } from "../../../modules/flagship-event/services/flagship-event.service";
+import connectDatabase from "../../config/typeorm/db.config";
 
+const flagshipEventVersionService = new FlagshipEventVersionService(connectDatabase);
 /* Helper */
 const ensureDirectoryExists = (dirPath: string) => {
   if (!fs.existsSync(dirPath)) {
@@ -18,7 +22,7 @@ const ensureDirectoryExists = (dirPath: string) => {
   }
 };
 
-const removeFile = async (filePath?: string) => {
+export const removeFile = async (filePath?: string) => {
   if (!filePath) return;
   try {
     await fs.promises.unlink(filePath);
@@ -28,24 +32,36 @@ const removeFile = async (filePath?: string) => {
 };
 
 /* Multer storage configuration */
-const storage = (version: string, moduleName: string) =>
-  multer.diskStorage({
-    destination: (_req, _file, cb) => {
+const storage = multer.diskStorage({
+  destination: async (req, _file, cb) => {
+    try {
+      // Determine moduleName from the route (e.g. '/api/team-members' -> 'team-members')
+      const moduleName = req.baseUrl.split("/").filter(Boolean).pop() || "unknown-module";
+
+      // Determine versionId from body, query or headers
+      const isVersionExist = await flagshipEventVersionService.findById(req.body.versionId);
+      if (!isVersionExist) {
+        return cb(new AppError("Version not found", 404), "");
+      }
+
       const uploadDir = path.join(
         process.cwd(),
         "public",
         "assets",
-        version,
-        moduleName
+        String(isVersionExist.version_name),
+        String(moduleName)
       );
       ensureDirectoryExists(uploadDir);
       cb(null, uploadDir);
-    },
-    filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname);
-      cb(null, `${Date.now()}-${uuidv4()}${ext}`);
-    },
-  });
+    } catch (err) {
+      cb(err instanceof Error ? err : new AppError("Failed to resolve upload directory", 500), "");
+    }
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}-${uuidv4()}${ext}`);
+  },
+});
 
 /* File validation */
 const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
@@ -69,79 +85,88 @@ type UploadOptions =
 
 /* Main middleware */
 export const imageUploadHandler =
-  (version: string, moduleName: string, options: UploadOptions) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    const upload = options.multiple
-      ? multer({
-          storage: storage(version, moduleName),
+  (options: UploadOptions) =>
+    (req: Request, res: Response, next: NextFunction) => {
+      const upload = options.multiple
+        ? multer({
+          storage: storage,
           fileFilter,
           limits: { fileSize: MAX_IMAGE_SIZE },
         }).array(options.fieldName, options.maxCount)
-      : multer({
-          storage: storage(version, moduleName),
+        : multer({
+          storage: storage,
           fileFilter,
           limits: { fileSize: MAX_IMAGE_SIZE },
         }).single(options.fieldName);
 
-    upload(req, res, async (err) => {
-      const files: Express.Multer.File[] = options.multiple
-        ? (req.files as Express.Multer.File[]) || []
-        : req.file
-        ? [req.file]
-        : [];
+      upload(req, res, async (err) => {
+        const files: Express.Multer.File[] = options.multiple
+          ? (req.files as Express.Multer.File[]) || []
+          : req.file
+            ? [req.file]
+            : [];
 
-      
-      if (err) {
-        for (const file of files) {
-          await removeFile(file.path);
-        }
-        return next(handleMulterError(err));
-      }
 
-      
-      if (files.length === 0) {
-        return next(new Error(`${options.fieldName} file(s) are required`));
-      }
-
-      try {
-        const uploadedImages: {
-          localPath: string;
-          localUrl: string;
-          cloudUrl: string;
-          publicId: string;
-        }[] = [];
-
-       
-        for (const file of files) {
-          const cloudResult = await cloudinary.uploader.upload(file.path, {
-            folder: `assets/${version}/${moduleName}`,
-            resource_type: "image",
-          });
-
-          uploadedImages.push({
-            localPath: file.path,
-            localUrl: `/assets/${version}/${moduleName}/${file.filename}`, 
-            cloudUrl: cloudResult.secure_url,
-            publicId: cloudResult.public_id,
-          });
+        if (err) {
+          for (const file of files) {
+            await removeFile(file.path);
+          }
+          return next(handleMulterError(err));
         }
 
-        req.body.uploadedImages = options.multiple
-          ? uploadedImages
-          : uploadedImages[0];
 
-        next();
-      } catch (uploadError) {
-
-        for (const file of files) {
-          await removeFile(file.path);
+        if (files.length === 0) {
+          return next(new Error(`${options.fieldName} file(s) are required`));
         }
 
-        next(
-          uploadError instanceof Error
-            ? uploadError
-            : new Error("Unexpected error during image upload")
-        );
-      }
-    });
-  };
+        try {
+          const uploadedImages: {
+            localPath: string;
+            localUrl: string;
+            cloudUrl: string;
+            publicId: string;
+          }[] = [];
+
+
+          for (const file of files) {
+            const version = (req as any).version;
+            const moduleName = (req as any).moduleName;
+            const cloudResult = await cloudinary.uploader.upload(file.path, {
+              folder: `assets/${version}/${moduleName}`,
+              resource_type: "image",
+            });
+
+            uploadedImages.push({
+              localPath: file.path,
+              localUrl: `/public/assets/${version}/${moduleName}/${file.filename}`,
+              cloudUrl: cloudResult.secure_url,
+              publicId: cloudResult.public_id,
+            });
+          }
+
+          req.body.uploadedImages = options.multiple
+            ? uploadedImages
+            : uploadedImages[0];
+          req.body.imagePath = options.multiple
+            ? uploadedImages.map((image) => image.localUrl)
+            : uploadedImages[0].localUrl;
+          req.body.imageUrl = options.multiple
+            ? uploadedImages.map((image) => image.cloudUrl)
+            : uploadedImages[0].cloudUrl;
+
+          next();
+        } catch (uploadError) {
+
+          for (const file of files) {
+            await removeFile(file.path);
+          }
+
+          next(
+            uploadError instanceof Error
+              ? uploadError
+              : new Error("Unexpected error during image upload")
+          );
+        }
+      });
+    };
+

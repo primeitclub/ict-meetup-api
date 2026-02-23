@@ -3,11 +3,15 @@ export interface CreateTeamMemberDto {
   categoryId: string;
   name: string;
   designationId: string;
-  role?: string;
-  imagePath?: string;
+  role: string;
+  imagePath: string;
   imageUrl?: string;
-  socialLinks?: Record<string, string>;
-  designationOrder?: number;
+  socialLinks?: {
+    instagram?: string;
+    linkedin?: string;
+    portfolio?: string;
+  };
+  designationOrder: number;
 }
 
 export interface UpdateTeamMemberDto {
@@ -18,7 +22,11 @@ export interface UpdateTeamMemberDto {
   role?: string;
   imagePath?: string;
   imageUrl?: string;
-  socialLinks?: Record<string, string>;
+  socialLinks?: {
+    instagram?: string;
+    linkedin?: string;
+    portfolio?: string;
+  };
   designationOrder?: number;
 }
 
@@ -31,19 +39,23 @@ export interface TeamMemberResponseDto {
     id: string;
     name: string;
   };
-  role?: string;
-  imagePath?: string;
+  role: string;
+  imagePath: string;
   imageUrl?: string;
-  socialLinks?: Record<string, string>;
+  socialLinks?: {
+    instagram?: string;
+    linkedin?: string;
+    portfolio?: string;
+  };
   designationOrder: number;
   createdAt: Date;
   updatedAt: Date;
-  category?: {
+  category: {
     id: string;
     type: string;
     name: string;
   };
-  flagshipEvent?: {
+  flagshipEvent: {
     id: string;
     versionName: string;
   };

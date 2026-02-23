@@ -34,19 +34,23 @@ export class TeamMember extends BaseEntity {
   @Column({ type: 'varchar', length: 150 })
   name: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100 })
   role: string;
 
-  @Column({ name: 'image_path', type: 'varchar', nullable: true })
+  @Column({ name: 'image_path', type: 'varchar' })
   imagePath: string;
 
   @Column({ name: 'image_url', type: 'varchar', nullable: true })
   imageUrl: string;
 
-  @Column({ type: 'json', nullable: true })
-  socialLinks: Record<string, string>;
+  @Column({ type: 'json' })
+  socialLinks: {
+    instagram?: string;
+    linkedin?: string;
+    portfolio?: string;
+  };
 
-  @Column({ name: 'designation_order', type: 'int', default: 0 })
+  @Column({ name: 'designation_order', type: 'int', default: 1 })
   designationOrder: number;
 
   @Index()

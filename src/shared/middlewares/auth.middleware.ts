@@ -13,7 +13,13 @@ export const createAuthenticate = (dataSource: DataSource) =>
                   if (!token) {
                         throw new AppError('Unauthorized', 401);
                   }
-                  const decoded = jwt.verify(token, envConfig.JWT_ACCESS_SECRET) as TokenPayload;
+
+                  let decoded: TokenPayload;
+                  try {
+                        decoded = jwt.verify(token, envConfig.JWT_ACCESS_SECRET) as TokenPayload;
+                  } catch (jwtErr) {
+                        throw new AppError('Unauthorized - Invalid or expired token', 401);
+                  }
 
                   const accessTokenRepository = dataSource.getRepository(AccessToken);
                   const storedToken = await accessTokenRepository.findOne({ where: { token, isRevoked: false } });

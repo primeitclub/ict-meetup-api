@@ -7,6 +7,7 @@ import { DesignationService } from '../../designation/services/designation.servi
 import { AuditLogActionType, AuditLogScope, AuditLogType } from '../../../shared/constants/audit-log.constants';
 import { BaseController } from '../../../shared/base/base.controller';
 import { FlagshipEventVersionService } from '../../flagship-event/services/flagship-event.service';
+import { removeFile } from '../../../shared/utils/helpers/imageUpload.helper';
 
 export class TeamMemberController extends BaseController {
   private service: TeamMemberService;
@@ -38,10 +39,11 @@ export class TeamMemberController extends BaseController {
       );
       return responseHandler(res)(
         'Team member created successfully',
-        result,
+        null,
         201
       );
     } catch (error) {
+      await removeFile(req.body.imagePath);
       next(error);
     }
   };
@@ -84,7 +86,6 @@ export class TeamMemberController extends BaseController {
       const result = await this.service.update(
         req.params.id,
         req.body,
-        userId
       );
       await this.createAuditLog(
         AuditLogType.INFO,
@@ -97,10 +98,11 @@ export class TeamMemberController extends BaseController {
       );
       return responseHandler(res)(
         'Team member updated successfully',
-        result,
+        null,
         200
       );
     } catch (error) {
+      await removeFile(req.body.imagePath);
       next(error);
     }
   };
@@ -128,11 +130,11 @@ export class TeamMemberController extends BaseController {
   createForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId || 'system';
-      const result = await this.serviceForCategory.create(req.body, userId);
       const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
       if (!isVersionExist) {
         return responseHandler(res)('Version not found', null, 404);
       }
+      const result = await this.serviceForCategory.create(req.body, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.CREATE,
@@ -155,15 +157,15 @@ export class TeamMemberController extends BaseController {
   updateForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId || 'system';
+      const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
+      if (!isVersionExist) {
+        return responseHandler(res)('Version not found', null, 404);
+      }
       const result = await this.serviceForCategory.update(
         req.params.id,
         req.body,
         userId
       );
-      const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-      if (!isVersionExist) {
-        return responseHandler(res)('Version not found', null, 404);
-      }
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.UPDATE,
@@ -187,11 +189,11 @@ export class TeamMemberController extends BaseController {
     try {
       const userId = (req as any).user?.id || 'system';
       const { versionId } = req.query as any;
-      await this.serviceForCategory.delete(req.params.id, userId);
       const isVersionExist = await this.flagshipEventVersion.findById(versionId);
       if (!isVersionExist) {
         return responseHandler(res)('Version not found', null, 404);
       }
+      await this.serviceForCategory.delete(req.params.id, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.DELETE,
@@ -226,11 +228,11 @@ export class TeamMemberController extends BaseController {
   createForDesignation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId || 'system';
-      const result = await this.serviceForDesignation.create(req.body, userId);
       const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
       if (!isVersionExist) {
         return responseHandler(res)('Version not found', null, 404);
       }
+      const result = await this.serviceForDesignation.create(req.body, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.CREATE,
@@ -253,15 +255,15 @@ export class TeamMemberController extends BaseController {
   updateForDesignation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId || 'system';
+      const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
+      if (!isVersionExist) {
+        return responseHandler(res)('Version not found', null, 404);
+      }
       const result = await this.serviceForDesignation.update(
         req.params.id,
         req.body,
         userId
       );
-      const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-      if (!isVersionExist) {
-        return responseHandler(res)('Version not found', null, 404);
-      }
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.UPDATE,

@@ -17,6 +17,7 @@ import {
   teamMemberDesignationQuerySchema,
 } from '../validators/team-member.validator';
 import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
+import { imageUploadHandler } from '../../../shared/utils/helpers/imageUpload.helper';
 
 const createTeamMemberRouter = (dataSource: DataSource) => {
   const router = Router();
@@ -32,7 +33,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *     requestBody:
    *       required: true
    *       content:
-   *         application/json:
+   *         multipart/form-data:
    *           schema:
    *             type: object
    *             required: [versionId, categoryId, designationId, name]
@@ -43,11 +44,18 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *               name: { type: string, minLength: 1, maxLength: 150 }
    *               role: { type: string, maxLength: 100 }
    *               designationOrder: { type: integer, minimum: 1, maximum: 15, default: 1 }
+   *               image: { type: string, format: binary }
+   *               socialLinks:
+   *                 type: object
+   *                 properties:
+   *                   instagram: { type: string, format: uri, pattern: "^https://" }
+   *                   linkedin: { type: string, format: uri, pattern: "^https://" }
+   *                   portfolio: { type: string, format: uri, pattern: "^https://" }
    *     responses:
    *       201:
    *         description: Created
    */
-  router.post('/', authenticate, validateRequestBody(createTeamMemberSchema), controller.create);
+  router.post('/', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(createTeamMemberSchema), controller.create);
 
   /**
    * @swagger
@@ -297,7 +305,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *         schema: { type: string, format: uuid }
    *     requestBody:
    *       content:
-   *         application/json:
+   *         multipart/form-data:
    *           schema:
    *             type: object
    *             properties:
@@ -307,11 +315,18 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *               name: { type: string, minLength: 1, maxLength: 150 }
    *               role: { type: string, maxLength: 100 }
    *               designationOrder: { type: integer, minimum: 1, maximum: 15, default: 1 }
+   *               image: { type: string, format: binary }
+   *               socialLinks:
+   *                 type: object
+   *                 properties:
+   *                   instagram: { type: string, format: uri, pattern: "^https://" }
+   *                   linkedin: { type: string, format: uri, pattern: "^https://" }
+   *                   portfolio: { type: string, format: uri, pattern: "^https://" }
    *     responses:
    *       200:
    *         description: OK
    */
-  router.put('/:id', authenticate, validateRequestParams(teamMemberIdParamSchema), validateRequestBody(updateTeamMemberSchema), controller.update);
+  router.put('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestParams(teamMemberIdParamSchema), validateRequestBody(updateTeamMemberSchema), controller.update);
 
   /**
    * @swagger

@@ -6,6 +6,7 @@ import { CreateTeamMemberDto, UpdateTeamMemberDto } from '../dto/team-member.dto
 import { Category } from '../../category/entities/category.entity';
 import { FlagshipEventVersion } from '../../flagship-event/entities/flagship-event.entity';
 import { Designation } from '../../designation/entities/designation.entity';
+import { removeFile } from '../../../shared/utils/helpers/imageUpload.helper';
 
 export class TeamMemberService {
   private dataSource: DataSource;
@@ -17,7 +18,7 @@ export class TeamMemberService {
   }
 
 
-
+  // social links and images
   async create(data: CreateTeamMemberDto): Promise<TeamMember> {
     logger.info(`Creating new team member: ${data.name}`, {
       module: 'TeamMemberService',
@@ -68,10 +69,7 @@ export class TeamMemberService {
       teamMember.category = categoryExists;
       teamMember.designation = designationExists;
 
-      const savedTeamMember = await this.teamMemberRepository.save(teamMember);
-
-
-
+      const savedTeamMember = await this.teamMemberRepository.save(teamMember)
       return savedTeamMember;
     } catch (error: any) {
       logger.error(`Error saving team member: ${error.message}`, {
@@ -162,7 +160,6 @@ export class TeamMemberService {
   async update(
     id: string,
     data: UpdateTeamMemberDto,
-    userId: string
   ): Promise<TeamMember> {
     const teamMember = await this.findById(id);
     logger.info(`Updating team member: ${id}`, {
@@ -251,6 +248,7 @@ export class TeamMemberService {
     });
 
     await this.teamMemberRepository.remove(teamMember);
+    await removeFile(teamMember.imagePath);
     return { versionId: teamMember.versionId };
   }
 }

@@ -5,12 +5,28 @@ export const createTeamMemberSchema = z.object({
   versionId: z.uuid(),
   categoryId: z.uuid(),
   name: z.string().min(1).max(150),
-  designation: z.string().max(150).optional(),
-  role: z.string().max(100).optional(),
-  imagePath: z.string().optional(),
+  designationId: z.uuid(),
+  role: z.string().max(100),
+  imagePath: z.string(),
   imageUrl: z.string().optional(),
-  socialLinks: z.record(z.string(), z.string()).optional(),
-  designationOrder: z.number().int().min(1).max(15).default(1),
+  designationOrder: z.preprocess(
+    (val) => (typeof val === 'string' ? Number(val) : val),
+    z.number().int().min(1).max(15).default(1)
+  ),
+  socialLinks: z.preprocess(
+    (val) => {
+      if (typeof val === 'string') {
+        try { return JSON.parse(val); } catch { return val; }
+      }
+      return val;
+    },
+    z.object({
+      instagram: z.url().startsWith('https://', { message: 'Must start with https://' }).optional(),
+      linkedin: z.url().startsWith('https://', { message: 'Must start with https://' }).optional(),
+      portfolio: z.url().startsWith('https://', { message: 'Must start with https://' }).optional(),
+    }).optional()
+  ),
+
 });
 
 export const updateTeamMemberSchema = createTeamMemberSchema.partial();
@@ -29,7 +45,10 @@ export const createTeamCategorySchema = z.object({
   versionId: z.uuid(),
   type: z.string(),
   name: z.string().min(1).max(150),
-  displayOrder: z.number().int().min(1).max(15).default(1),
+  displayOrder: z.preprocess(
+    (val) => (typeof val === 'string' ? Number(val) : val),
+    z.number().int().min(1).max(15).default(1)
+  ),
 });
 
 export const updateTeamCategorySchema = createTeamCategorySchema.partial();
