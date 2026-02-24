@@ -26,6 +26,18 @@ const options: swaggerJSDoc.Options = {
                         name: "Seed",
                         description: "Seed endpoints",
                   },
+                  {
+                        name: "HeroSections",
+                        description: "API for managing hero sections",
+                  },
+                  {
+                        name: "AboutSections",
+                        description: "API for managing about sections",
+                  },
+                  {
+                        name: "FAQs",
+                        description: "API for managing FAQs",
+                  },
             ],
       },
       apis: ["./src/modules/**/*.routes.ts", "./dist/modules/**/*.routes.js"],
