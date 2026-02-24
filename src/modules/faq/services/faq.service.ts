@@ -11,20 +11,6 @@ export class FaqService {
     this.faqRepository = dataSource.getRepository(Faq);
   }
 
-  private async createAuditLog(
-    tableName: string,
-    recordId: string | null | undefined,
-    action: string,
-    changedBy: string,
-    changes: any
-  ) {
-    logger.info(`Audit Log: ${action} on ${tableName} by ${changedBy}`, {
-      module: 'FaqService',
-      recordId,
-      changes,
-    });
-  }
-
   async create(data: CreateFaqDto, userId: string): Promise<Faq> {
     logger.info(`Creating new faq: ${data.title}`, {
       module: 'FaqService',
@@ -36,14 +22,6 @@ export class FaqService {
     };
     const newFaq = this.faqRepository.create(payload);
     const savedFaq = await this.faqRepository.save(newFaq);
-
-    await this.createAuditLog(
-      'faqs',
-      savedFaq.id,
-      'CREATE',
-      userId,
-      savedFaq
-    );
 
     return savedFaq;
   }
@@ -104,14 +82,6 @@ export class FaqService {
     Object.assign(faq, payload);
     const updatedFaq = await this.faqRepository.save(faq);
 
-    await this.createAuditLog(
-      'faqs',
-      updatedFaq.id,
-      'UPDATE',
-      userId,
-      { before: oldState, after: updatedFaq }
-    );
-
     return updatedFaq;
   }
 
@@ -123,14 +93,6 @@ export class FaqService {
     });
 
     await this.faqRepository.remove(faq);
-
-    await this.createAuditLog(
-      'faqs',
-      id,
-      'DELETE',
-      userId,
-      { deleted_faq: faq }
-    );
 
     return;
   }

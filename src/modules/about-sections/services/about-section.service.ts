@@ -11,20 +11,6 @@ export class AboutSectionService {
     this.aboutSectionRepository = dataSource.getRepository(AboutSection);
   }
 
-  private async createAuditLog(
-    tableName: string,
-    recordId: string | null | undefined,
-    action: string,
-    changedBy: string,
-    changes: any
-  ) {
-    logger.info(`Audit Log: ${action} on ${tableName} by ${changedBy}`, {
-      module: 'AboutSectionService',
-      recordId,
-      changes,
-    });
-  }
-
   async create(data: CreateAboutSectionDto, userId: string): Promise<AboutSection> {
     logger.info(`Creating new about section`, {
       module: 'AboutSectionService',
@@ -48,14 +34,6 @@ export class AboutSectionService {
 
     const newAboutSection = this.aboutSectionRepository.create(payload);
     const savedAboutSection = await this.aboutSectionRepository.save(newAboutSection);
-
-    await this.createAuditLog(
-      'about_sections',
-      savedAboutSection.id,
-      'CREATE',
-      userId,
-      savedAboutSection
-    );
 
     return savedAboutSection;
   }
@@ -121,14 +99,6 @@ export class AboutSectionService {
     Object.assign(aboutSection, payload);
     const updatedAboutSection = await this.aboutSectionRepository.save(aboutSection);
 
-    await this.createAuditLog(
-      'about_sections',
-      updatedAboutSection.id,
-      'UPDATE',
-      userId,
-      { before: oldState, after: updatedAboutSection }
-    );
-
     return updatedAboutSection;
   }
 
@@ -140,14 +110,6 @@ export class AboutSectionService {
     });
 
     await this.aboutSectionRepository.remove(aboutSection);
-
-    await this.createAuditLog(
-      'about_sections',
-      id,
-      'DELETE',
-      userId,
-      { deleted_about_section: aboutSection }
-    );
 
     return;
   }

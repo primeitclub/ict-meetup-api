@@ -11,20 +11,6 @@ export class HeroSectionService {
     this.heroSectionRepository = dataSource.getRepository(HeroSection);
   }
 
-  private async createAuditLog(
-    tableName: string,
-    recordId: string | null | undefined,
-    action: string,
-    changedBy: string,
-    changes: any
-  ) {
-    logger.info(`Audit Log: ${action} on ${tableName} by ${changedBy}`, {
-      module: 'HeroSectionService',
-      recordId,
-      changes,
-    });
-  }
-
   async create(data: CreateHeroSectionDto, userId: string): Promise<HeroSection> {
     logger.info(`Creating new hero section`, {
       module: 'HeroSectionService',
@@ -48,14 +34,6 @@ export class HeroSectionService {
 
     const newHeroSection = this.heroSectionRepository.create(payload);
     const savedHeroSection = await this.heroSectionRepository.save(newHeroSection);
-
-    await this.createAuditLog(
-      'hero_sections',
-      savedHeroSection.id,
-      'CREATE',
-      userId,
-      savedHeroSection
-    );
 
     return savedHeroSection;
   }
@@ -121,14 +99,6 @@ export class HeroSectionService {
     Object.assign(heroSection, payload);
     const updatedHeroSection = await this.heroSectionRepository.save(heroSection);
 
-    await this.createAuditLog(
-      'hero_sections',
-      updatedHeroSection.id,
-      'UPDATE',
-      userId,
-      { before: oldState, after: updatedHeroSection }
-    );
-
     return updatedHeroSection;
   }
 
@@ -140,14 +110,6 @@ export class HeroSectionService {
     });
 
     await this.heroSectionRepository.remove(heroSection);
-
-    await this.createAuditLog(
-      'hero_sections',
-      id,
-      'DELETE',
-      userId,
-      { deleted_hero_section: heroSection }
-    );
 
     return;
   }
