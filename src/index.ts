@@ -18,6 +18,9 @@ import createUploadRouter from "./modules/upload/routes/upload.routes";
 import { startCronJobs } from "./shared/cron/cron";
 import { Request, Response } from "express";
 import createAuditLogRouter from "./modules/auditlogs/routes/audit-log.routes";
+import createHeroSectionRouter from "./modules/hero-sections/routes/hero-section.routes";
+import createAboutSectionRouter from "./modules/about-sections/routes/about-section.routes";
+import createFaqRouter from "./modules/faq/routes/faq.routes";
 dotenv.config();
 
 const app = express();
@@ -53,6 +56,9 @@ connectDatabase.initialize()
     app.use("/api/seeds", createSeedRouter(connectDatabase));
     app.use("/api/upload", createUploadRouter(connectDatabase));
     app.use("/api/audit-logs", createAuditLogRouter(connectDatabase));
+    app.use("/api/hero-sections", createHeroSectionRouter(connectDatabase));
+    app.use("/api/about-sections", createAboutSectionRouter(connectDatabase));
+    app.use("/api/faqs", createFaqRouter(connectDatabase));
 
     app.use(errorHandler);
 

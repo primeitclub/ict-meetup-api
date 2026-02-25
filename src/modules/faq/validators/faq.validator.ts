@@ -1,0 +1,17 @@
+import { z } from 'zod';
+
+export const createFaqSchema = z.object({
+  flagshipEventVersionId: z.string().uuid(),
+  title: z.string().min(1).max(255),
+  description: z.string().optional(),
+});
+
+export const updateFaqSchema = createFaqSchema.partial();
+
+export const faqIdParamSchema = z.object({
+  id: z.uuid(),
+});
+
+export const faqQuerySchema = z.object({
+  flagshipEventVersionId: z.string().uuid().optional(),
+});
