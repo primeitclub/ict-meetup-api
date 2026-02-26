@@ -3,11 +3,14 @@ import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { Faq } from '../entities/faq.entity';
 import { CreateFaqDto, UpdateFaqDto } from '../dto/faq.dto';
+import { FlagshipEventVersion, EventVersionStatus } from '../../flagship-event/entities/flagship-event.entity';
 
 export class FaqService {
   private faqRepository: Repository<Faq>;
+  private dataSource: DataSource;
 
   constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
     this.faqRepository = dataSource.getRepository(Faq);
   }
 
@@ -15,6 +18,18 @@ export class FaqService {
     logger.info(`Creating new faq: ${data.title}`, {
       module: 'FaqService',
     });
+
+    const versionExists = await this.dataSource
+      .getRepository(FlagshipEventVersion)
+      .findOne({ where: { id: data.flagshipEventVersionId } });
+
+    if (!versionExists) {
+      throw new AppError('Flagship event version not found', 404);
+    }
+
+    if (versionExists.status !== EventVersionStatus.DRAFT) {
+      throw new AppError('Can only create faqs for a flagship event version that is in "draft" status', 400);
+    }
 
     const payload = {
       ...data,
@@ -72,6 +87,19 @@ export class FaqService {
     logger.info(`Updating faq: ${id}`, {
       module: 'FaqService',
     });
+
+    const versionId = data.flagshipEventVersionId || faq.flagshipEventVersionId;
+    const versionExists = await this.dataSource
+      .getRepository(FlagshipEventVersion)
+      .findOne({ where: { id: versionId } });
+
+    if (!versionExists) {
+      throw new AppError('Flagship event version not found', 404);
+    }
+
+    if (versionExists.status === EventVersionStatus.ARCHIVED) {
+      throw new AppError('Cannot update faqs for an archived flagship event version', 400);
+    }
 
     const oldState = { ...faq };
 

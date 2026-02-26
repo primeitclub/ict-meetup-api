@@ -3,11 +3,14 @@ import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { HeroSection } from '../entities/hero-section.entity';
 import { CreateHeroSectionDto, UpdateHeroSectionDto } from '../dto/hero-section.dto';
+import { FlagshipEventVersion, EventVersionStatus } from '../../flagship-event/entities/flagship-event.entity';
 
 export class HeroSectionService {
   private heroSectionRepository: Repository<HeroSection>;
+  private dataSource: DataSource;
 
   constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
     this.heroSectionRepository = dataSource.getRepository(HeroSection);
   }
 
@@ -15,6 +18,18 @@ export class HeroSectionService {
     logger.info(`Creating new hero section`, {
       module: 'HeroSectionService',
     });
+
+    const versionExists = await this.dataSource
+      .getRepository(FlagshipEventVersion)
+      .findOne({ where: { id: data.flagshipEventVersionId } });
+
+    if (!versionExists) {
+      throw new AppError('Flagship event version not found', 404);
+    }
+
+    if (versionExists.status !== EventVersionStatus.DRAFT) {
+      throw new AppError('Can only create hero sections for a flagship event version that is in "draft" status', 400);
+    }
 
     const existing = await this.heroSectionRepository.findOne({
       where: { flagshipEventVersionId: data.flagshipEventVersionId },
@@ -88,6 +103,19 @@ export class HeroSectionService {
     logger.info(`Updating hero section: ${id}`, {
       module: 'HeroSectionService',
     });
+
+    const versionId = data.flagshipEventVersionId || heroSection.flagshipEventVersionId;
+    const versionExists = await this.dataSource
+      .getRepository(FlagshipEventVersion)
+      .findOne({ where: { id: versionId } });
+
+    if (!versionExists) {
+      throw new AppError('Flagship event version not found', 404);
+    }
+
+    if (versionExists.status === EventVersionStatus.ARCHIVED) {
+      throw new AppError('Cannot update hero sections for an archived flagship event version', 400);
+    }
 
     const oldState = { ...heroSection };
 

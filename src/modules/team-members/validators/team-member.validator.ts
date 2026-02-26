@@ -11,7 +11,7 @@ export const createTeamMemberSchema = z.object({
   imageUrl: z.string().optional(),
   designationOrder: z.preprocess(
     (val) => (typeof val === 'string' ? Number(val) : val),
-    z.number().int().min(1).max(15).default(1)
+    z.number().int().min(1).max(15)
   ),
   socialLinks: z.preprocess(
     (val) => {

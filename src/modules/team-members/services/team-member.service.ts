@@ -4,7 +4,7 @@ import logger from '../../../shared/utils/logger.utils';
 import { TeamMember } from '../entities/team-member.entity';
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from '../dto/team-member.dto';
 import { Category } from '../../category/entities/category.entity';
-import { FlagshipEventVersion } from '../../flagship-event/entities/flagship-event.entity';
+import { FlagshipEventVersion, EventVersionStatus } from '../../flagship-event/entities/flagship-event.entity';
 import { Designation } from '../../designation/entities/designation.entity';
 import { removeFile } from '../../../shared/utils/helpers/imageUpload.helper';
 
@@ -29,6 +29,9 @@ export class TeamMemberService {
       .findOne({ where: { id: data.versionId } });
     if (!versionExists) {
       throw new AppError('Flagship event version not found', 404);
+    }
+    if (versionExists.status !== EventVersionStatus.DRAFT) {
+      throw new AppError('Can only create team members for a flagship event version that is in "draft" status', 400);
     }
 
     const categoryExists = await this.dataSource
@@ -172,6 +175,9 @@ export class TeamMemberService {
         .findOne({ where: { id: data.versionId } });
       if (!versionExists) {
         throw new AppError('Flagship event version not found', 404);
+      }
+      if (versionExists.status === EventVersionStatus.ARCHIVED) {
+        throw new AppError('Cannot update team members for an archived flagship event version', 400);
       }
     }
 
