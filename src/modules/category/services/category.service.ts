@@ -1,7 +1,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
-import { Category } from '../entities/category.entity';
+import { Category, CategoryType } from '../entities/category.entity';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
 
 export class CategoryService {
@@ -25,27 +25,27 @@ export class CategoryService {
     });
   }
 
-  async create(data: CreateCategoryDto, userId: string): Promise<Category> {
+  async create(data: CreateCategoryDto, type: CategoryType, userId: string): Promise<Category> {
     logger.info(`Creating new category: ${data.name}`, {
       module: 'CategoryService',
     });
 
     const existing = await this.categoryRepository.findOne({
-      where: { name: data.name, type: data.type, displayOrder: data.displayOrder },
+      where: { name: data.name, type: type, displayOrder: data.displayOrder },
     });
 
     if (existing) {
       throw new AppError(
-        `Category with name '${data.name}' and type '${data.type}' and display order '${data.displayOrder}' already exists`,
+        `Category with name '${data.name}' and type '${type}' and display order '${data.displayOrder}' already exists`,
         400
       );
     }
     const payload = {
       ...data,
-      createdById: userId
+      createdById: userId,
+      type: type
     }
-    const newCategory = this.categoryRepository.create(payload);
-    const savedCategory = await this.categoryRepository.save(newCategory);
+    const savedCategory = await this.categoryRepository.save(payload);
 
     await this.createAuditLog(
       'category',
@@ -96,6 +96,7 @@ export class CategoryService {
 
   async update(
     id: string,
+    type: CategoryType,
     data: UpdateCategoryDto,
     userId: string
   ): Promise<Category> {
@@ -108,8 +109,8 @@ export class CategoryService {
     const oldState = { ...category };
 
 
-    if (data.name || data.type) {
-      const checkType = data.type || category.type;
+    if (data.name) {
+      const checkType = type || category.type;
       const checkName = data.name || category.name;
       const existing = await this.categoryRepository.findOne({
         where: { name: checkName, type: checkType, displayOrder: data.displayOrder },
@@ -123,7 +124,8 @@ export class CategoryService {
     }
     const payload = {
       ...data,
-      modifiedById: userId
+      modifiedById: userId,
+      type: type
     }
     Object.assign(category, payload);
     const updatedCategory = await this.categoryRepository.save(category);

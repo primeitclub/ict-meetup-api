@@ -7,15 +7,21 @@ import {
   Index,
 } from 'typeorm';
 import { BaseEntity } from '../../../shared/config/typeorm/base-entity';
+
+export enum CategoryType {
+  TEAM = 'teams',
+  DESIGNATION = 'designations',
+  EVENT = 'events',
+}
+
 @Entity({ name: 'category' })
 export class Category extends BaseEntity {
-
   @Index()
   @Column({
-    type: 'varchar',
-    length: 50,
+    type: 'enum',
+    enum: CategoryType,
   })
-  type: string;
+  type: CategoryType;
 
   @Column({ type: 'varchar', length: 100 })
   name: string;

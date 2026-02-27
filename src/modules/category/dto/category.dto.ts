@@ -7,7 +7,6 @@ export interface CreateCategoryDto {
 
 export interface UpdateCategoryDto {
   versionId: string;
-  type?: string;
   name?: string;
   displayOrder?: number;
 }

@@ -8,6 +8,7 @@ import { AuditLogActionType, AuditLogScope, AuditLogType } from '../../../shared
 import { BaseController } from '../../../shared/base/base.controller';
 import { FlagshipEventVersionService } from '../../flagship-event/services/flagship-event.service';
 import { removeFile } from '../../../shared/utils/helpers/imageUpload.helper';
+import { CategoryType } from '../../category/entities/category.entity';
 
 export class TeamMemberController extends BaseController {
   private service: TeamMemberService;
@@ -134,7 +135,7 @@ export class TeamMemberController extends BaseController {
       if (!isVersionExist) {
         return responseHandler(res)('Version not found', null, 404);
       }
-      const result = await this.serviceForCategory.create(req.body, userId);
+      const result = await this.serviceForCategory.create(req.body, CategoryType.TEAM, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.CREATE,
@@ -163,6 +164,7 @@ export class TeamMemberController extends BaseController {
       }
       const result = await this.serviceForCategory.update(
         req.params.id,
+        CategoryType.TEAM,
         req.body,
         userId
       );
