@@ -82,8 +82,11 @@ export class TeamMemberController extends BaseController {
   };
 
   update = async (req: Request, res: Response, next: NextFunction) => {
+    let existingTeamMember: any = null;
     try {
       const userId = (req as any).user?.id || 'system';
+      existingTeamMember = await this.service.findById(req.params.id);
+
       const result = await this.service.update(
         req.params.id,
         req.body,
@@ -103,7 +106,10 @@ export class TeamMemberController extends BaseController {
         200
       );
     } catch (error) {
-      await removeFile(req.body.imagePath);
+      // Only remove the newly uploaded file if it's different from the existing one
+      if (req.body.imagePath && existingTeamMember && req.body.imagePath !== existingTeamMember.imagePath) {
+        await removeFile(req.body.imagePath);
+      }
       next(error);
     }
   };
