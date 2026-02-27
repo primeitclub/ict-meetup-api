@@ -195,7 +195,7 @@ export class TeamMemberController extends BaseController {
       if (!isVersionExist) {
         return responseHandler(res)('Version not found', null, 404);
       }
-      await this.serviceForCategory.delete(req.params.id, userId);
+      await this.serviceForCategory.delete(req.params.id, CategoryType.TEAM, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.DELETE,
@@ -213,7 +213,7 @@ export class TeamMemberController extends BaseController {
 
   getAllForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.serviceForCategory.findAll(req.query as any);
+      const result = await this.serviceForCategory.findAll(req.query as any, CategoryType.TEAM);
       if (!result.items.length) {
         return responseHandler(res)('Categories not found', result, 200);
       }

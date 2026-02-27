@@ -58,14 +58,14 @@ export class CategoryService {
     return savedCategory;
   }
 
-  async findAll(query: any = {}): Promise<any> {
+  async findAll(query: any = {}, type: CategoryType): Promise<any> {
     logger.debug('Fetching all categories', {
       module: 'CategoryService',
       query,
     });
 
-    const { type, page = 1, limit = 10 } = query;
-    const where = type ? { type } : {};
+    const { page = 1, limit = 10 } = query;
+    const where = { type };
     const skip = (Number(page) - 1) * Number(limit);
 
     const [items, total] = await this.categoryRepository.findAndCount({
@@ -141,14 +141,17 @@ export class CategoryService {
     return updatedCategory;
   }
 
-  async delete(id: string, userId: string): Promise<void> {
-    const category = await this.findById(id);
+  async delete(id: string, type: CategoryType, userId: string): Promise<void> {
+    const category = await this.categoryRepository.findOne({ where: { id, type } });
+    if (!category) {
+      throw new AppError('Category not found', 404);
+    }
 
     logger.warn(`Deleting category: ${id}`, {
       module: 'CategoryService',
     });
 
-    await this.categoryRepository.remove(category);
+    await this.categoryRepository.softRemove(category);
 
     await this.createAuditLog(
       'category',
