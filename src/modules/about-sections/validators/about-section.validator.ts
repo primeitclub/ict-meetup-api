@@ -5,7 +5,7 @@ export const createAboutSectionSchema = z.object({
   title: z.string(),
   content: z.string(),
   imageUrl: z.string().optional(),
-  imagePath: z.string().optional(),
+  imagePath: z.string(),
 });
 
 export const updateAboutSectionSchema = createAboutSectionSchema.partial();
