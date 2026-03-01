@@ -1,6 +1,5 @@
 export interface CreateCategoryDto {
   versionId: string;
-  type: string;
   name: string;
   displayOrder: number;
 }

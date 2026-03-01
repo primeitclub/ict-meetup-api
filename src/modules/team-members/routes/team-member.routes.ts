@@ -7,10 +7,6 @@ import {
   updateTeamMemberSchema,
   teamMemberIdParamSchema,
   teamMemberQuerySchema,
-  createTeamCategorySchema,
-  updateTeamCategorySchema,
-  teamCategoryIdParamSchema,
-  teamCategoryQuerySchema,
   createTeamMemberDesignationSchema,
   updateTeamMemberDesignationSchema,
   teamMemberDesignationIdParamSchema,
@@ -18,6 +14,7 @@ import {
 } from '../validators/team-member.validator';
 import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
 import { imageUploadHandler } from '../../../shared/utils/helpers/imageUpload.helper';
+import { categoryIdParamSchema, categoryQuerySchema, createCategorySchema, updateCategorySchema } from '../../category/validators/category.validator';
 
 const createTeamMemberRouter = (dataSource: DataSource) => {
   const router = Router();
@@ -109,7 +106,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       201:
    *         description: Created
    */
-  router.post('/category', authenticate, validateRequestBody(createTeamCategorySchema), controller.createForCategory);
+  router.post('/category', authenticate, validateRequestBody(createCategorySchema), controller.createForCategory);
 
   /**
    * @swagger
@@ -137,7 +134,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.get('/category', authenticate, validateRequestQuery(teamCategoryQuerySchema), controller.getAllForCategory);
+  router.get('/category', authenticate, validateRequestQuery(categoryQuerySchema), controller.getAllForCategory);
 
   /**
    * @swagger
@@ -162,7 +159,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.put('/category/:id', authenticate, validateRequestParams(teamCategoryIdParamSchema), validateRequestBody(updateTeamCategorySchema), controller.updateForCategory);
+  router.put('/category/:id', authenticate, validateRequestParams(categoryIdParamSchema), validateRequestBody(updateCategorySchema), controller.updateForCategory);
 
   /**
    * @swagger
@@ -179,7 +176,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.delete('/category/:id', authenticate, validateRequestParams(teamCategoryIdParamSchema), controller.deleteForCategory);
+  router.delete('/category/:id', authenticate, validateRequestParams(categoryIdParamSchema), controller.deleteForCategory);
 
 
   /**

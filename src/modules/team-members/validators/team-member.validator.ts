@@ -40,28 +40,6 @@ export const teamMemberQuerySchema = z.object({
   ...paginationShape
 });
 
-
-export const createTeamCategorySchema = z.object({
-  versionId: z.uuid(),
-  type: z.string(),
-  name: z.string().min(1).max(150),
-  displayOrder: z.preprocess(
-    (val) => (typeof val === 'string' ? Number(val) : val),
-    z.number().int().min(1).max(15).default(1)
-  ),
-});
-
-export const updateTeamCategorySchema = createTeamCategorySchema.partial();
-
-export const teamCategoryIdParamSchema = z.object({
-  id: z.uuid(),
-});
-
-export const teamCategoryQuerySchema = z.object({
-  type: z.string().optional(),
-  ...paginationShape
-});
-
 export const createTeamMemberDesignationSchema = z.object({
   versionId: z.uuid(),
   name: z.string().min(1).max(150),
