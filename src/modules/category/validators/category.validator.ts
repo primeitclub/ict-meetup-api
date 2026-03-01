@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { paginationShape } from '../../../shared/validators/pagination.validator';
 
 export const createCategorySchema = z.object({
+  type: z.enum(['teams', 'designations', 'events', 'speakers']),
   name: z.string().min(1).max(100),
   versionId: z.uuid(),
   displayOrder: z.preprocess(

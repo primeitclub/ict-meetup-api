@@ -33,7 +33,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *         multipart/form-data:
    *           schema:
    *             type: object
-   *             required: [versionId, categoryId, designationId, name]
+   *             required: [versionId, categoryId, designationId, name, image]
    *             properties:
    *               versionId: { type: string, format: uuid }
    *               categoryId: { type: string, format: uuid }
@@ -90,7 +90,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    * /api/team-members/category:
    *   post:
    *     summary: Create a new team category
-   *     tags: [TeamMembers]
+   *     tags: [TeamMemberCategories]
    *     requestBody:
    *       required: true
    *       content:
@@ -113,7 +113,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    * /api/team-members/category:
    *   get:
    *     summary: Get all team categories
-   *     tags: [TeamMembers]
+   *     tags: [TeamMemberCategories]
    *     parameters: 
    *       - in: query
    *         name: page
@@ -139,9 +139,9 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
   /**
    * @swagger
    * /api/team-members/category/{id}:
-   *   put:
+   *   patch:
    *     summary: Update a team category
-   *     tags: [TeamMembers]
+   *     tags: [TeamMemberCategories]
    *     parameters:
    *       - in: path
    *         name: id
@@ -159,14 +159,14 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.put('/category/:id', authenticate, validateRequestParams(categoryIdParamSchema), validateRequestBody(updateCategorySchema), controller.updateForCategory);
+  router.patch('/category/:id', authenticate, validateRequestParams(categoryIdParamSchema), validateRequestBody(updateCategorySchema), controller.updateForCategory);
 
   /**
    * @swagger
    * /api/team-members/category/{id}:
    *   delete:
    *     summary: Delete a team category
-   *     tags: [TeamMembers]
+   *     tags: [TeamMemberCategories]
    *     parameters:
    *       - in: path
    *         name: id
@@ -184,7 +184,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    * /api/team-members/designation:
    *   post:
    *     summary: Create a new team member designation
-   *     tags: [TeamMembers]
+   *     tags: [TeamMemberDesignations]
    *     requestBody:
    *       required: true
    *       content:
@@ -206,7 +206,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    * /api/team-members/designation:
    *   get:
    *     summary: Get all team member designations
-   *     tags: [TeamMembers]
+   *     tags: [TeamMemberDesignations]
    *     parameters: 
    *       - in: query
    *         name: page
@@ -234,7 +234,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    * /api/team-members/designation/{id}:
    *   put:
    *     summary: Update a team member designation
-   *     tags: [TeamMembers]
+   *     tags: [TeamMemberDesignations]
    *     parameters:
    *       - in: path
    *         name: id
@@ -251,14 +251,14 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    * */
-  router.put('/designation/:id', authenticate, validateRequestParams(teamMemberDesignationIdParamSchema), validateRequestBody(updateTeamMemberDesignationSchema), controller.updateForDesignation);
+  router.patch('/designation/:id', authenticate, validateRequestParams(teamMemberDesignationIdParamSchema), validateRequestBody(updateTeamMemberDesignationSchema), controller.updateForDesignation);
 
   /**
    * @swagger
    * /api/team-members/designation/{id}:
    *   delete:
    *     summary: Delete a team member designation
-   *     tags: [TeamMembers]
+   *     tags: [TeamMemberDesignations]
    *     parameters:
    *       - in: path
    *         name: id

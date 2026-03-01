@@ -15,6 +15,8 @@ import { Designation } from "../../../modules/designation/entities/designation.e
 import { HeroSection } from "../../../modules/hero-sections/entities/hero-section.entity";
 import { AboutSection } from "../../../modules/about-sections/entities/about-section.entity";
 import { Faq } from "../../../modules/faq/entities/faq.entity";
+import { Event } from "../../../modules/event/entities/event.entity";
+import { Speaker } from "../../../modules/speaker/entities/speaker.entity";
 
 dotenv.config();
 
@@ -37,7 +39,7 @@ const connectDatabase = new DataSource({
   database: dbConfigOptions.database,
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
-  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember, AssetLibrary, Asset, Designation, HeroSection, AboutSection, Faq],
+  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember, AssetLibrary, Asset, Designation, HeroSection, AboutSection, Faq, Event, Speaker],
   migrations: [__dirname + '/../typeorm/migrations/*{.ts,.js}'],
 });
 export default connectDatabase;
