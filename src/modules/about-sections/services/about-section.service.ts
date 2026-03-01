@@ -2,7 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { AboutSection } from '../entities/about-section.entity';
-import { CreateAboutSectionDto, UpdateAboutSectionDto } from '../dto/about-section.dto';
+import { CreateAboutSectionDto, UpdateAboutSectionDto } from '../validators/about-section.validator';
 import { FlagshipEventVersion, EventVersionStatus } from '../../flagship-event/entities/flagship-event.entity';
 
 export class AboutSectionService {

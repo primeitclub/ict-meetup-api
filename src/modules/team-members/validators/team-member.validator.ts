@@ -54,3 +54,6 @@ export const teamMemberDesignationIdParamSchema = z.object({
 export const teamMemberDesignationQuerySchema = z.object({
   ...paginationShape
 });
+
+export type CreateTeamMemberDto = z.infer<typeof createTeamMemberSchema>;
+export type UpdateTeamMemberDto = z.infer<typeof updateTeamMemberSchema>;   

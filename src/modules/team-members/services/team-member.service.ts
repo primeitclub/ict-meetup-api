@@ -2,7 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { TeamMember } from '../entities/team-member.entity';
-import { CreateTeamMemberDto, UpdateTeamMemberDto } from '../dto/team-member.dto';
+import { CreateTeamMemberDto, UpdateTeamMemberDto } from '../validators/team-member.validator';
 import { Category, CategoryType } from '../../category/entities/category.entity';
 import { FlagshipEventVersion, EventVersionStatus } from '../../flagship-event/entities/flagship-event.entity';
 import { Designation } from '../../designation/entities/designation.entity';

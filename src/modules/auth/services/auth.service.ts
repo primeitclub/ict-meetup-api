@@ -1,6 +1,6 @@
 import { DataSource, Repository } from "typeorm";
 import { User } from "../../user/entities/user.entity";
-import { LoginDto } from "../dto/auth.dto";
+import { LoginDto } from "../validators/auth.validator";
 import { AppError } from "../../../shared/utils/error.utils";
 import bcrypt from "bcrypt";
 import { envConfig } from "../../../shared/config/env";
