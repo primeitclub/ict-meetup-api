@@ -33,7 +33,7 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *               flagshipEventVersionId: { type: string, format: uuid }
   *               title: { type: string }
   *               content: { type: string }
-  *               image: { type: string }
+  *               image: { type: string, format: binary }
   *     responses:
   *       201:
   *         description: Created
