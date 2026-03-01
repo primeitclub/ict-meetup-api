@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 export const createAboutSectionSchema = z.object({
   flagshipEventVersionId: z.string().uuid(),
-  title: z.string().optional(),
-  content: z.string().optional(),
-  imageUrl: z.string().url().optional(),
+  title: z.string(),
+  content: z.string(),
+  imageUrl: z.string().optional(),
   imagePath: z.string().optional(),
 });
 
@@ -17,3 +17,6 @@ export const aboutSectionIdParamSchema = z.object({
 export const aboutSectionQuerySchema = z.object({
   flagshipEventVersionId: z.string().uuid().optional(),
 });
+
+export type CreateAboutSectionDto = z.infer<typeof createAboutSectionSchema>;
+export type UpdateAboutSectionDto = z.infer<typeof updateAboutSectionSchema>;

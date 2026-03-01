@@ -15,3 +15,6 @@ export const faqIdParamSchema = z.object({
 export const faqQuerySchema = z.object({
   flagshipEventVersionId: z.string().uuid().optional(),
 });
+
+export type CreateFaqDto = z.infer<typeof createFaqSchema>;
+export type UpdateFaqDto = z.infer<typeof updateFaqSchema>;

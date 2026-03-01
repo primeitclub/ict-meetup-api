@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { DataSource } from "typeorm";
 import { AuthService } from "../services/auth.service";
-import { LoginDto } from "../dto/auth.dto";
+import { LoginDto } from "../validators/auth.validator";
 
 import { responseHandler } from "../../../shared/utils/helpers/response.helper";
 import { TokenPayload } from "../interfaces/auth.interface";
