@@ -13,7 +13,8 @@ export class CategoryController {
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any).user?.id || 'system';
-      const result = await this.service.create(req.body, userId);
+      const { type, ...data } = req.body;
+      const result = await this.service.create(data, type, userId);
       return responseHandler(res)(
         'Category created successfully',
         result,
@@ -27,7 +28,7 @@ export class CategoryController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { type } = req.query;
-      const result = await this.service.findAll(type as string);
+      const result = await this.service.findAll(req.query, type as any);
       return responseHandler(res)(
         'Categories fetched successfully',
         result,
@@ -54,9 +55,11 @@ export class CategoryController {
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any).user?.id || 'system';
+      const { type, ...data } = req.body;
       const result = await this.service.update(
         req.params.id,
-        req.body,
+        type,
+        data,
         userId
       );
       return responseHandler(res)(
@@ -72,7 +75,8 @@ export class CategoryController {
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any).user?.id || 'system';
-      await this.service.delete(req.params.id, userId);
+      const { type } = req.query;
+      await this.service.delete(req.params.id, type as any, userId);
       return responseHandler(res)('Category deleted successfully', null, 200);
     } catch (error) {
       next(error);
