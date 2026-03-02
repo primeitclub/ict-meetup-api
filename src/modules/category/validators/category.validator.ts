@@ -3,10 +3,9 @@ import { paginationShape } from '../../../shared/validators/pagination.validator
 import { CategoryType } from '../entities/category.entity';
 
 export const createCategorySchema = z.object({
-  type: z.enum(['teams', 'designations', 'events', 'speakers']),
+  type: z.enum(CategoryType),
   name: z.string().min(1).max(100),
   versionId: z.uuid(),
-  type: z.nativeEnum(CategoryType).optional(),
   displayOrder: z.preprocess(
     (val) => (typeof val === 'string' ? Number(val) : val),
     z.number().int().min(1).max(15).default(1)
@@ -21,7 +20,6 @@ export const categoryIdParamSchema = z.object({
 
 export const categoryQuerySchema = z.object({
   ...paginationShape,
-  type: z.nativeEnum(CategoryType).optional(),
 });
 
 export type CreateCategoryDto = z.infer<typeof createCategorySchema>;
