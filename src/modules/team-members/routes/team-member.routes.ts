@@ -134,7 +134,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.get('/category', authenticate, validateRequestQuery(categoryQuerySchema), controller.getAllForCategory);
+  router.get('/category', validateRequestQuery(categoryQuerySchema), controller.getAllForCategory);
 
   /**
    * @swagger
@@ -227,7 +227,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    * */
-  router.get('/designation', authenticate, validateRequestQuery(teamMemberDesignationQuerySchema), controller.getAllForDesignation);
+  router.get('/designation', validateRequestQuery(teamMemberDesignationQuerySchema), controller.getAllForDesignation);
 
   /** 
    * @swagger
