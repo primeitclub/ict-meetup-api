@@ -15,7 +15,7 @@ const createAuditLogRouter = (dataSource: DataSource) => {
        * /api/audit-logs:
        *   get:
        *     summary: Get all audit logs
-       *     tags: [Audit Logs]
+       *     tags: [AuditLogs]
        *     parameters:
        *       - in: query
        *         name: versionId

@@ -151,7 +151,7 @@ export class CategoryService {
       module: 'CategoryService',
     });
 
-    await this.categoryRepository.softRemove(category);
+    await this.categoryRepository.remove(category);
 
     await this.createAuditLog(
       'category',

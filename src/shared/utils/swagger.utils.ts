@@ -23,8 +23,12 @@ const options: swaggerJSDoc.Options = {
                         description: "API for managing team members",
                   },
                   {
-                        name: "Seed",
-                        description: "Seed endpoints",
+                        name: "TeamMemberCategories",
+                        description: "API for managing team member categories",
+                  },
+                  {
+                        name: "TeamMemberDesignations",
+                        description: "API for managing team member designations",
                   },
                   {
                         name: "HeroSections",
@@ -37,6 +41,22 @@ const options: swaggerJSDoc.Options = {
                   {
                         name: "FAQs",
                         description: "API for managing FAQs",
+                  },
+                  {
+                        name: "Events",
+                        description: "API for managing events",
+                  },
+                  {
+                        name: "EventCategories",
+                        description: "API for managing event categories",
+                  },
+                  {
+                        name: "AuditLogs",
+                        description: "API for managing audit logs",
+                  },
+                  {
+                        name: "Seed",
+                        description: "Seed endpoints",
                   },
             ],
       },

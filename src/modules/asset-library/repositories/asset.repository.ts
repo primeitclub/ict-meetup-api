@@ -1,6 +1,7 @@
 import { Repository, DataSource, IsNull } from 'typeorm';
 import { Asset } from '../entities/asset.entity';
 import { IAssetRepository } from '../interfaces/asset.interface';
+import { AppError } from '../../../shared/utils/error.utils';
 
 export class AssetRepository implements IAssetRepository {
   private repository: Repository<Asset>;
@@ -35,7 +36,7 @@ export class AssetRepository implements IAssetRepository {
   async update(id: string, data: Partial<Asset>): Promise<Asset> {
     await this.repository.update(id, data);
     const updated = await this.findById(id);
-    if (!updated) throw new Error('Asset not found');
+    if (!updated) throw new AppError('Asset not found', 404);
     return updated;
   }
 

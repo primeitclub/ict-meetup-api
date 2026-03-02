@@ -12,6 +12,7 @@ export enum CategoryType {
   TEAM = 'teams',
   DESIGNATION = 'designations',
   EVENT = 'events',
+  SPEAKER = 'speakers',
 }
 
 @Entity({ name: 'category' })

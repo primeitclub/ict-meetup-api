@@ -11,7 +11,6 @@ import swaggerSpec from "./shared/utils/swagger.utils";
 import { errorHandler } from "./shared/utils/helpers/error.helper";
 import createAuthRouter from "./modules/auth/routes/auth.routes";
 import cookieParser from "cookie-parser";
-import createCategoryRouter from "./modules/category/routes/category.routes";
 import createTeamMemberRouter from "./modules/team-members/routes/team-member.routes";
 import createAssetLibraryRouter from "./modules/asset-library/routes/asset-library.routes";
 import createUploadRouter from "./modules/upload/routes/upload.routes";
@@ -21,6 +20,9 @@ import createAuditLogRouter from "./modules/auditlogs/routes/audit-log.routes";
 import createHeroSectionRouter from "./modules/hero-sections/routes/hero-section.routes";
 import createAboutSectionRouter from "./modules/about-sections/routes/about-section.routes";
 import createFaqRouter from "./modules/faq/routes/faq.routes";
+import createEventRouter from "./modules/event/routes/event.routes";
+import createSpeakerRouter from "./modules/speaker/routes/speaker.routes";
+
 dotenv.config();
 
 const app = express();
@@ -50,7 +52,6 @@ connectDatabase.initialize()
     // Register routes AFTER DB is initialized — safe to create repositories
     app.use("/api/auth", createAuthRouter(connectDatabase));
     app.use("/api/flagship-event/versions", createVersionRouter(connectDatabase));
-    app.use("/api/categories", createCategoryRouter(connectDatabase));
     app.use("/api/team-members", createTeamMemberRouter(connectDatabase));
     app.use("/api/asset-library", createAssetLibraryRouter(connectDatabase));
     app.use("/api/seeds", createSeedRouter(connectDatabase));
@@ -59,6 +60,9 @@ connectDatabase.initialize()
     app.use("/api/hero-sections", createHeroSectionRouter(connectDatabase));
     app.use("/api/about-sections", createAboutSectionRouter(connectDatabase));
     app.use("/api/faqs", createFaqRouter(connectDatabase));
+    app.use("/api/events", createEventRouter(connectDatabase));
+    app.use("/api/speakers", createSpeakerRouter(connectDatabase));
+
 
     app.use(errorHandler);
 
