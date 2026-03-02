@@ -9,7 +9,7 @@ export const createTeamMemberSchema = z.object({
   role: z.string().max(100),
   imagePath: z.string(),
   imageUrl: z.string().optional(),
-  designationOrder: z.preprocess(
+  displayOrder: z.preprocess(
     (val) => (typeof val === 'string' ? Number(val) : val),
     z.number().int().min(1).max(15)
   ),
@@ -37,7 +37,8 @@ export const teamMemberIdParamSchema = z.object({
 
 export const teamMemberQuerySchema = z.object({
   versionId: z.uuid(),
-  ...paginationShape
+  ...paginationShape,
+  categoryId: z.uuid().optional(),
 });
 
 export const createTeamMemberDesignationSchema = z.object({

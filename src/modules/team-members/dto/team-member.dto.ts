@@ -11,7 +11,7 @@
 //     linkedin?: string;
 //     portfolio?: string;
 //   };
-//   designationOrder: number;
+//   displayOrder: number;
 // }
 
 // export interface UpdateTeamMemberDto {
@@ -27,7 +27,7 @@
 //     linkedin?: string;
 //     portfolio?: string;
 //   };
-//   designationOrder?: number;
+//   displayOrder?: number;
 // }
 
 // export interface TeamMemberResponseDto {
@@ -47,7 +47,7 @@
 //     linkedin?: string;
 //     portfolio?: string;
 //   };
-//   designationOrder: number;
+//   displayOrder: number;
 //   createdAt: Date;
 //   updatedAt: Date;
 //   category: {

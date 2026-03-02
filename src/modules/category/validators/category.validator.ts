@@ -6,6 +6,7 @@ export const createCategorySchema = z.object({
   type: z.enum(CategoryType),
   name: z.string().min(1).max(100),
   versionId: z.uuid(),
+  displayName: z.string().min(1).max(100),
   displayOrder: z.preprocess(
     (val) => (typeof val === 'string' ? Number(val) : val),
     z.number().int().min(1).max(15).default(1)
@@ -20,6 +21,7 @@ export const categoryIdParamSchema = z.object({
 
 export const categoryQuerySchema = z.object({
   ...paginationShape,
+  versionId: z.uuid().optional(),
 });
 
 export type CreateCategoryDto = z.infer<typeof createCategorySchema>;

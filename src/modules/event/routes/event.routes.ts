@@ -185,6 +185,7 @@ const createEventRouter = (dataSource: DataSource) => {
        *             properties:
        *               name: { type: string }
        *               versionId: { type: string, format: uuid }
+       *               displayName: { type: string, minLength: 1, maxLength: 150 }
        *               displayOrder: { type: number, default: 1 }
        *     responses:
        *       201:
@@ -213,6 +214,7 @@ const createEventRouter = (dataSource: DataSource) => {
        *             properties:
        *               name: { type: string }
        *               versionId: { type: string, format: uuid }
+       *               displayName: { type: string, minLength: 1, maxLength: 150 }
        *               displayOrder: { type: number }
        *     responses:
        *       200:

@@ -47,15 +47,15 @@ export class TeamMemberService {
       throw new AppError('Only categories of type "teams" can be assigned to team members', 400);
     }
 
-    const designationOrderExists = await this.teamMemberRepository.findOne({
+    const displayOrderExists = await this.teamMemberRepository.findOne({
       where: {
         categoryId: data.categoryId,
-        designationOrder: data.designationOrder || 0
+        displayOrder: data.displayOrder || 0
       }
     });
 
-    if (designationOrderExists) {
-      throw new AppError(`A member with designation order ${data.designationOrder || 0} already exists in this category`, 400);
+    if (displayOrderExists) {
+      throw new AppError(`A member with display order ${data.displayOrder || 0} already exists in this category`, 400);
     }
 
     const designationExists = await this.designationRepository.findOne({ where: { id: data.designationId } });
@@ -98,7 +98,7 @@ export class TeamMemberService {
         imagePath: true,
         imageUrl: true,
         socialLinks: true as any,
-        designationOrder: true,
+        displayOrder: true,
         createdAt: true,
         updatedAt: true,
         // designationId: true,
@@ -119,7 +119,7 @@ export class TeamMemberService {
       },
       order: {
         category: { displayOrder: 'ASC' },
-        designationOrder: 'ASC',
+        displayOrder: 'ASC',
         createdAt: 'DESC',
       },
       skip,
@@ -189,11 +189,11 @@ export class TeamMemberService {
 
     const nameChanged = data.name && data.name !== teamMember.name;
     const categoryChanged = data.categoryId && data.categoryId !== teamMember.categoryId;
-    const orderChanged = data.designationOrder !== undefined && data.designationOrder !== teamMember.designationOrder;
+    const orderChanged = data.displayOrder !== undefined && data.displayOrder !== teamMember.displayOrder;
 
     if (nameChanged || categoryChanged || orderChanged) {
       const categoryId = data.categoryId || teamMember.categoryId;
-      const designationOrder = data.designationOrder !== undefined ? data.designationOrder : teamMember.designationOrder;
+      const displayOrder = data.displayOrder !== undefined ? data.displayOrder : teamMember.displayOrder;
 
       // 1. Check unique name in category
       if (nameChanged || categoryChanged) {
@@ -211,16 +211,16 @@ export class TeamMemberService {
         }
       }
 
-      // 2. Check unique designationOrder in category
+      // 2. Check unique displayOrder in category
       if (orderChanged || categoryChanged) {
         const orderMatch = await this.teamMemberRepository.findOne({
           where: {
             categoryId,
-            designationOrder
+            displayOrder
           }
         });
         if (orderMatch && orderMatch.id !== id) {
-          throw new AppError(`A member with designation order ${designationOrder} already exists in this category`, 400);
+          throw new AppError(`A member with display order ${displayOrder} already exists in this category`, 400);
         }
       }
     }

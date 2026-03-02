@@ -50,8 +50,8 @@ export class TeamMember extends BaseEntity {
     portfolio?: string;
   };
 
-  @Column({ name: 'designation_order', type: 'int', default: 1 })
-  designationOrder: number;
+  @Column({ name: 'display_order', type: 'int', default: 1 })
+  displayOrder: number;
 
   @Index()
   @Column({ name: 'designation_id', type: 'uuid' })

@@ -27,6 +27,9 @@ export class Category extends BaseEntity {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
+  @Column({ type: 'varchar', length: 100 })
+  displayName: string;
+
   @Column({ name: 'display_order', type: 'int', default: 0 })
   displayOrder: number;
 

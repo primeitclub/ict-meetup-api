@@ -219,6 +219,11 @@ export class TeamMemberController extends BaseController {
 
   getAllForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { versionId } = req.query as any;
+      const isVersionExist = await this.flagshipEventVersion.findById(versionId);
+      if (!isVersionExist) {
+        return responseHandler(res)('Version not found', null, 404);
+      }
       const result = await this.serviceForCategory.findAll(req.query as any, CategoryType.TEAM);
       if (!result.items.length) {
         return responseHandler(res)('Categories not found', result, 200);
