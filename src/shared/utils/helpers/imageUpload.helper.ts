@@ -38,11 +38,16 @@ const storage = multer.diskStorage({
       // Determine moduleName from the route (e.g. '/api/team-members' -> 'team-members')
       const moduleName = req.baseUrl.split("/").filter(Boolean).pop() || "unknown-module";
 
-      // Determine versionId from body, query or headers
-      const isVersionExist = await flagshipEventVersionService.findById(req.body.versionId);
+      // Determine versionId from body or query
+      const versionId = req.body.versionId || req.query.versionId;
+      const isVersionExist = await flagshipEventVersionService.findById(versionId as string);
       if (!isVersionExist) {
         return cb(new AppError("Version not found", 404), "");
       }
+
+      // Assign to req for use in the loop later
+      (req as any).version = isVersionExist.version_name;
+      (req as any).moduleName = moduleName;
 
       const uploadDir = path.join(
         process.cwd(),
@@ -68,11 +73,11 @@ const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
   const extension = path.extname(file.originalname).slice(1).toLowerCase();
 
   if (!ALLOWED_IMAGE_EXTENSIONS.includes(extension)) {
-    return cb(new Error("Invalid file extension"));
+    return cb(new AppError("Invalid file extension", 400));
   }
 
   if (!ALLOWED_IMAGE_MIME_TYPES.includes(file.mimetype)) {
-    return cb(new Error("Invalid MIME type"));
+    return cb(new AppError("Invalid MIME type", 400));
   }
 
   cb(null, true);
@@ -80,8 +85,8 @@ const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
 
 
 type UploadOptions =
-  | { fieldName: string; multiple?: false }
-  | { fieldName: string; multiple: true; maxCount: number };
+  | { fieldName: string; multiple?: false; optional?: boolean }
+  | { fieldName: string; multiple: true; maxCount: number; optional?: boolean };
 
 /* Main middleware */
 export const imageUploadHandler =
@@ -116,7 +121,10 @@ export const imageUploadHandler =
 
 
         if (files.length === 0) {
-          return next(new Error(`${options.fieldName} file(s) are required`));
+          if (options.optional) {
+            return next();
+          }
+          return next(new AppError(`${options.fieldName} file(s) are required`, 400));
         }
 
         try {
@@ -164,7 +172,7 @@ export const imageUploadHandler =
           next(
             uploadError instanceof Error
               ? uploadError
-              : new Error("Unexpected error during image upload")
+              : new AppError("Unexpected error during image upload", 500)
           );
         }
       });

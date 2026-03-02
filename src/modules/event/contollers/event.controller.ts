@@ -8,6 +8,7 @@ import { FlagshipEventVersionService } from "../../flagship-event/services/flags
 import { CategoryType } from "../../category/entities/category.entity";
 import { responseHandler } from "../../../shared/utils/helpers/response.helper";
 import { AuditLogActionType, AuditLogScope, AuditLogType } from "../../../shared/constants/audit-log.constants";
+import { AppError } from "../../../shared/utils/error.utils";
 
 export class EventController extends BaseController {
       protected moduleName: string = 'EventController';
@@ -62,12 +63,13 @@ export class EventController extends BaseController {
       delete = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const userId = req.user!.userId || 'system';
-                  await this.eventService.delete(req.params.id);
+                  const versionId = req.query.versionId as string;
+                  await this.eventService.delete(req.params.id, versionId);
                   await this.createAuditLog(
                         AuditLogType.INFO,
                         AuditLogActionType.DELETE,
                         `Event ${req.params.id} deleted successfully`,
-                        req.body.versionId,
+                        versionId,
                         AuditLogScope.EVENTS,
                         req.ip,
                         userId

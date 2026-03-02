@@ -36,7 +36,7 @@ export class SpeakerController extends BaseController {
                   );
                   return responseHandler(res)(
                         'Speaker created successfully',
-                        null,
+                        result,
                         201
                   );
             } catch (error) {
@@ -114,16 +114,13 @@ export class SpeakerController extends BaseController {
       delete = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const userId = (req as any).user?.id || 'system';
-                  const existingSpeaker = await this.service.findById(req.params.id);
-                  if (!existingSpeaker) {
-                        return responseHandler(res)('Speaker not found', null, 404);
-                  }
-                  await this.service.delete(req.params.id, userId);
+                  const versionId = req.query.versionId as string;
+                  await this.service.delete(req.params.id, versionId, userId);
                   await this.createAuditLog(
                         AuditLogType.INFO,
                         AuditLogActionType.DELETE,
                         `Speaker ${req.params.id} deleted successfully`,
-                        existingSpeaker.versionId,
+                        versionId,
                         AuditLogScope.SPEAKERS,
                         req.ip,
                         userId

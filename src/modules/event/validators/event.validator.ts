@@ -73,6 +73,10 @@ export const eventQuerySchema = z.object({
       ...paginationShape
 });
 
+export const deleteEventQuerySchema = z.object({
+      versionId: z.uuid(),
+});
+
 export type CreateEventDto = z.infer<typeof createEventSchema>;
 export type UpdateEventDto = z.infer<typeof updateEventSchema>;
 export type EventQueryDto = z.infer<typeof eventQuerySchema>;

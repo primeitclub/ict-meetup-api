@@ -6,14 +6,26 @@ export const createSpeakerSchema = z.object({
       imagePath: z.string().min(1, 'Image path is required'),
       designation: z.string().min(1, 'Designation is required'),
       company: z.string().min(1, 'Company is required'),
-      versionId: z.uuid().min(1, 'Version ID is required'),
-      categoryId: z.uuid().min(1, 'Category ID is required'),
-      displayOrder: z.number().min(0, 'Display order must be non-negative'),
-      socialLinks: z.object({
-            instagram: z.string().optional(),
-            linkedin: z.string().optional(),
-            portfolio: z.string().optional(),
-      }).optional(),
+      versionId: z.uuid(),
+      categoryId: z.uuid(),
+      displayOrder: z.coerce.number().min(1, 'Display order must be positive'),
+      socialLinks: z.preprocess(
+            (val) => {
+                  if (typeof val === 'string') {
+                        try {
+                              return JSON.parse(val);
+                        } catch {
+                              return val;
+                        }
+                  }
+                  return val;
+            },
+            z.object({
+                  instagram: z.url().startsWith('https://', { message: 'Must start with https://' }).optional(),
+                  linkedin: z.url().startsWith('https://', { message: 'Must start with https://' }).optional(),
+                  portfolio: z.url().startsWith('https://', { message: 'Must start with https://' }).optional(),
+            }).optional()
+      ),
 })
 
 export const updateSpeakerSchema = createSpeakerSchema.partial();
@@ -24,8 +36,12 @@ export const speakerIdParamSchema = z.object({
 
 export const speakerQuerySchema = z.object({
       versionId: z.uuid(),
-      categoryId: z.uuid(),
+      categoryId: z.uuid().optional(),
       ...paginationShape
+});
+
+export const deleteSpeakerQuerySchema = z.object({
+      versionId: z.uuid(),
 });
 
 export type CreateSpeakerDto = z.infer<typeof createSpeakerSchema>;

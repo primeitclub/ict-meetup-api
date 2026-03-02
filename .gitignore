@@ -24,7 +24,7 @@ out/
 
 # ==================== Uploads / Media ====================
 uploads/
-public/uploads/
+public/assets/
 storage/
 media/
 

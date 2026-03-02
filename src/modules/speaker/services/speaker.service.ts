@@ -3,6 +3,8 @@ import { Speaker } from "../entities/speaker.entity";
 import { CreateSpeakerDto } from "../validators/speaker.validator";
 import { Category, CategoryType } from "../../category/entities/category.entity";
 import { FlagshipEventVersion } from "../../flagship-event/entities/flagship-event.entity";
+import { removeFile } from "../../../shared/utils/helpers/imageUpload.helper";
+import { AppError } from "../../../shared/utils/error.utils";
 
 export class SpeakerService {
       private dataSource: DataSource;
@@ -19,12 +21,21 @@ export class SpeakerService {
       async create(data: CreateSpeakerDto) {
             const versionExists = await this.flagshipEventVersionRepository.findOne({ where: { id: data.versionId } });
             if (!versionExists) {
-                  throw new Error('Version not found');
+                  throw new AppError('Version not found', 404);
             }
             const categoryExists = await this.categoryRepository.findOne({ where: { id: data.categoryId } });
             if (!categoryExists) {
-                  throw new Error('Category not found');
+                  throw new AppError('Category not found', 404);
             }
+
+            const existingOrder = await this.speakerRepository.findOne({
+                  where: { categoryId: data.categoryId, displayOrder: data.displayOrder }
+            });
+
+            if (existingOrder) {
+                  throw new AppError(`Display order ${data.displayOrder} is already taken in this category`, 400);
+            }
+
             const speaker = this.speakerRepository.create(data);
             return await this.speakerRepository.save(speaker);
       }
@@ -113,20 +124,42 @@ export class SpeakerService {
                   },
             });
             if (!speaker) {
-                  throw new Error('Speaker not found');
+                  throw new AppError('Speaker not found', 404);
             }
             return speaker;
       }
 
       async update(id: string, data: any, userId: string) {
             const speaker = await this.findById(id);
+            if (!speaker) {
+                  throw new AppError('Speaker not found', 404);
+            }
+
+            if (data.displayOrder) {
+                  const targetCategoryId = data.categoryId || speaker.category.id;
+                  const existingOrder = await this.speakerRepository.findOne({
+                        where: {
+                              categoryId: targetCategoryId,
+                              displayOrder: data.displayOrder
+                        }
+                  });
+
+                  if (existingOrder && existingOrder.id !== id) {
+                        throw new AppError(`Display order ${data.displayOrder} is already taken in this category`, 400);
+                  }
+            }
+
             Object.assign(speaker, data);
             speaker.modifiedById = userId;
             return await this.speakerRepository.save(speaker);
       }
 
-      async delete(id: string, userId: string) {
-            const speaker = await this.findById(id);
+      async delete(id: string, versionId: string, userId: string) {
+            const speaker = await this.speakerRepository.findOne({ where: { id, versionId } });
+            if (!speaker) {
+                  throw new AppError('Speaker not found in this version', 404);
+            }
+            await removeFile(speaker.imagePath);
             await this.speakerRepository.remove(speaker);
             return { message: 'Speaker deleted successfully' };
       }

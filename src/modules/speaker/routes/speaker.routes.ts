@@ -2,8 +2,8 @@ import { Router } from "express";
 import { SpeakerController } from "../controllers/speaker.controller";
 import { DataSource } from "typeorm";
 import { createAuthenticate } from "../../../shared/middlewares/auth.middleware";
-import { validateRequestBody } from "../../../shared/validators/request.validator";
-import { createSpeakerSchema, updateSpeakerSchema } from "../validators/speaker.validator";
+import { validateRequestBody, validateRequestQuery } from "../../../shared/validators/request.validator";
+import { createSpeakerSchema, updateSpeakerSchema, deleteSpeakerQuerySchema } from "../validators/speaker.validator";
 import { createCategorySchema, updateCategorySchema } from "../../category/validators/category.validator";
 import { imageUploadHandler } from "../../../shared/utils/helpers/imageUpload.helper";
 
@@ -71,86 +71,6 @@ const createSpeakerRouter = (dataSource: DataSource) => {
        *         description: List of speakers
        */
       router.get('/', controller.getAll);
-
-      /**
-       * @swagger
-       * /api/speakers/{id}:
-       *   get:
-       *     summary: Get speaker by ID
-       *     tags: [Speakers]
-       *     parameters:
-       *       - in: path
-       *         name: id
-       *         required: true
-       *         schema: { type: string, format: uuid }
-       *     responses:
-       *       200:
-       *         description: Speaker details
-       *       404:
-       *         description: Speaker not found
-       */
-      router.get('/:id', controller.getById);
-
-      /**
-       * @swagger
-       * /api/speakers/{id}:
-       *   put:
-       *     summary: Update an existing speaker
-       *     tags: [Speakers]
-       *     parameters:
-       *       - in: path
-       *         name: id
-       *         required: true
-       *         schema: { type: string, format: uuid }
-       *     requestBody:
-       *       content:
-       *         multipart/form-data:
-       *           schema:
-       *             type: object
-       *             properties:
-       *               name: { type: string }
-       *               image: { type: string, format: binary }
-       *               designation: { type: string }
-       *               company: { type: string }
-       *               versionId: { type: string, format: uuid }
-       *               categoryId: { type: string, format: uuid }
-       *               displayOrder: { type: number }
-       *               socialLinks:
-       *                 type: object
-       *                 properties:
-       *                   instagram: { type: string }
-       *                   linkedin: { type: string }
-       *                   portfolio: { type: string }
-       *     responses:
-       *       200:
-       *         description: Speaker updated successfully
-       *       401:
-       *         description: Unauthorized
-       *       404:
-       *         description: Speaker not found
-       */
-      router.put('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(updateSpeakerSchema), controller.update);
-
-      /**
-       * @swagger
-       * /api/speakers/{id}:
-       *   delete:
-       *     summary: Delete a speaker
-       *     tags: [Speakers]
-       *     parameters:
-       *       - in: path
-       *         name: id
-       *         required: true
-       *         schema: { type: string, format: uuid }
-       *     responses:
-       *       200:
-       *         description: Speaker deleted successfully
-       *       401:
-       *         description: Unauthorized
-       *       404:
-       *         description: Speaker not found
-       */
-      router.delete('/:id', authenticate, controller.delete);
 
       /**
        * @swagger
@@ -269,6 +189,90 @@ const createSpeakerRouter = (dataSource: DataSource) => {
        *         description: Category not found
        */
       router.delete('/category/:id', authenticate, controller.deleteForCategory);
+
+      /**
+       * @swagger
+       * /api/speakers/{id}:
+       *   get:
+       *     summary: Get speaker by ID
+       *     tags: [Speakers]
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *     responses:
+       *       200:
+       *         description: Speaker details
+       *       404:
+       *         description: Speaker not found
+       */
+      router.get('/:id', controller.getById);
+
+      /**
+       * @swagger
+       * /api/speakers/{id}:
+       *   put:
+       *     summary: Update an existing speaker
+       *     tags: [Speakers]
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *     requestBody:
+       *       content:
+       *         multipart/form-data:
+       *           schema:
+       *             type: object
+       *             properties:
+       *               name: { type: string }
+       *               image: { type: string, format: binary }
+       *               designation: { type: string }
+       *               company: { type: string }
+       *               versionId: { type: string, format: uuid }
+       *               categoryId: { type: string, format: uuid }
+       *               displayOrder: { type: number }
+       *               socialLinks:
+       *                 type: object
+       *                 properties:
+       *                   instagram: { type: string }
+       *                   linkedin: { type: string }
+       *                   portfolio: { type: string }
+       *     responses:
+       *       200:
+       *         description: Speaker updated successfully
+       *       401:
+       *         description: Unauthorized
+       *       404:
+       *         description: Speaker not found
+       */
+      router.put('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false, optional: true }), validateRequestBody(updateSpeakerSchema), controller.update);
+
+      /**
+       * @swagger
+       * /api/speakers/{id}:
+       *   delete:
+       *     summary: Delete a speaker
+       *     tags: [Speakers]
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *       - in: query
+       *         name: versionId
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *     responses:
+       *       200:
+       *         description: Speaker deleted successfully
+       *       401:
+       *         description: Unauthorized
+       *       404:
+       *         description: Speaker not found
+       */
+      router.delete('/:id', authenticate, validateRequestQuery(deleteSpeakerQuerySchema), controller.delete);
 
       return router;
 }

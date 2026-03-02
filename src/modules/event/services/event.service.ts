@@ -96,6 +96,7 @@ export class EventService {
                         speakerId: true,
                         title: true,
                         description: true,
+                        imagePath: true,
                         startTime: true,
                         endTime: true,
                         date: true,
@@ -281,10 +282,10 @@ export class EventService {
             return { items, meta: { total, page, limit, totalPages: Math.ceil(total / Number(limit)) } };
       }
 
-      async delete(id: string) {
-            const event = await this.findById(id);
+      async delete(id: string, versionId: string) {
+            const event = await this.eventRepository.findOne({ where: { id, versionId } });
             if (!event) {
-                  throw new AppError('Event not found', 404);
+                  throw new AppError('Event not found in this version', 404);
             }
             await this.eventRepository.remove(event);
             if (event.imagePath) {

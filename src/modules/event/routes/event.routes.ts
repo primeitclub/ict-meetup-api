@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { createEventSchema, updateEventSchema } from "../validators/event.validator";
+import { createEventSchema, updateEventSchema, deleteEventQuerySchema } from "../validators/event.validator";
 import { EventController } from "../contollers/event.controller";
 import { DataSource } from "typeorm";
-import { validateRequestBody } from "../../../shared/validators/request.validator";
+import { validateRequestBody, validateRequestQuery } from "../../../shared/validators/request.validator";
 import { imageUploadHandler } from "../../../shared/utils/helpers/imageUpload.helper";
 import { createAuthenticate } from "../../../shared/middlewares/auth.middleware";
 import { createCategorySchema, updateCategorySchema } from "../../category/validators/category.validator";
@@ -157,13 +157,17 @@ const createEventRouter = (dataSource: DataSource) => {
        *         name: id
        *         required: true
        *         schema: { type: string, format: uuid }
+       *       - in: query
+       *         name: versionId
+       *         required: true
+       *         schema: { type: string, format: uuid }
        *     responses:
        *       200:
        *         description: Event deleted successfully
        *       401:
        *         description: Unauthorized
        */
-      router.delete('/:id', authenticate, eventController.delete);
+      router.delete('/:id', authenticate, validateRequestQuery(deleteEventQuerySchema), eventController.delete);
 
       /**
        * @swagger
