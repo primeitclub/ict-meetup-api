@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createEventSchema, updateEventSchema, deleteEventQuerySchema } from "../validators/event.validator";
+import { createEventSchema, deleteEventQuerySchema, updateEventSchema } from "../validators/event.validator";
 import { EventController } from "../contollers/event.controller";
 import { DataSource } from "typeorm";
 import { validateRequestBody, validateRequestQuery } from "../../../shared/validators/request.validator";

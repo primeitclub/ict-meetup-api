@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { EventStatus, FeeType } from '../entities/event.entity';
 import { paginationShape } from '../../../shared/validators/pagination.validator';
 
-export const createEventSchema = z.object({
+export const baseEventSchema = z.object({
       title: z.string().min(1).max(100),
       description: z.string().min(1).max(255),
       imagePath: z.string().min(1).max(255),
@@ -22,7 +22,9 @@ export const createEventSchema = z.object({
             (val) => (typeof val === 'string' ? Number(val) : val),
             z.number().int().min(1).max(15).default(1)
       ),
-}).superRefine((data, ctx) => {
+});
+
+export const createEventSchema = baseEventSchema.superRefine((data, ctx) => {
       // 1. Time Range Validation
       if (data.startTime && data.endTime) {
             const [sHours, sMinutes] = data.startTime.split(':').map(Number);
@@ -61,7 +63,44 @@ export const createEventSchema = z.object({
       }
 });
 
-export const updateEventSchema = createEventSchema.partial();
+export const updateEventSchema = baseEventSchema.partial().superRefine((data, ctx) => {
+      // 1. Time Range Validation
+      if (data.startTime && data.endTime) {
+            const [sHours, sMinutes] = data.startTime.split(':').map(Number);
+            const [eHours, eMinutes] = data.endTime.split(':').map(Number);
+            const startTotal = sHours * 60 + sMinutes;
+            const endTotal = eHours * 60 + eMinutes;
+
+            if (startTotal >= endTotal) {
+                  ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "Start time must be before end time",
+                        path: ["startTime"],
+                  });
+            }
+      }
+
+      // 2. Fee Validation
+      if (data.feeType === FeeType.PAID && (!data.fee || data.fee <= 0)) {
+            ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: "Paid events must have a fee greater than 0",
+                  path: ["fee"],
+            });
+      }
+
+      // 3. Registration Deadline Validation
+      if (data.date && data.registrationDeadline) {
+            const eventDate = new Date(data.date);
+            if (data.registrationDeadline >= eventDate) {
+                  ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "Registration deadline must be before the event date",
+                        path: ["registrationDeadline"],
+                  });
+            }
+      }
+});
 
 export const eventIdParamSchema = z.object({
       id: z.uuid(),
