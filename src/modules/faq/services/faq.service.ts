@@ -2,7 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { Faq } from '../entities/faq.entity';
-import { CreateFaqDto, UpdateFaqDto } from '../dto/faq.dto';
+import { CreateFaqDto, UpdateFaqDto } from '../validators/faq.validator';
 import { FlagshipEventVersion, EventVersionStatus } from '../../flagship-event/entities/flagship-event.entity';
 
 export class FaqService {

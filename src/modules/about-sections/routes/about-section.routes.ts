@@ -9,6 +9,7 @@ import {
   aboutSectionQuerySchema,
 } from '../validators/about-section.validator';
 import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
+import { imageUploadHandler } from '../../../shared/utils/helpers/imageUpload.helper';
 
 const createAboutSectionRouter = (dataSource: DataSource) => {
   const router = Router();
@@ -32,13 +33,12 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *               flagshipEventVersionId: { type: string, format: uuid }
   *               title: { type: string }
   *               content: { type: string }
-  *               imageUrl: { type: string }
-  *               imagePath: { type: string }
+  *               image: { type: string, format: binary }
   *     responses:
   *       201:
   *         description: Created
   */
-  router.post('/', authenticate, validateRequestBody(createAboutSectionSchema), controller.create);
+  router.post('/', authenticate,imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(createAboutSectionSchema), controller.create);
 
   /**
   * @swagger
@@ -93,13 +93,12 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *               flagshipEventVersionId: { type: string, format: uuid }
   *               title: { type: string }
   *               content: { type: string }
-  *               imageUrl: { type: string }
-  *               imagePath: { type: string }
+  *               image: { type: string, format: binary }
   *     responses:
   *       200:
   *         description: OK
   */
-  router.put('/:id', authenticate, validateRequestBody(updateAboutSectionSchema), controller.update);
+  router.put('/:id', authenticate,imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(updateAboutSectionSchema), controller.update);
 
   /**
   * @swagger

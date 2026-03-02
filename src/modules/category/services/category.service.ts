@@ -2,7 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { Category, CategoryType } from '../entities/category.entity';
-import { CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
+import { CreateCategoryDto, UpdateCategoryDto } from '../validators/category.validator';
 
 export class CategoryService {
   private categoryRepository: Repository<Category>;

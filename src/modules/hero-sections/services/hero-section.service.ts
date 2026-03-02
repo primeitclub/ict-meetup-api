@@ -2,7 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { HeroSection } from '../entities/hero-section.entity';
-import { CreateHeroSectionDto, UpdateHeroSectionDto } from '../dto/hero-section.dto';
+import { CreateHeroSectionDto, UpdateHeroSectionDto } from '../validators/hero-section.validator';
 import { FlagshipEventVersion, EventVersionStatus } from '../../flagship-event/entities/flagship-event.entity';
 
 export class HeroSectionService {
