@@ -12,14 +12,7 @@ export const baseSponsorSchema = z.object({
             z.number().int().min(0).max(100).default(0)
       ),
       isActive: z.preprocess(
-            (val) => {
-                  if (typeof val === 'boolean') return val;
-                  if (val === 'true' || val === '1' || val === 1) return true;
-                  if (val === 'false' || val === '0' || val === 0) return false;
-                  return val;
-            },
-            z.boolean().default(true)
-      ),
+           (val) => val === 'true' || val === true, z.boolean()),
 });
 
 export const createSponsorSchema = baseSponsorSchema;
