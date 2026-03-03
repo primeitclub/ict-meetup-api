@@ -16,7 +16,7 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
        * /api/event-registrations:
        *   post:
        *     summary: Create a new event registration
-       *     tags: [Event Registration]
+       *     tags: [EventRegistration]
        *     requestBody:
        *       required: true
        *       content:
@@ -59,7 +59,7 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
        * /api/event-registrations:
        *   get:
        *     summary: Get all event registrations
-       *     tags: [Event Registration]
+       *     tags: [EventRegistration]
        *     parameters:
        *       - in: query
        *         name: eventId
@@ -79,7 +79,7 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
        * /api/event-registrations/{id}:
        *   get:
        *     summary: Get event registration by ID
-       *     tags: [Event Registration]
+       *     tags: [EventRegistration]
        *     parameters:
        *       - in: path
        *         name: id
@@ -101,7 +101,7 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
        * /api/event-registrations/{id}/status:
        *   put:
        *     summary: Update event registration status
-       *     tags: [Event Registration]
+       *     tags: [EventRegistration]
        *     parameters:
        *       - in: path
        *         name: id
@@ -133,7 +133,7 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
        * /api/event-registration/{id}:
        *   delete:
        *     summary: Delete event registration
-       *     tags: [Event Registration]
+       *     tags: [EventRegistration]
        *     parameters:
        *       - in: path
        *         name: id

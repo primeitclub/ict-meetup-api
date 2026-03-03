@@ -22,7 +22,7 @@ import createAboutSectionRouter from "./modules/about-sections/routes/about-sect
 import createFaqRouter from "./modules/faq/routes/faq.routes";
 import createEventRouter from "./modules/event/routes/event.routes";
 import createSpeakerRouter from "./modules/speaker/routes/speaker.routes";
-import createEventRegistrationRouter from "./modules/event-registration/routes/event-registration.route";
+import createEventRegistrationRouter from "./modules/event-registration/routes/event-registration.routes";
 
 
 dotenv.config();
