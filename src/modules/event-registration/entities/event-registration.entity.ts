@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, ManyToOne, JoinColumn, DeleteDateColumn } from "typeorm";
 import { BaseEntity } from "../../../shared/config/typeorm/base-entity";
 import { FlagshipEventVersion } from "../../flagship-event/entities/flagship-event.entity";
 import { Event } from "../../event/entities/event.entity";
@@ -51,4 +51,7 @@ export class EventRegistration extends BaseEntity {
 
       @Column({ type: "enum", enum: EventRegistrationStatus })
       status: EventRegistrationStatus;
+
+      @DeleteDateColumn({ name: 'deleted_at', type: 'datetime', nullable: true, default: null })
+      deletedAt?: Date;
 }

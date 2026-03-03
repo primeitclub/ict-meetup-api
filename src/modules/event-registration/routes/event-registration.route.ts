@@ -3,8 +3,9 @@ import { EventRegistrationController } from "../controllers/event-registration.c
 import { DataSource } from "typeorm";
 import { createAuthenticate } from "../../../shared/middlewares/auth.middleware";
 import { imageUploadHandler } from "../../../shared/utils/helpers/imageUpload.helper";
-import { validateRequestBody } from "../../../shared/validators/request.validator";
+import { validateRequestBody, validateRequestParams, validateRequestQuery } from "../../../shared/validators/request.validator";
 import { createEventRegistrationSchema, eventRegistrationIdParamSchema, eventRegistrationQuerySchema } from "../validators/event-registration.validator";
+import { z } from "zod";
 
 const createEventRegistrationRouter = (dataSource: DataSource) => {
       const router = Router();
@@ -70,7 +71,7 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
        */
       router.get(
             '/',
-            validateRequestBody(eventRegistrationQuerySchema),
+            validateRequestQuery(eventRegistrationQuerySchema),
             eventRegistrationController.getAll
       );
       /**
@@ -92,7 +93,7 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
        */
       router.get(
             '/:id',
-            validateRequestBody(eventRegistrationIdParamSchema),
+            validateRequestParams(eventRegistrationIdParamSchema),
             eventRegistrationController.getById
       );
       /**
@@ -123,7 +124,8 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
       router.put(
             '/:id/status',
             authenticate,
-            validateRequestBody(eventRegistrationIdParamSchema),
+            validateRequestParams(eventRegistrationIdParamSchema),
+            validateRequestBody(z.object({ status: z.string() })),
             eventRegistrationController.updateStatus
       );
       /**
@@ -150,7 +152,7 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
       router.delete(
             '/:id',
             authenticate,
-            validateRequestBody(eventRegistrationIdParamSchema),
+            validateRequestParams(eventRegistrationIdParamSchema),
             eventRegistrationController.delete
       );
       return router;
