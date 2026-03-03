@@ -11,7 +11,7 @@ import { AuditLogActionType, AuditLogScope, AuditLogType } from "../../../shared
 import { AppError } from "../../../shared/utils/error.utils";
 
 export class EventController extends BaseController {
-      protected moduleName: string = 'EventController';
+      protected moduleName: string = 'EventService';
       private eventService: EventService;
       private serviceForCategory: CategoryService;
       private flagshipEventVersion: FlagshipEventVersionService;

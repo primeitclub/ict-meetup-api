@@ -55,6 +55,10 @@ const options: swaggerJSDoc.Options = {
                         description: "API for managing audit logs",
                   },
                   {
+                        name: "EventRegistration",
+                        description: "API for managing event registrations",
+                  },
+                  {
                         name: "Seed",
                         description: "Seed endpoints",
                   },
