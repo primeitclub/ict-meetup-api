@@ -22,6 +22,7 @@ import createAboutSectionRouter from "./modules/about-sections/routes/about-sect
 import createFaqRouter from "./modules/faq/routes/faq.routes";
 import createEventRouter from "./modules/event/routes/event.routes";
 import createSpeakerRouter from "./modules/speaker/routes/speaker.routes";
+import createSponsorRouter from "./modules/sponsor/routes/sponsor.routes";
 
 dotenv.config();
 
@@ -62,6 +63,7 @@ connectDatabase.initialize()
     app.use("/api/faqs", createFaqRouter(connectDatabase));
     app.use("/api/events", createEventRouter(connectDatabase));
     app.use("/api/speakers", createSpeakerRouter(connectDatabase));
+    app.use("/api/sponsors", createSponsorRouter(connectDatabase));
 
 
     app.use(errorHandler);
