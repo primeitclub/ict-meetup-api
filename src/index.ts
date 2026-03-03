@@ -22,6 +22,8 @@ import createAboutSectionRouter from "./modules/about-sections/routes/about-sect
 import createFaqRouter from "./modules/faq/routes/faq.routes";
 import createEventRouter from "./modules/event/routes/event.routes";
 import createSpeakerRouter from "./modules/speaker/routes/speaker.routes";
+import createEventRegistrationRouter from "./modules/event-registration/routes/event-registration.route";
+
 
 dotenv.config();
 
@@ -62,6 +64,8 @@ connectDatabase.initialize()
     app.use("/api/faqs", createFaqRouter(connectDatabase));
     app.use("/api/events", createEventRouter(connectDatabase));
     app.use("/api/speakers", createSpeakerRouter(connectDatabase));
+    app.use("/api/event-registrations", createEventRegistrationRouter(connectDatabase));
+
 
 
     app.use(errorHandler);
