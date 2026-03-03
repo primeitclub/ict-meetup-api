@@ -23,6 +23,8 @@ import createFaqRouter from "./modules/faq/routes/faq.routes";
 import createEventRouter from "./modules/event/routes/event.routes";
 import createSpeakerRouter from "./modules/speaker/routes/speaker.routes";
 import createSponsorRouter from "./modules/sponsor/routes/sponsor.routes";
+import createEventRegistrationRouter from "./modules/event-registration/routes/event-registration.routes";
+
 
 dotenv.config();
 
@@ -64,6 +66,8 @@ connectDatabase.initialize()
     app.use("/api/events", createEventRouter(connectDatabase));
     app.use("/api/speakers", createSpeakerRouter(connectDatabase));
     app.use("/api/sponsors", createSponsorRouter(connectDatabase));
+    app.use("/api/event-registrations", createEventRegistrationRouter(connectDatabase));
+
 
 
     app.use(errorHandler);

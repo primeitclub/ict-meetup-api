@@ -21,6 +21,7 @@ out/
 *.js
 *.js.map
 *.d.ts
+dist.zip
 
 # ==================== Uploads / Media ====================
 uploads/
