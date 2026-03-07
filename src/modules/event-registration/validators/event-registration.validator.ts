@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { EventRegistrationStatus } from "../entities/event-registration.entity";
 
-export const createEventRegistrationSchema = z.object({
+const createEventRegistrationBaseSchema = z.object({
       username: z.string().min(3).max(150),
       email: z.email(),
       contactNumber: z.string().min(10).max(15),
@@ -13,7 +13,9 @@ export const createEventRegistrationSchema = z.object({
       eventId: z.string().min(3).max(150),
       versionId: z.string().min(3).max(150),
       status: z.enum(EventRegistrationStatus).default(EventRegistrationStatus.PENDING),
-}).superRefine((data, ctx) => {
+});
+
+export const createEventRegistrationSchema = createEventRegistrationBaseSchema.superRefine((data, ctx) => {
       if (data.isStudent) {
             if (!data.educationLevel) {
                   ctx.addIssue({
@@ -39,7 +41,7 @@ export const createEventRegistrationSchema = z.object({
       }
 });
 
-export const updateEventRegistrationSchema = createEventRegistrationSchema.partial();
+export const updateEventRegistrationSchema = createEventRegistrationBaseSchema.partial();
 
 
 export const eventRegistrationQuerySchema = z.object({
