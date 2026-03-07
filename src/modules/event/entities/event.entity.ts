@@ -76,4 +76,7 @@ export class Event extends BaseEntity {
 
       @Column({ name: 'display_order', type: 'int', default: 0 })
       displayOrder: number
+
+      @Column({ name: 'is_highlighted', type: 'boolean', default: false })
+      isHighlighted: boolean;
 }

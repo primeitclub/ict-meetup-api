@@ -129,6 +129,92 @@ const createEventRouter = (dataSource: DataSource) => {
 
       /**
        * @swagger
+       * /api/events/category:
+       *   post:
+       *     summary: Create a new category for events
+       *     tags: [EventCategories]
+       *     requestBody:
+       *       required: true
+       *       content:
+       *         application/json:
+       *           schema:
+       *             type: object
+       *             required: [name, versionId]
+       *             properties:
+       *               name: { type: string }
+       *               versionId: { type: string, format: uuid }
+       *               displayName: { type: string, minLength: 1, maxLength: 150 }
+       *               displayOrder: { type: number, default: 1 }
+       *     responses:
+       *       201:
+       *         description: Category created successfully
+       *       401:
+       *         description: Unauthorized
+       */
+      router.post('/category', authenticate, validateRequestBody(createCategorySchema), eventController.createForCategory);
+
+      /**
+       * @swagger
+       * /api/events/category:
+       *   get:
+       *     summary: Get all event categories
+       *     tags: [EventCategories]
+       *     responses:
+       *       200:
+       *         description: List of event categories
+       */
+      router.get('/category', eventController.getAllForCategory);
+
+      /**
+       * @swagger
+       * /api/events/category/{id}:
+       *   patch:
+       *     summary: Update an existing event category
+       *     tags: [EventCategories]
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *     requestBody:
+       *       content:
+       *         application/json:
+       *           schema:
+       *             type: object
+       *             properties:
+       *               name: { type: string }
+       *               versionId: { type: string, format: uuid }
+       *               displayName: { type: string, minLength: 1, maxLength: 150 }
+       *               displayOrder: { type: number }
+       *     responses:
+       *       200:
+       *         description: Category updated successfully
+       *       401:
+       *         description: Unauthorized
+       */
+      router.patch('/category/:id', authenticate, validateRequestBody(updateCategorySchema), eventController.updateForCategory);
+
+      /**
+       * @swagger
+       * /api/events/category/{id}:
+       *   delete:
+       *     summary: Delete an event category
+       *     tags: [EventCategories]
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *     responses:
+       *       200:
+       *         description: Category deleted successfully
+       *       401:
+       *         description: Unauthorized
+       */
+      router.delete('/category/:id', authenticate, eventController.deleteForCategory);
+
+      /**
+       * @swagger
        * /api/events/{id}:
        *   get:
        *     summary: Get event by ID
@@ -168,92 +254,6 @@ const createEventRouter = (dataSource: DataSource) => {
        *         description: Unauthorized
        */
       router.delete('/:id', authenticate, validateRequestQuery(deleteEventQuerySchema), eventController.delete);
-
-      /**
-       * @swagger
-       * /api/events/category:
-       *   post:
-       *     summary: Create a new category for events
-       *     tags: [EventCategories]
-       *     requestBody:
-       *       required: true
-       *       content:
-       *         application/json:
-       *           schema:
-       *             type: object
-       *             required: [name, versionId]
-       *             properties:
-       *               name: { type: string }
-       *               versionId: { type: string, format: uuid }
-       *               displayName: { type: string, minLength: 1, maxLength: 150 }
-       *               displayOrder: { type: number, default: 1 }
-       *     responses:
-       *       201:
-       *         description: Category created successfully
-       *       401:
-       *         description: Unauthorized
-       */
-      router.post('/category', authenticate, validateRequestBody(createCategorySchema), eventController.createForCategory);
-
-      /**
-       * @swagger
-       * /api/events/category/{id}:
-       *   patch:
-       *     summary: Update an existing event category
-       *     tags: [EventCategories]
-       *     parameters:
-       *       - in: path
-       *         name: id
-       *         required: true
-       *         schema: { type: string, format: uuid }
-       *     requestBody:
-       *       content:
-       *         application/json:
-       *           schema:
-       *             type: object
-       *             properties:
-       *               name: { type: string }
-       *               versionId: { type: string, format: uuid }
-       *               displayName: { type: string, minLength: 1, maxLength: 150 }
-       *               displayOrder: { type: number }
-       *     responses:
-       *       200:
-       *         description: Category updated successfully
-       *       401:
-       *         description: Unauthorized
-       */
-      router.patch('/category/:id', authenticate, validateRequestBody(updateCategorySchema), eventController.updateForCategory);
-
-      /**
-       * @swagger
-       * /api/events/category:
-       *   get:
-       *     summary: Get all event categories
-       *     tags: [EventCategories]
-       *     responses:
-       *       200:
-       *         description: List of event categories
-       */
-      router.get('/category', eventController.getAllForCategory);
-
-      /**
-       * @swagger
-       * /api/events/category/{id}:
-       *   delete:
-       *     summary: Delete an event category
-       *     tags: [EventCategories]
-       *     parameters:
-       *       - in: path
-       *         name: id
-       *         required: true
-       *         schema: { type: string, format: uuid }
-       *     responses:
-       *       200:
-       *         description: Category deleted successfully
-       *       401:
-       *         description: Unauthorized
-       */
-      router.delete('/category/:id', authenticate, eventController.deleteForCategory);
 
       return router;
 }

@@ -38,7 +38,7 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *       201:
   *         description: Created
   */
-  router.post('/', authenticate,imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(createAboutSectionSchema), controller.create);
+  router.post('/', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(createAboutSectionSchema), controller.create);
 
   /**
   * @swagger
@@ -54,7 +54,7 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.get('/', authenticate, validateRequestQuery(aboutSectionQuerySchema), controller.getAll);
+  router.get('/', validateRequestQuery(aboutSectionQuerySchema), controller.getAll);
 
   /**
   * @swagger
@@ -71,7 +71,7 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.get('/:id', authenticate, controller.getById);
+  router.get('/:id', controller.getById);
 
   /**
   * @swagger
@@ -98,7 +98,7 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.put('/:id', authenticate,imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(updateAboutSectionSchema), controller.update);
+  router.put('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(updateAboutSectionSchema), controller.update);
 
   /**
   * @swagger

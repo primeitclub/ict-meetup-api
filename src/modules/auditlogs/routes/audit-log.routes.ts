@@ -21,7 +21,7 @@ const createAuditLogRouter = (dataSource: DataSource) => {
        *         name: versionId
        *         schema:
        *           type: string
-       *         required: true
+       *         required: false
        *         description: The version ID
        *       - in: query
        *         name: page

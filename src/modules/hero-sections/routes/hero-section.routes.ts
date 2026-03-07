@@ -53,7 +53,7 @@ const createHeroSectionRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.get('/', authenticate, validateRequestQuery(heroSectionQuerySchema), controller.getAll);
+  router.get('/', validateRequestQuery(heroSectionQuerySchema), controller.getAll);
 
   /**
   * @swagger
@@ -70,7 +70,7 @@ const createHeroSectionRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.get('/:id', authenticate, controller.getById);
+  router.get('/:id', controller.getById);
 
   /**
   * @swagger

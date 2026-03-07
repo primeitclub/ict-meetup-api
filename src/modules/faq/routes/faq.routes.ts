@@ -52,7 +52,7 @@ const createFaqRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.get('/', authenticate, validateRequestQuery(faqQuerySchema), controller.getAll);
+  router.get('/', validateRequestQuery(faqQuerySchema), controller.getAll);
 
   /**
    * @swagger
@@ -69,7 +69,7 @@ const createFaqRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.get('/:id', authenticate, controller.getById);
+  router.get('/:id', controller.getById);
 
   /**
    * @swagger
