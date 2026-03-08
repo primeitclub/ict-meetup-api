@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import { paginationShape } from '../../../shared/validators/pagination.validator';
-import { CategoryType } from '../entities/category.entity';
 
 export const createCategorySchema = z.object({
-  type: z.enum(CategoryType),
   name: z.string().min(1).max(100),
   versionId: z.uuid(),
   displayName: z.string().min(1).max(100),
