@@ -20,6 +20,9 @@ export class Event extends BaseEntity {
       @Column({ type: 'varchar', length: 150 })
       title: string;
 
+      @Column({ type: 'varchar', length: 150 })
+      subtitle: string;
+
       @Column({ type: 'varchar', length: 255 })
       description: string;
 
@@ -59,11 +62,11 @@ export class Event extends BaseEntity {
       @Column({ name: 'total_seats', type: 'int', default: 0 })
       totalSeats: number;
 
-      @Column({ type: "enum", enum: FeeType })
+      @Column({ name: 'fee_type', type: "enum", enum: FeeType })
       feeType: FeeType;
 
-      @Column({ type: 'decimal', precision: 10, scale: 2 })
-      fee: number;
+      @Column({ type: 'varchar', length: 255 })
+      fee: string;
 
       @Column({ type: 'varchar', length: 255 })
       location: string;

@@ -26,6 +26,7 @@ const createEventRouter = (dataSource: DataSource) => {
        *             type: object
        *             properties:
        *               title: { type: string }
+       *               subtitle: { type: string }
        *               description: { type: string }
        *               startTime: { type: string, format: date-time }
        *               endTime: { type: string, format: date-time }
@@ -35,7 +36,7 @@ const createEventRouter = (dataSource: DataSource) => {
        *               speakerId: { type: string }
        *               totalSeats: { type: number }
        *               feeType: { type: string, enum: [FREE, PAID] }
-       *               fee: { type: number }
+       *               fee: { type: string }
        *               location: { type: string }
        *               status: { type: string, enum: [DRAFT, PUBLISHED, ARCHIVED] }
        *               registrationDeadline: { type: string, format: date-time }
@@ -67,6 +68,7 @@ const createEventRouter = (dataSource: DataSource) => {
        *             type: object
        *             properties:
        *               title: { type: string }
+       *               subtitle: { type: string }
        *               description: { type: string }
        *               startTime: { type: string, format: date-time }
        *               endTime: { type: string, format: date-time }
@@ -76,7 +78,7 @@ const createEventRouter = (dataSource: DataSource) => {
        *               speakerId: { type: string }
        *               totalSeats: { type: number }
        *               feeType: { type: string, enum: [FREE, PAID] }
-       *               fee: { type: number }
+       *               fee: { type: string }
        *               location: { type: string }
        *               status: { type: string, enum: [DRAFT, PUBLISHED, ARCHIVED] }
        *               registrationDeadline: { type: string, format: date-time }

@@ -4,6 +4,7 @@ import { paginationShape } from '../../../shared/validators/pagination.validator
 
 export const baseEventSchema = z.object({
       title: z.string().min(1).max(100),
+      subtitle: z.string().min(1).max(150),
       description: z.string().min(1).max(255),
       imagePath: z.string().min(1).max(255),
       startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)"),
@@ -14,7 +15,7 @@ export const baseEventSchema = z.object({
       speakerId: z.string().optional(),
       totalSeats: z.coerce.number().min(1).max(100),
       feeType: z.enum([FeeType.FREE, FeeType.PAID]),
-      fee: z.coerce.number(),
+      fee: z.string(),
       location: z.string().min(1).max(255),
       status: z.enum([EventStatus.DRAFT, EventStatus.PUBLISHED, EventStatus.ARCHIVED]),
       registrationDeadline: z.coerce.date(),
@@ -42,13 +43,13 @@ export const createEventSchema = baseEventSchema.superRefine((data, ctx) => {
       }
 
       // 2. Fee Validation
-      if (data.feeType === FeeType.PAID && (!data.fee || data.fee <= 0)) {
-            ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: "Paid events must have a fee greater than 0",
-                  path: ["fee"],
-            });
-      }
+      // if (data.feeType === FeeType.PAID && (!data.fee)) {
+      //       ctx.addIssue({
+      //             code: z.ZodIssueCode.custom,
+      //             message: "Paid events must have a fee greater than 0",
+      //             path: ["fee"],
+      //       });
+      // }
 
       // 3. Registration Deadline Validation
       if (data.date && data.registrationDeadline) {
@@ -81,13 +82,13 @@ export const updateEventSchema = baseEventSchema.partial().superRefine((data, ct
       }
 
       // 2. Fee Validation
-      if (data.feeType === FeeType.PAID && (!data.fee || data.fee <= 0)) {
-            ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: "Paid events must have a fee greater than 0",
-                  path: ["fee"],
-            });
-      }
+      // if (data.feeType === FeeType.PAID && (!data.fee || data.fee <= 0)) {
+      //       ctx.addIssue({
+      //             code: z.ZodIssueCode.custom,
+      //             message: "Paid events must have a fee greater than 0",
+      //             path: ["fee"],
+      //       });
+      // }
 
       // 3. Registration Deadline Validation
       if (data.date && data.registrationDeadline) {
