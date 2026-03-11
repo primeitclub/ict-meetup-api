@@ -4,9 +4,9 @@ import { paginationShape } from '../../../shared/validators/pagination.validator
 export const createTeamMemberSchema = z.object({
   versionId: z.uuid(),
   categoryId: z.uuid(),
-  name: z.string().min(1).max(150),
+  name: z.string().trim().min(1).max(150),
   designationId: z.uuid(),
-  role: z.string().max(100),
+  role: z.string().trim().max(100),
   imagePath: z.string(),
   imageUrl: z.string().optional(),
   displayOrder: z.preprocess(
@@ -43,7 +43,7 @@ export const teamMemberQuerySchema = z.object({
 
 export const createTeamMemberDesignationSchema = z.object({
   versionId: z.uuid(),
-  name: z.string().min(1).max(150),
+  name: z.string().trim().min(1).max(150),
 });
 
 export const updateTeamMemberDesignationSchema = createTeamMemberDesignationSchema.partial();

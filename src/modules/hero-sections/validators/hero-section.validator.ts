@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const createHeroSectionSchema = z.object({
   flagshipEventVersionId: z.string().uuid(),
-  heading: z.string(),
-  paragraph: z.string(),
+  heading: z.string().trim(),
+  paragraph: z.string().trim(),
   extraOptions: z.record(z.string(), z.any()).optional(),
 });
 
