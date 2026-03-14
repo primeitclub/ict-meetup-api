@@ -17,7 +17,7 @@ export class GalleryController extends BaseController {
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId;
-      const result = await this.service.create(req.body, req.files as Express.Multer.File[], userId);
+      const result = await this.service.create(req.body, userId);
 
       await this.createAuditLog(
         AuditLogType.INFO,
@@ -69,7 +69,11 @@ export class GalleryController extends BaseController {
     try {
       const userId = req.user!.userId;
       const versionId = req.params.version_id;
-      const result = await this.service.bulkUpdate(versionId, req.body.data, req.body as any, userId);
+      const result = await this.service.bulkUpdate(
+        versionId, 
+        { items: req.body.data, uploadedImages: req.body.uploadedImages }, 
+        userId
+      );
 
       await this.createAuditLog(
         AuditLogType.INFO,

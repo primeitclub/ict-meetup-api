@@ -46,35 +46,33 @@ export class GalleryService {
     const totalCount = currentCount + additionalCount;
 
     if (totalCount < MIN_IMAGES) {
-      throw new AppError(`Minimum ${MIN_IMAGES} image is required`, 400);
+      throw new AppError(`Please upload at least ${MIN_IMAGES} image to the gallery.`, 400);
     }
 
     if (totalCount > MAX_IMAGES) {
-      throw new AppError(`Maximum ${MAX_IMAGES} images allowed`, 400);
+      throw new AppError(`A maximum of ${MAX_IMAGES} images can be uploaded to the gallery.`, 400);
     }
   }
 
   async create(
-    data: CreateGalleryDto,
-    files: Express.Multer.File[],
+    data: CreateGalleryDto & { uploadedImages?: any[] },
     userId: string
   ): Promise<GalleryImage[]> {
+    const uploadedImages = data.uploadedImages || [];
+
     logger.info(`Creating gallery images for version: ${data.flagshipEventVersionId}`, {
       module: 'GalleryService',
-      fileCount: files?.length || 0,
+      fileCount: uploadedImages.length,
     });
 
     await this.validateVersion(data.flagshipEventVersionId);
 
-
-    const uploadedImages = (files as any)?.uploadedImages || [];
-
     if (uploadedImages.length === 0) {
-      throw new AppError('At least 1 image is required', 400);
+      throw new AppError('Please upload at least one image to the gallery.', 400);
     }
 
     if (uploadedImages.length > MAX_IMAGES) {
-      throw new AppError(`Maximum ${MAX_IMAGES} images allowed`, 400);
+      throw new AppError(`A maximum of ${MAX_IMAGES} images can be uploaded to the gallery.`, 400);
     }
 
     await this.validateImageCount(data.flagshipEventVersionId, uploadedImages.length);
@@ -146,57 +144,40 @@ export class GalleryService {
 
   async bulkUpdate(
     versionId: string,
-    data: BulkUpdateGalleryDto,
-    files: Express.Multer.File[],
+    data: { items: BulkUpdateGalleryDto; uploadedImages?: UploadedImage[] },
     userId: string
   ): Promise<GalleryImage[]> {
     logger.info(`Bulk updating gallery images for version: ${versionId}`, {
       module: 'GalleryService',
-      submittedCount: data.length,
+      submittedCount: data.items.length,
     });
 
     await this.validateVersion(versionId);
 
-  
-    const uploadedImages: UploadedImage[] = (files as any)?.uploadedImages || [];
+    const uploadedImages: UploadedImage[] = data.uploadedImages || [];
 
     const existingImages = await this.galleryRepository.find({
       where: { flagshipEventVersionId: versionId },
     });
 
-    if (data.length !== existingImages.length) {
-      throw new AppError(
-        `You must submit exactly ${existingImages.length} images`,
-        400
-      );
-    }
-
     const existingImageIds = new Set(existingImages.map(img => img.id));
-
     const results: GalleryImage[] = [];
     let fileIndex = 0;
 
-    for (const item of data) {
+    for (const item of data.items) {
       if (item.id) {
         const existingImage = existingImages.find(img => img.id === item.id);
 
-        if (!existingImage) {
-          continue;
-        }
-
-        
-        if (item.link !== undefined) {
-          existingImage.link = item.link;
-          existingImage.modifiedById = userId;
+        if (existingImage) {
+          if (item.link !== undefined) {
+            existingImage.link = item.link;
+            existingImage.modifiedById = userId;
+          }
           const updated = await this.galleryRepository.save(existingImage);
           results.push(updated);
-        } else {
-          results.push(existingImage);
+          existingImageIds.delete(item.id);
         }
-
-        existingImageIds.delete(item.id);
       } else {
-       
         if (fileIndex < uploadedImages.length) {
           const newUploadedImage = uploadedImages[fileIndex];
 
@@ -214,23 +195,30 @@ export class GalleryService {
       }
     }
 
-    
-    const currentImageCount = await this.getImageCount(versionId);
-    let projectedCount = currentImageCount;
+    // Clean up unused new uploads (orphans) - e.g. if user sent more files than needed
+    for (let i = fileIndex; i < uploadedImages.length; i++) {
+      const orphan = uploadedImages[i];
+      await this.deleteFileFromDisk(versionId, orphan.localPath, orphan.cloudUrl);
+    }
 
+    // Identify images removed from the list to delete them
     for (const imageId of existingImageIds) {
       const imageToDelete = existingImages.find(img => img.id === imageId);
       if (imageToDelete) {
-        if (projectedCount - 1 < MIN_IMAGES) {
-          throw new AppError(`Minimum ${MIN_IMAGES} image is required`, 400);
-        }
-        await this.deleteFileFromDisk(imageToDelete.imagePath, imageToDelete.cloudImageUrl);
+        await this.deleteFileFromDisk(imageToDelete.flagshipEventVersionId, imageToDelete.imagePath, imageToDelete.cloudImageUrl);
         await this.galleryRepository.remove(imageToDelete);
-        projectedCount--;
       }
     }
 
-    logger.info(`Bulk update complete. Final count: ${projectedCount}`, {
+    if (results.length < MIN_IMAGES) {
+      throw new AppError(`Please upload at least ${MIN_IMAGES} image to the gallery.`, 400);
+    }
+
+    if (results.length > MAX_IMAGES) {
+      throw new AppError(`A maximum of ${MAX_IMAGES} images can be uploaded to the gallery.`, 400);
+    }
+
+    logger.info(`Bulk update complete. Final count: ${results.length}`, {
       module: 'GalleryService',
       versionId,
     });
@@ -248,10 +236,10 @@ export class GalleryService {
 
     const finalCount = await this.getImageCount(versionId);
     if (finalCount - 1 < MIN_IMAGES) {
-      throw new AppError(`Minimum ${MIN_IMAGES} image is required`, 400);
+      throw new AppError(`Please upload at least ${MIN_IMAGES} image to the gallery.`, 400);
     }
 
-    await this.deleteFileFromDisk(image.imagePath, image.cloudImageUrl);
+    await this.deleteFileFromDisk(image.flagshipEventVersionId, image.imagePath, image.cloudImageUrl);
 
     await this.galleryRepository.remove(image);
 
@@ -272,7 +260,7 @@ export class GalleryService {
     });
 
     for (const image of images) {
-      await this.deleteFileFromDisk(image.imagePath, image.cloudImageUrl);
+      await this.deleteFileFromDisk(image.flagshipEventVersionId, image.imagePath, image.cloudImageUrl);
     }
 
     await this.galleryRepository.remove(images);
@@ -282,13 +270,15 @@ export class GalleryService {
     });
   }
 
-  private async deleteFileFromDisk(imagePath: string, cloudImageUrl?: string): Promise<void> {
+  private async deleteFileFromDisk(versionId: string, imagePath: string, cloudImageUrl?: string): Promise<void> {
     try {
       if (cloudImageUrl) {
         const parts = cloudImageUrl.split('/');
-        const versionId = parts[parts.length - 2];
         const filename = parts[parts.length - 1].split('.')[0];
-        const publicId = `gallery/${versionId}/${filename}`;
+        const version = await this.versionRepository.findOne({ where: { id: versionId } });
+        const versionName = version?.version_name || versionId;
+        const publicId = `assets/${versionName}/gallery/${filename}`;
+        
         await cloudinary.uploader.destroy(publicId);
         logger.info(`Deleted from Cloudinary: ${publicId}`, {
           module: 'GalleryService',
@@ -296,7 +286,9 @@ export class GalleryService {
       }
       
       let fullPath = imagePath;
-      if (!path.isAbsolute(imagePath)) {
+      if (imagePath.startsWith('/public')) {
+        fullPath = path.join(process.cwd(), imagePath);
+      } else if (!path.isAbsolute(imagePath)) {
         fullPath = path.join(process.cwd(), imagePath);
       }
 
