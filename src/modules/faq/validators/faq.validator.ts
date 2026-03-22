@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createFaqSchema = z.object({
   flagshipEventVersionId: z.string().uuid(),
-  title: z.string().min(1).max(255),
+  title: z.string().trim().min(1).max(255),
   description: z.string().optional(),
 });
 
