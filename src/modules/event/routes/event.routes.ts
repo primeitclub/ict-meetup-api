@@ -35,10 +35,10 @@ const createEventRouter = (dataSource: DataSource) => {
        *               versionId: { type: string }
        *               speakerId: { type: string }
        *               totalSeats: { type: number }
-       *               feeType: { type: string, enum: [FREE, PAID] }
+       *               feeType: { type: string, enum: [free, paid] }
        *               fee: { type: string }
        *               location: { type: string }
-       *               status: { type: string, enum: [DRAFT, PUBLISHED, ARCHIVED] }
+       *               status: { type: string, enum: [draft, published, archived] }
        *               registrationDeadline: { type: string, format: date-time }
        *               displayOrder: { type: number }
        *               image: { type: string, format: binary }

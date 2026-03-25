@@ -66,10 +66,10 @@ const createVersionRouter = (dataSource: DataSource) => {
        *     parameters:
        *       - in: query
        *         name: page
-       *         schema: { type: number }
+       *         schema: { type: number , default: 1}
        *       - in: query
        *         name: limit
-       *         schema: { type: number }
+       *         schema: { type: number , default: 10}
        *       - in: query
        *         name: search
        *         schema: { type: string }
