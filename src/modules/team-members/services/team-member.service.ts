@@ -85,46 +85,21 @@ export class TeamMemberService {
 
     const { page = 1, limit = 10 } = rest;
     const skip = (Number(page) - 1) * Number(limit);
+    const queryBuilder = this.teamMemberRepository.createQueryBuilder('teamMember');
+    queryBuilder
+      .leftJoinAndSelect('teamMember.category', 'category')
+      .leftJoinAndSelect('teamMember.flagshipEvent', 'flagshipEvent')
+      .leftJoinAndSelect('teamMember.designation', 'designation')
+      .where(where)
+      .orderBy('category.displayOrder = 0', 'ASC')
+      .addOrderBy('category.displayOrder', 'ASC')
+      .addOrderBy('teamMember.displayOrder = 0', 'ASC')
+      .addOrderBy('teamMember.displayOrder', 'ASC')
+      .addOrderBy('teamMember.createdAt', 'DESC')
+      .skip(skip)
+      .take(Number(limit));
 
-    const [items, total] = await this.teamMemberRepository.findAndCount({
-      where,
-      relations: ['category', 'flagshipEvent', 'designation'],
-      select: {
-        id: true,
-        // versionId: true,
-        // categoryId: true,
-        name: true,
-        role: true,
-        imagePath: true,
-        imageUrl: true,
-        socialLinks: true as any,
-        displayOrder: true,
-        createdAt: true,
-        updatedAt: true,
-        // designationId: true,
-        category: {
-          id: true,
-          type: true,
-          name: true,
-          displayOrder: true,
-        },
-        designation: {
-          id: true,
-          name: true,
-        },
-        flagshipEvent: {
-          id: true,
-          version_name: true,
-        },
-      },
-      order: {
-        category: { displayOrder: 'ASC' },
-        displayOrder: 'ASC',
-        createdAt: 'DESC',
-      },
-      skip,
-      take: Number(limit),
-    });
+    const [items, total] = await queryBuilder.getManyAndCount();
 
     return {
       items,
