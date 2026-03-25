@@ -5,7 +5,7 @@ import { paginationShape } from '../../../shared/validators/pagination.validator
 export const baseEventSchema = z.object({
       title: z.string().min(1).max(100),
       subtitle: z.string().min(1).max(150),
-      description: z.string().min(1).max(255),
+      description: z.string().min(1),
       imagePath: z.string().min(1).max(255),
       startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)"),
       endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)"),
@@ -21,7 +21,7 @@ export const baseEventSchema = z.object({
       registrationDeadline: z.coerce.date(),
       displayOrder: z.preprocess(
             (val) => (typeof val === 'string' ? Number(val) : val),
-            z.number().int().min(1).max(15).default(1)
+            z.number().int().min(1)
       ),
 });
 
@@ -43,13 +43,13 @@ export const createEventSchema = baseEventSchema.superRefine((data, ctx) => {
       }
 
       // 2. Fee Validation
-      // if (data.feeType === FeeType.PAID && (!data.fee)) {
-      //       ctx.addIssue({
-      //             code: z.ZodIssueCode.custom,
-      //             message: "Paid events must have a fee greater than 0",
-      //             path: ["fee"],
-      //       });
-      // }
+      if (data.feeType === FeeType.FREE && data.fee) {
+            ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: "Free events cannot have a fee",
+                  path: ["fee"],
+            });
+      }
 
       // 3. Registration Deadline Validation
       if (data.date && data.registrationDeadline) {
