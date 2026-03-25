@@ -43,8 +43,11 @@ const storage = multer.diskStorage({
       // Determine moduleName from the route (e.g. '/api/team-members' -> 'team-members')
       const moduleName = req.baseUrl.split("/").filter(Boolean).pop() || "unknown-module";
 
-      // Determine versionId from body or query
-      const versionId = req.body.versionId || req.query.versionId;
+      // Determine versionId from body, query, or params
+      const versionId = req.body.versionId || req.query.versionId || req.body.flagshipEventVersionId || req.params.version_id || req.params.versionId;
+      if (!versionId) {
+        return cb(new AppError("Version ID is required", 400), "");
+      }
       const isVersionExist = await flagshipEventVersionService.findById(versionId as string);
       if (!isVersionExist) {
         return cb(new AppError("Version not found", 404), "");

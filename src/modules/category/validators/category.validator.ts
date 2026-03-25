@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { paginationShape } from '../../../shared/validators/pagination.validator';
 
 export const createCategorySchema = z.object({
-  name: z.string().min(1).max(100),
+  name: z.string().trim().min(1).max(100),
   versionId: z.uuid(),
-  displayName: z.string().min(1).max(100),
+  displayName: z.string().trim().min(1).max(100),
   displayOrder: z.preprocess(
     (val) => (typeof val === 'string' ? Number(val) : val),
     z.number().int().min(1)

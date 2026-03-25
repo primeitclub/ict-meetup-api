@@ -2,16 +2,16 @@ import { z } from "zod";
 import { EventRegistrationStatus } from "../entities/event-registration.entity";
 
 const createEventRegistrationBaseSchema = z.object({
-      username: z.string().min(3).max(150),
-      email: z.email(),
-      contactNumber: z.string().min(10).max(15),
+      username: z.string().trim().min(3).max(150),
+      email: z.email().trim(),
+      contactNumber: z.string().trim().min(10).max(15),
       isStudent: z.preprocess((val) => val === 'true' || val === true, z.boolean()),
-      educationLevel: z.string().min(3).max(150).optional(),
-      faculty: z.string().min(3).max(150).optional(),
+      educationLevel: z.string().trim().min(3).max(150).optional(),
+      faculty: z.string().trim().min(3).max(150).optional(),
       year: z.coerce.number().optional(),
-      attachedPaymentScreenshot: z.string().min(3).max(150),
-      eventId: z.string().min(3).max(150),
-      versionId: z.string().min(3).max(150),
+      attachedPaymentScreenshot: z.string().trim().min(3).max(150),
+      eventId: z.string().trim().min(3).max(150),
+      versionId: z.string().trim().min(3).max(150),
       status: z.enum(EventRegistrationStatus).default(EventRegistrationStatus.PENDING),
 });
 
@@ -45,11 +45,11 @@ export const updateEventRegistrationSchema = createEventRegistrationBaseSchema.p
 
 
 export const eventRegistrationQuerySchema = z.object({
-      eventId: z.string().min(3).max(150),
+      eventId: z.string().trim().min(3).max(150),
 })
 
 export const eventRegistrationIdParamSchema = z.object({
-      id: z.string().min(3).max(150),
+      id: z.string().trim().min(3).max(150),
 })
 
 export type CreateEventRegistrationDto = z.infer<typeof createEventRegistrationSchema>;

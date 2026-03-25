@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 export const createAboutSectionSchema = z.object({
   flagshipEventVersionId: z.string().uuid(),
-  title: z.string(),
-  content: z.string(),
-  imageUrl: z.string().optional(),
+  title: z.string().trim(),
+  content: z.string().trim(),
+  imageUrl: z.string().trim().optional(),
   imagePath: z.string(),
 });
 

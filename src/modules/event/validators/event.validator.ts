@@ -16,7 +16,7 @@ export const baseEventSchema = z.object({
       totalSeats: z.coerce.number().min(1).max(100),
       feeType: z.enum([FeeType.FREE, FeeType.PAID]),
       fee: z.string(),
-      location: z.string().min(1).max(255),
+      location: z.string().trim().min(1).max(255),
       status: z.enum([EventStatus.DRAFT, EventStatus.PUBLISHED, EventStatus.ARCHIVED]),
       registrationDeadline: z.coerce.date(),
       displayOrder: z.preprocess(

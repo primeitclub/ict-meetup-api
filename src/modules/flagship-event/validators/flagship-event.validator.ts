@@ -3,9 +3,10 @@ import { EventVersionStatus } from "../entities/flagship-event.entity";
 import { paginationShape } from "../../../shared/validators/pagination.validator";
 
 const baseFlagshipEventVersionSchema = z.object({
-  version_name: z.string().min(1).max(50),
+  version_name: z.string().trim().min(1).max(50),
   slug: z
     .string()
+    .trim()
     .min(1)
     .max(50)
     .regex(/^[a-z0-9-]+$/, "Slug must be alphanumeric with hyphens"),
