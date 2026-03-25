@@ -31,14 +31,19 @@ export class CategoryService {
     });
 
     const existing = await this.categoryRepository.findOne({
-      where: { name: data.name, type: type, displayOrder: data.displayOrder, displayName: data.displayName },
+      where: { name: data.name, type: type }
     });
-
     if (existing) {
-      throw new AppError(
-        `Category with name '${data.name}' and type '${type}' and display order '${data.displayOrder}' and display name '${data.displayName}' already exists`,
-        400
-      );
+      throw new AppError(`Category with name '${data.name}' already exists`, 400);
+    }
+
+    if (data.displayOrder) {
+      const existingDisplayOrder = await this.categoryRepository.findOne({
+        where: { displayOrder: data.displayOrder, type: type }
+      });
+      if (existingDisplayOrder) {
+        throw new AppError(`Display order '${data.displayOrder}' is already taken`, 400);
+      }
     }
     const payload = {
       ...data,
@@ -94,14 +99,18 @@ export class CategoryService {
       }
     }
 
-    const [items, total] = await Promise.all([
-      queryBuilder
-        .orderBy('category.displayOrder', 'ASC')
-        .skip(skip)
-        .take(Number(limit))
-        .getMany(),
-      queryBuilder.getCount(),
-    ]);
+    queryBuilder.addSelect(
+      'CASE WHEN category.display_order = 0 THEN 1 ELSE 0 END',
+      'is_zero_order'
+    );
+
+    const [items, total] = await queryBuilder
+      .orderBy('is_zero_order', 'ASC')
+      .addOrderBy('category.displayOrder', 'ASC')
+      .addOrderBy('category.createdAt', 'DESC')
+      .skip(skip)
+      .take(Number(limit))
+      .getManyAndCount();
 
     return {
       items,
@@ -140,14 +149,21 @@ export class CategoryService {
     if (data.name) {
       const checkType = type || category.type;
       const checkName = data.name || category.name;
+
       const existing = await this.categoryRepository.findOne({
-        where: { name: checkName, type: checkType, displayOrder: data.displayOrder, displayName: data.displayName },
+        where: { name: checkName, type: checkType },
       });
       if (existing && existing.id !== id) {
-        throw new AppError(
-          `Category with name '${checkName}' and type '${checkType}' and display order '${data.displayOrder}' and display name '${data.displayName}' already exists`,
-          400
-        );
+        throw new AppError(`Category with name '${checkName}' already exists`, 400);
+      }
+    }
+
+    if (data.displayOrder) {
+      const existingDisplayOrder = await this.categoryRepository.findOne({
+        where: { displayOrder: data.displayOrder, type: type || category.type },
+      });
+      if (existingDisplayOrder && existingDisplayOrder.id !== id) {
+        throw new AppError(`Display order '${data.displayOrder}' is already taken`, 400);
       }
     }
     const payload = {

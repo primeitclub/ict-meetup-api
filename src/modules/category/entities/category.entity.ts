@@ -9,7 +9,7 @@ import {
 import { BaseEntity } from '../../../shared/config/typeorm/base-entity';
 
 export enum CategoryType {
-  TEAM = 'teams',
+  TEAM = 'team_members',
   DESIGNATION = 'designations',
   EVENT = 'events',
   SPEAKER = 'speakers',

@@ -25,7 +25,12 @@ const ensureDirectoryExists = (dirPath: string) => {
 export const removeFile = async (filePath?: string) => {
   if (!filePath) return;
   try {
-    await fs.promises.unlink(filePath);
+    // Resolve relative URL-style paths (e.g. "/public/assets/...") to absolute disk paths
+    const resolvedPath = path.isAbsolute(filePath)
+      ? filePath
+      : path.join(process.cwd(), filePath);
+    await fs.promises.unlink(resolvedPath);
+    console.log(`Successfully removed file: ${resolvedPath}`);
   } catch (err) {
     console.error(`Failed to remove file ${filePath}:`, err);
   }
@@ -158,12 +163,16 @@ export const imageUploadHandler =
           req.body.uploadedImages = options.multiple
             ? uploadedImages
             : uploadedImages[0];
+          // imagePath stores the real disk path so removeFile (fs.unlink) works on failure cleanup
           req.body.imagePath = options.multiple
-            ? uploadedImages.map((image) => image.localUrl)
-            : uploadedImages[0].localUrl;
+            ? uploadedImages.map((image) => image.localPath)
+            : uploadedImages[0].localPath;
           req.body.imageUrl = options.multiple
             ? uploadedImages.map((image) => image.cloudUrl)
             : uploadedImages[0].cloudUrl;
+          req.body.imageLocalUrl = options.multiple
+            ? uploadedImages.map((image) => image.localUrl)
+            : uploadedImages[0].localUrl;
 
           next();
         } catch (uploadError) {

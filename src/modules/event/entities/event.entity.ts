@@ -18,12 +18,15 @@ export enum EventStatus {
 @Entity({ name: 'events' })
 export class Event extends BaseEntity {
       @Column({ type: 'varchar', length: 150 })
+      trackingId: string
+
+      @Column({ type: 'varchar', length: 150 })
       title: string;
 
       @Column({ type: 'varchar', length: 150 })
       subtitle: string;
 
-      @Column({ type: 'varchar', length: 255 })
+      @Column({ type: 'text' })
       description: string;
 
       @Column({ name: 'image_path', type: 'varchar' })

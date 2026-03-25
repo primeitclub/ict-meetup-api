@@ -39,8 +39,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *               categoryId: { type: string, format: uuid }
    *               designationId: { type: string, format: uuid }
    *               name: { type: string, minLength: 1, maxLength: 150 }
-   *               role: { type: string, maxLength: 100 }
-   *               displayOrder: { type: integer, minimum: 1, maximum: 15, default: 1 }
+   *               displayOrder: { type: integer, minimum: 1 }
    *               image: { type: string, format: binary }
    *               socialLinks:
    *                 type: object
@@ -69,10 +68,10 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *         schema: { type: string, format: uuid }
    *       - in: query
    *         name: page
-   *         schema: { type: number }
+   *         schema: { type: number, default: 1 }
    *       - in: query
    *         name: limit
-   *         schema: { type: number }
+   *         schema: { type: number, default: 10}
    *       - in: query
    *         name: search
    *         schema: { type: string }
@@ -100,12 +99,12 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *         application/json:
    *           schema:
    *             type: object
-   *             required: [versionId, name, displayName, displayOrder]
+   *             required: [versionId, name, displayName]
    *             properties:
    *               versionId: { type: string, format: uuid }
    *               name: { type: string, minLength: 1, maxLength: 150 }
    *               displayName: { type: string, minLength: 1, maxLength: 150 }
-   *               displayOrder: { type: integer, minimum: 1, maximum: 15, default: 1 }
+   *               displayOrder: { type: integer, minimum: 1}
    *     responses:
    *       201:
    *         description: Created
@@ -124,10 +123,10 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *         schema: { type: string, format: uuid }
    *       - in: query
    *         name: page
-   *         schema: { type: number }
+   *         schema: { type: number , default: 1 }
    *       - in: query
    *         name: limit
-   *         schema: { type: number }
+   *         schema: { type: number , default: 10 }
    *       - in: query
    *         name: search
    *         schema: { type: string }
@@ -163,7 +162,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *               versionId: { type: string, format: uuid }
    *               name: { type: string, minLength: 1, maxLength: 150 }
    *               displayName: { type: string, minLength: 1, maxLength: 150 }
-   *               displayOrder: { type: integer, minimum: 1, maximum: 15, default: 1 }
+   *               displayOrder: { type: integer, minimum: 1}
    *     responses:
    *       200:
    *         description: OK
@@ -219,10 +218,10 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *     parameters: 
    *       - in: query
    *         name: page
-   *         schema: { type: number }
+   *         schema: { type: number , default: 1}
    *       - in: query
    *         name: limit
-   *         schema: { type: number }
+   *         schema: { type: number , default: 10}
    *       - in: query
    *         name: search
    *         schema: { type: string }
@@ -241,7 +240,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
   /** 
    * @swagger
    * /api/team-members/designation/{id}:
-   *   put:
+   *   patch:
    *     summary: Update a team member designation
    *     tags: [TeamMemberDesignations]
    *     parameters:
@@ -299,7 +298,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
   /**
    * @swagger
    * /api/team-members/{id}:
-   *   put:
+   *   patch:
    *     summary: Update a team member
    *     tags: [TeamMembers]
    *     parameters:
@@ -317,8 +316,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *               categoryId: { type: string, format: uuid }
    *               designationId: { type: string, format: uuid }
    *               name: { type: string, minLength: 1, maxLength: 150 }
-   *               role: { type: string, maxLength: 100 }
-   *               displayOrder: { type: integer, minimum: 1, maximum: 15, default: 1 }
+   *               displayOrder: { type: integer, minimum: 1 }
    *               image: { type: string, format: binary }
    *               socialLinks:
    *                 type: object
@@ -330,7 +328,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.put('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestParams(teamMemberIdParamSchema), validateRequestBody(updateTeamMemberSchema), controller.update);
+  router.patch('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestParams(teamMemberIdParamSchema), validateRequestBody(updateTeamMemberSchema), controller.update);
 
   /**
    * @swagger

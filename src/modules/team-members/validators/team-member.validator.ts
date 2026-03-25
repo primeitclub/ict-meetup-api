@@ -6,12 +6,11 @@ export const createTeamMemberSchema = z.object({
   categoryId: z.uuid(),
   name: z.string().trim().min(1).max(150),
   designationId: z.uuid(),
-  role: z.string().trim().max(100),
   imagePath: z.string(),
   imageUrl: z.string().optional(),
   displayOrder: z.preprocess(
     (val) => (typeof val === 'string' ? Number(val) : val),
-    z.number().int().min(1).max(15)
+    z.number().int().min(1)
   ),
   socialLinks: z.preprocess(
     (val) => {

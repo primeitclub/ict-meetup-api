@@ -6,6 +6,7 @@ import { Category, CategoryType } from "../../category/entities/category.entity"
 import { removeFile } from "../../../shared/utils/helpers/imageUpload.helper";
 import { Speaker } from "../../speaker/entities/speaker.entity";
 import { EventVersionStatus, FlagshipEventVersion } from "../../flagship-event/entities/flagship-event.entity";
+import { randomInt, randomUUID } from "crypto";
 
 export class EventService {
       private eventRepository: Repository<EventEntity>;
@@ -52,7 +53,10 @@ export class EventService {
                   throw new AppError(`Display order ${rest.displayOrder} is already taken in this category`, 400);
             }
 
+            const trackingId = `ICT-Meetup-${versionExists.version_number}-${randomUUID().slice(0, 8)}`
+
             const newEvent = this.eventRepository.create({
+                  trackingId: trackingId,
                   title: rest.title,
                   subtitle: rest.subtitle,
                   description: rest.description,
@@ -95,6 +99,7 @@ export class EventService {
                         versionId: true,
                         categoryId: true,
                         speakerId: true,
+                        trackingId: true,
                         title: true,
                         subtitle: true,
                         description: true,
@@ -143,6 +148,7 @@ export class EventService {
                         versionId: true,
                         categoryId: true,
                         speakerId: true,
+                        trackingId: true,
                         title: true,
                         subtitle: true,
                         description: true,
@@ -261,6 +267,7 @@ export class EventService {
                         versionId: true,
                         categoryId: true,
                         speakerId: true,
+                        trackingId: true,
                         title: true,
                         subtitle: true,
                         description: true,
