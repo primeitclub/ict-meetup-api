@@ -31,7 +31,7 @@ export class Category extends BaseEntity {
   @Column({ type: 'varchar', length: 100 })
   displayName: string;
 
-  @Column({ name: 'display_order', type: 'int', unique: true, default: 0 })
+  @Column({ name: 'display_order', type: 'int', default: 0 })
   displayOrder: number;
 
 }
