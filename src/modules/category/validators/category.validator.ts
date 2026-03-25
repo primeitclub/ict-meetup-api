@@ -7,8 +7,8 @@ export const createCategorySchema = z.object({
   displayName: z.string().min(1).max(100),
   displayOrder: z.preprocess(
     (val) => (typeof val === 'string' ? Number(val) : val),
-    z.number().int().min(1).max(15).default(1)
-  ),
+    z.number().int().min(1)
+  ).optional(),
 });
 
 export const updateCategorySchema = createCategorySchema.partial();
