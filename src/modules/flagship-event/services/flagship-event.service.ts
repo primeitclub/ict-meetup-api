@@ -168,6 +168,10 @@ export class FlagshipEventVersionService {
       throw new AppError("Active versions cannot be deleted", 400);
     }
 
+    if (version.status === EventVersionStatus.ARCHIVED) {
+      throw new AppError("Archived versions cannot be deleted", 400);
+    }
+
     logger.warn(`Deleting flagship event version: ${id}`, {
       module: "FlagshipEventVersionService",
     });
