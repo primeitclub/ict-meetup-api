@@ -25,15 +25,18 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *     requestBody:
   *       required: true
   *       content:
-  *         application/json:
+  *         multipart/form-data:
   *           schema:
   *             type: object
-  *             required: [flagshipEventVersionId]
+  *             required: [versionId]
   *             properties:
-  *               flagshipEventVersionId: { type: string, format: uuid }
+  *               versionId: { type: string, format: uuid }
   *               title: { type: string }
   *               content: { type: string }
-  *               image: { type: string, format: binary }
+  *               image:
+  *                 type: string
+  *                 format: binary
+  *                 description: Image file
   *     responses:
   *       201:
   *         description: Created
@@ -48,7 +51,7 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *     tags: [AboutSections]
   *     parameters:
   *       - in: query
-  *         name: flagshipEventVersionId
+  *         name: versionId
   *         schema: { type: string, format: uuid }
   *     responses:
   *       200:
@@ -86,14 +89,17 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *         schema: { type: string, format: uuid }
   *     requestBody:
   *       content:
-  *         application/json:
+  *         multipart/form-data:
   *           schema:
   *             type: object
   *             properties:
-  *               flagshipEventVersionId: { type: string, format: uuid }
+  *               versionId: { type: string, format: uuid }
   *               title: { type: string }
   *               content: { type: string }
-  *               image: { type: string, format: binary }
+  *               image:
+  *                 type: string
+  *                 format: binary
+  *                 description: Image file
   *     responses:
   *       200:
   *         description: OK

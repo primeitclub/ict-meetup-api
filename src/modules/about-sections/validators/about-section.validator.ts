@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const createAboutSectionSchema = z.object({
-  flagshipEventVersionId: z.string().uuid(),
-  title: z.string().trim(),
-  content: z.string().trim(),
+  versionId: z.uuid(),
+  title: z.string().trim().min(1).max(255),
+  content: z.string().trim().min(1).max(1000),
   imageUrl: z.string().trim().optional(),
   imagePath: z.string(),
 });
@@ -15,7 +15,7 @@ export const aboutSectionIdParamSchema = z.object({
 });
 
 export const aboutSectionQuerySchema = z.object({
-  flagshipEventVersionId: z.string().uuid().optional(),
+  versionId: z.uuid(),
 });
 
 export type CreateAboutSectionDto = z.infer<typeof createAboutSectionSchema>;

@@ -12,7 +12,7 @@ export class Faq extends BaseEntity {
     length: 36,
     nullable: false,
   })
-  flagshipEventVersionId: string;
+  versionId: string;
 
   @ManyToOne(() => FlagshipEventVersion)
   @JoinColumn({ name: 'flagship_event_version_id' })

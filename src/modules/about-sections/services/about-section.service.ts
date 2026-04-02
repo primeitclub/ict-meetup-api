@@ -21,7 +21,7 @@ export class AboutSectionService {
 
     const versionExists = await this.dataSource
       .getRepository(FlagshipEventVersion)
-      .findOne({ where: { id: data.flagshipEventVersionId } });
+      .findOne({ where: { id: data.versionId } });
 
     if (!versionExists) {
       throw new AppError('Flagship event version not found', 404);
@@ -32,7 +32,7 @@ export class AboutSectionService {
     }
 
     const existing = await this.aboutSectionRepository.findOne({
-      where: { flagshipEventVersionId: data.flagshipEventVersionId },
+      where: { versionId: data.versionId },
     });
 
     if (existing) {
@@ -59,8 +59,8 @@ export class AboutSectionService {
       query,
     });
 
-    const { flagshipEventVersionId, page = 1, limit = 10 } = query;
-    const where = flagshipEventVersionId ? { flagshipEventVersionId } : {};
+    const { versionId, page = 1, limit = 10 } = query;
+    const where = versionId ? { versionId } : {};
     const skip = (Number(page) - 1) * Number(limit);
 
     const [items, total] = await this.aboutSectionRepository.findAndCount({
@@ -104,7 +104,7 @@ export class AboutSectionService {
       module: 'AboutSectionService',
     });
 
-    const versionId = data.flagshipEventVersionId || aboutSection.flagshipEventVersionId;
+    const versionId = data.versionId || aboutSection.versionId;
     const versionExists = await this.dataSource
       .getRepository(FlagshipEventVersion)
       .findOne({ where: { id: versionId } });

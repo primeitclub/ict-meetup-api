@@ -22,7 +22,7 @@ export class AboutSectionController extends BaseController {
         AuditLogType.INFO,
         AuditLogActionType.CREATE,
         "About section created successfully",
-        result.flagshipEventVersionId,
+        result.versionId,
         AuditLogScope.ABOUT_SECTIONS,
         req.ip,
         userId
@@ -75,7 +75,7 @@ export class AboutSectionController extends BaseController {
         AuditLogType.INFO,
         AuditLogActionType.UPDATE,
         "About section updated successfully",
-        result.flagshipEventVersionId,
+        result.versionId,
         AuditLogScope.ABOUT_SECTIONS,
         req.ip,
         userId
@@ -99,7 +99,7 @@ export class AboutSectionController extends BaseController {
         AuditLogType.INFO,
         AuditLogActionType.DELETE,
         "About section deleted successfully",
-        aboutSection.flagshipEventVersionId,
+        aboutSection.versionId,
         AuditLogScope.ABOUT_SECTIONS,
         req.ip,
         userId
