@@ -58,4 +58,10 @@ export class FlagshipEventVersion extends BaseEntity {
     default: false,
   })
   is_current: boolean;
+
+  @Column({
+    type: "varchar",
+    nullable: false,
+  })
+  logo: string;
 }

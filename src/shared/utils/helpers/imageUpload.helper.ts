@@ -41,27 +41,51 @@ const storage = multer.diskStorage({
   destination: async (req, _file, cb) => {
     try {
       // Determine moduleName from the route (e.g. '/api/team-members' -> 'team-members')
-      const moduleName = req.baseUrl.split("/").filter(Boolean).pop() || "unknown-module";
+      let moduleName = req.baseUrl.split("/").filter(Boolean).pop() || "unknown-module";
+
+      // If the module name is 'versions' (common in flagship-event routing), rename it for storage clarity
+      if (moduleName === "versions" && req.baseUrl.includes("flagship-event")) {
+        moduleName = "flagship-event";
+      }
 
       // Determine versionId from body, query, or params
-      const versionId = req.body.versionId || req.query.versionId || req.body.flagshipEventVersionId || req.params.version_id || req.params.versionId;
+      const versionId =
+        req.body.versionId ||
+        req.query.versionId ||
+        req.body.flagshipEventVersionId ||
+        req.params.version_id ||
+        req.params.versionId ||
+        req.params.id;
+
+      let versionName: string;
+
       if (!versionId) {
-        return cb(new AppError("Version ID is required", 400), "");
-      }
-      const isVersionExist = await flagshipEventVersionService.findById(versionId as string);
-      if (!isVersionExist) {
-        return cb(new AppError("Version not found", 404), "");
+        // Fallback for creating new flagship event version
+        if (req.body.version_name) {
+          versionName = req.body.version_name;
+        } else if (moduleName === "flagship-event") {
+          // Special case: Flagship event logo can be uploaded even if name/id isn't in body yet
+          versionName = "flagship-main";
+        } else {
+          return cb(new AppError("Version ID or version_name is required", 400), "");
+        }
+      } else {
+        const isVersionExist = await flagshipEventVersionService.findById(versionId as string);
+        if (!isVersionExist) {
+          return cb(new AppError("Version not found", 404), "");
+        }
+        versionName = isVersionExist.version_name;
       }
 
       // Assign to req for use in the loop later
-      (req as any).version = isVersionExist.version_name;
+      (req as any).version = versionName;
       (req as any).moduleName = moduleName;
 
       const uploadDir = path.join(
         process.cwd(),
         "public",
         "assets",
-        String(isVersionExist.version_name),
+        String(versionName),
         String(moduleName)
       );
       ensureDirectoryExists(uploadDir);
@@ -160,6 +184,14 @@ export const imageUploadHandler =
             });
           }
 
+          const finalImageUrl = options.multiple
+            ? uploadedImages.map((image) => image.cloudUrl)
+            : uploadedImages[0].cloudUrl;
+
+          const finalLocalUrl = options.multiple
+            ? uploadedImages.map((image) => image.localUrl)
+            : uploadedImages[0].localUrl;
+
           req.body.uploadedImages = options.multiple
             ? uploadedImages
             : uploadedImages[0];
@@ -167,12 +199,11 @@ export const imageUploadHandler =
           req.body.imagePath = options.multiple
             ? uploadedImages.map((image) => image.localPath)
             : uploadedImages[0].localPath;
-          req.body.imageUrl = options.multiple
-            ? uploadedImages.map((image) => image.cloudUrl)
-            : uploadedImages[0].cloudUrl;
-          req.body.imageLocalUrl = options.multiple
-            ? uploadedImages.map((image) => image.localUrl)
-            : uploadedImages[0].localUrl;
+          req.body.imageUrl = finalImageUrl;
+          req.body.imageLocalUrl = finalLocalUrl;
+
+          // Also set the specific fieldName for validation/controller compatibility
+          req.body[options.fieldName] = finalImageUrl;
 
           next();
         } catch (uploadError) {
