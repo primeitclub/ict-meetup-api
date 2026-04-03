@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const createFaqSchema = z.object({
-  flagshipEventVersionId: z.string().uuid(),
+  versionId: z.string().uuid(),
   title: z.string().trim().min(1).max(255),
-  description: z.string().optional(),
+  description: z.string().trim().min(1).max(1000),
 });
 
 export const updateFaqSchema = createFaqSchema.partial();
@@ -13,7 +13,7 @@ export const faqIdParamSchema = z.object({
 });
 
 export const faqQuerySchema = z.object({
-  flagshipEventVersionId: z.string().uuid().optional(),
+  versionId: z.string().uuid().optional(),
 });
 
 export type CreateFaqDto = z.infer<typeof createFaqSchema>;

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1deb3
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Mar 07, 2026 at 04:00 PM
--- Server version: 8.0.45-0ubuntu0.24.04.1
--- PHP Version: 8.3.6
+-- Host: 127.0.0.1
+-- Generation Time: Apr 02, 2026 at 06:23 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,16 +29,23 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `about_sections` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
-  `flagship_event_version_id` varchar(36) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `content` text,
-  `image_url` text,
-  `image_path` text
+  `content` text DEFAULT NULL,
+  `image_url` text DEFAULT NULL,
+  `image_path` text DEFAULT NULL,
+  `flagship_event_version_id` varchar(36) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `about_sections`
+--
+
+INSERT INTO `about_sections` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `title`, `content`, `image_url`, `image_path`, `flagship_event_version_id`) VALUES
+('fa6f5b8d-ab00-4884-8403-393edfa4a0d3', '2026-04-02 13:31:53.160848', '2026-04-02 13:31:53.160848', '8c9bbd1b-7d13-472f-9374-52074bde1225', NULL, 'What is Ict?', 'This year Ict', 'https://res.cloudinary.com/dmjgb9sfv/image/upload/v1775116011/assets/ict-meetup-v7/about-sections/mo98apti4qcuuumd8zj4.jpg', 'C:\\Users\\Mandip Shrestha\\Desktop\\ict-meetup-api\\public\\assets\\ict-meetup-v7\\about-sections\\1775116009702-85405efb-18a6-4477-8d41-bb01d83b2f40.jpeg', '7d286505-6579-4cf7-9f0e-03363c5a314f');
 
 -- --------------------------------------------------------
 
@@ -48,8 +55,8 @@ CREATE TABLE `about_sections` (
 
 CREATE TABLE `access_tokens` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
   `token` varchar(500) NOT NULL,
@@ -57,7 +64,7 @@ CREATE TABLE `access_tokens` (
   `userId` varchar(36) NOT NULL,
   `ipAddress` varchar(255) NOT NULL,
   `userAgent` varchar(255) NOT NULL,
-  `isRevoked` tinyint NOT NULL DEFAULT '0'
+  `isRevoked` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -65,27 +72,29 @@ CREATE TABLE `access_tokens` (
 --
 
 INSERT INTO `access_tokens` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `token`, `expiresAt`, `userId`, `ipAddress`, `userAgent`, `isRevoked`) VALUES
-('32a534a4-ed0f-4163-ab7f-80db81e5dd11', '2026-03-03 10:20:09.692210', '2026-03-03 10:20:09.692210', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjUwOSwiZXhwIjoxNzcyNTEzNDA5fQ.Ty-BEK82vUrnE4NpjFwM3EdC88yQnvVXFCexDM7gSaI', '2026-03-03 10:35:10', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('3a71e69b-ce5d-444b-a6f7-aad1476f9191', '2026-03-03 10:06:29.179161', '2026-03-03 10:06:29.179161', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTY4OSwiZXhwIjoxNzcyNTEyNTg5fQ.ulEjIOkZ-kfWpx0LGmetGnIv21nfilAJgml-3IHQUWw', '2026-03-03 10:21:29', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('3f77d26d-df5f-473d-bdb8-a2497d19e370', '2026-03-03 10:06:48.355894', '2026-03-03 10:06:48.355894', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTcwOCwiZXhwIjoxNzcyNTEyNjA4fQ.X8wMfo4hV0IuTEAy5MhC4QRuIJEX7cOKS0vrqOy9o-4', '2026-03-03 10:21:48', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('55ede1e0-9ca7-4e21-a42f-cc89ac88e122', '2026-03-03 10:05:05.221798', '2026-03-03 10:05:05.221798', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTYwNSwiZXhwIjoxNzcyNTEyNTA1fQ.ZzObYJLpoNJ7XcvL3EpOz4jmva1WEXqBG8ZL7zpa5i0', '2026-03-03 10:20:05', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('58b898c4-d886-4336-bbbb-dcd54d16cfc6', '2026-03-03 10:05:50.883482', '2026-03-03 10:05:50.883482', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTY1MCwiZXhwIjoxNzcyNTEyNTUwfQ.qSG_tSHRS-dcgZ7aYD1fLg8gJxn7T73KoQDJ3pgJVGs', '2026-03-03 10:20:51', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('62a07a9a-d507-4f55-90a7-05a4f3ac5e79', '2026-03-03 10:19:30.915608', '2026-03-03 10:19:30.915608', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjQ3MCwiZXhwIjoxNzcyNTEzMzcwfQ.ANPeLJPbsaEHpeTzYC80YdSAV2Nwyn6cxEH5QYr2yhU', '2026-03-03 10:34:31', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('6719398b-eed6-49c8-936e-c8f1ef69d60c', '2026-03-03 10:03:24.410028', '2026-03-03 10:03:24.410028', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTUwNCwiZXhwIjoxNzcyNTEyNDA0fQ.7NJI1Obrv57-98oAEylc4jtO1Lm4dxyigSx1kIhLnsE', '2026-03-03 10:18:24', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::1', 'curl/8.5.0', 0),
-('67fe37d9-eebe-4dad-80ea-b51270f0e8fe', '2026-03-03 10:08:09.074551', '2026-03-03 10:08:09.074551', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTc4OSwiZXhwIjoxNzcyNTEyNjg5fQ.Ey0P-YXKAcLxWRZ4TSixxAIH3brfvU5H-vrmPE9bNSU', '2026-03-03 10:23:09', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('74a33a46-d30c-4878-ab8d-69f937629735', '2026-03-07 20:50:11.277689', '2026-03-07 20:50:11.277689', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3Mjg5NTkxMSwiZXhwIjoxNzcyODk2ODExfQ.yzs5Sf4vOGv3FP0tO1F8W_dx0m5z0d6G7qsl1BEusWE', '2026-03-07 21:05:11', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 0),
-('854614db-f03a-4a7c-b96f-5a92a6d5410a', '2026-03-03 10:17:21.495827', '2026-03-03 10:17:21.495827', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjM0MSwiZXhwIjoxNzcyNTEzMjQxfQ.zCWe-0SEDSod3_bSVNm_Q-VfDAwKfIWCVSx-5AsAhP4', '2026-03-03 10:32:21', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('85afc09a-acf8-44b0-842a-aaaf7746a2cf', '2026-03-03 10:17:11.039693', '2026-03-03 10:17:11.039693', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjMzMSwiZXhwIjoxNzcyNTEzMjMxfQ.BOb0VIxokV4Q1F-uiyYglIboNUmgbfL2zsrEa0jXv1o', '2026-03-03 10:32:11', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('897b6721-3279-49bd-b614-2dc2211b2bf1', '2026-03-03 10:18:13.273780', '2026-03-03 10:18:13.273780', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjM5MywiZXhwIjoxNzcyNTEzMjkzfQ.f3V-cbUHhoPr9-GrezDr2SHD12_FIz_-xBJZ2cTqBsg', '2026-03-03 10:33:13', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('92bf68c1-2914-49d9-a9e2-49e5bb869453', '2026-03-03 10:04:39.497822', '2026-03-03 10:04:39.497822', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTU3OSwiZXhwIjoxNzcyNTEyNDc5fQ.IP23ZDcRUlJmAW3WT9dSiY2hSOoejTqEXb9IWqVAYpU', '2026-03-03 10:19:39', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('92e4db4d-c0c8-4c2f-bd70-bb01adefe024', '2026-03-03 10:08:50.371321', '2026-03-03 10:08:50.371321', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTgzMCwiZXhwIjoxNzcyNTEyNzMwfQ.OmxmtxyuFGAGx0pB-u7AP5G3SeD-qdOGDUPrdZZlrB8', '2026-03-03 10:23:50', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('940ec511-3c07-4358-a05e-1cd982df7015', '2026-03-03 10:09:11.124908', '2026-03-03 10:09:11.124908', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTg1MSwiZXhwIjoxNzcyNTEyNzUxfQ.HPI_ao2WHCzPCW0f7WgM4EykBJquzvKjL-hXXNddNkw', '2026-03-03 10:24:11', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('9d480a13-0c3d-4815-bf48-7affdf422af6', '2026-03-03 10:19:13.121804', '2026-03-03 10:19:13.121804', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjQ1MywiZXhwIjoxNzcyNTEzMzUzfQ.6qwZiYXNAbDAIySixVwzOdsOj3VSkDBs-Jtd67sPg1I', '2026-03-03 10:34:13', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('bd887b43-e2a9-4367-96e8-15eedce95e5a', '2026-03-03 10:06:12.818611', '2026-03-03 10:06:12.818611', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTY3MiwiZXhwIjoxNzcyNTEyNTcyfQ.xgeJeF_XOfND5fw3CEKwO1wWa_K_E2ecBnqcPy58lwU', '2026-03-03 10:21:13', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('c985fe66-faae-4cc5-ad50-71176b8686e1', '2026-03-03 10:20:19.680282', '2026-03-03 10:20:19.680282', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjUxOSwiZXhwIjoxNzcyNTEzNDE5fQ.po3vk9C5CwjcUJnWrEdNHSFIFt-xk5j-HDsi_jFn17E', '2026-03-03 10:35:20', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('d804d7eb-c129-4439-aaa1-0b1ab1d012d5', '2026-03-03 10:20:34.990119', '2026-03-03 10:20:34.990119', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjUzNCwiZXhwIjoxNzcyNTEzNDM0fQ.kdMYZEj7gcBmDO18AooHI4j5AF612JjW9vSF27cjgBw', '2026-03-03 10:35:35', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('da45b6cf-99d0-4bb1-9082-be688533abdc', '2026-03-03 10:09:30.714524', '2026-03-03 10:09:30.714524', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTg3MCwiZXhwIjoxNzcyNTEyNzcwfQ.PrSEPkWm9czUYdhqgSqtrThZxl_xMrYXIvoggCKytZ0', '2026-03-03 10:24:31', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('f52e7e61-0d2a-4b0b-85df-89cab0d90344', '2026-03-03 10:05:28.533527', '2026-03-03 10:05:28.533527', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTYyOCwiZXhwIjoxNzcyNTEyNTI4fQ.IPK-Y-XmpQgx5KweDzIsoa__hfouAhGS0paWtI8QOeY', '2026-03-03 10:20:29', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0);
+('055e9aae-0c97-42e4-8e78-8bc49b569caa', '2026-04-02 13:55:42.216327', '2026-04-02 13:55:42.216327', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNzQ0MiwiZXhwIjoxNzc1MTE4MzQyfQ.dLSV9yN-248PO0LtN72leGM9ye585fOeW2snC0e4pt4', '2026-04-02 14:10:42', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('181ca273-9079-4641-899b-fa5278ef539e', '2026-04-02 12:59:43.718914', '2026-04-02 12:59:43.718914', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNDA4MywiZXhwIjoxNzc1MTE0OTgzfQ.ZNATUHeJE51z1DuQTrC1xNwp6BbFPU3g3KKz6lrWOdY', '2026-04-02 13:14:43', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('27b0d7a2-10cd-44a8-89db-95fbb9f2d69c', '2026-04-02 21:21:06.778677', '2026-04-02 21:21:06.778677', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NDE2NiwiZXhwIjoxNzc1MTQ1MDY2fQ.-lg2VRM25VeQdjDs_WGcmDTVvzeybbgZQu7OP6glf0o', '2026-04-02 21:36:06', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('2f65ebe1-c0a3-4a73-93f7-391335e76364', '2026-04-02 13:10:27.310672', '2026-04-02 13:10:27.310672', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNDcyNywiZXhwIjoxNzc1MTE1NjI3fQ.D68nfEY96o4j1F-R68ZOrA2xueMdrW9fTAv6y_efnQA', '2026-04-02 13:25:27', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('3c05f4b9-ae4a-4897-848d-98cf1a83d0ce', '2026-04-02 13:30:03.987330', '2026-04-02 13:30:03.987330', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNTkwMywiZXhwIjoxNzc1MTE2ODAzfQ.9Ls1ay_yumEeHecfcZui2NAKggkp9iJi1lOAgB8gdOw', '2026-04-02 13:45:03', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('49f8eeec-22c5-49b2-90fd-60615dec5900', '2026-04-02 21:40:25.279851', '2026-04-02 21:40:25.279851', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NTMyNSwiZXhwIjoxNzc1MTQ2MjI1fQ.zRgSCA1zMJnw4djcyatSI_uMx70WM-ZlUO67GLb5VyI', '2026-04-02 21:55:25', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('4b548d6a-815e-469b-926f-18d1337e41c8', '2026-04-02 13:07:43.392298', '2026-04-02 13:07:43.392298', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNDU2MywiZXhwIjoxNzc1MTE1NDYzfQ.hjMNZwvVBit9nkrw750nIND0DGmtD9a3vrsK6zK2_3E', '2026-04-02 13:22:43', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('4b961bfc-f019-4250-973a-c0d707418620', '2026-04-02 20:52:15.779768', '2026-04-02 20:52:15.779768', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0MjQzNSwiZXhwIjoxNzc1MTQzMzM1fQ.Cmam12kWejUz_nCwckBAeiXa0AxP0H9cGyV1y_iMTvE', '2026-04-02 21:07:15', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('6248d983-c1a1-4b52-8dce-76781207e412', '2026-04-02 12:52:28.968220', '2026-04-02 12:52:28.968220', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExMzY0OCwiZXhwIjoxNzc1MTE0NTQ4fQ.qduLiFgPkH3rx4MpsvDnkavzqQhYduZ1EFief74c3TU', '2026-04-02 13:07:28', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('62a87181-fa28-481d-b185-02517b786898', '2026-04-02 21:43:04.635902', '2026-04-02 21:43:04.635902', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NTQ4NCwiZXhwIjoxNzc1MTQ2Mzg0fQ.to5d_uoHByMviwWd0JBWXmpBG4M6ElJfB0j9em3eCl8', '2026-04-02 21:58:04', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::ffff:127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('6f00c8c6-3909-441d-b81f-4839c1397564', '2026-04-02 20:34:53.529725', '2026-04-02 20:34:53.529725', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0MTM5MywiZXhwIjoxNzc1MTQyMjkzfQ.SexJ-5Zj6EBHr-NyCJNMuG58Mam0KkWBAq5NcftSiMI', '2026-04-02 20:49:53', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('79518c7e-92e5-42f6-a1e7-45baef155a8a', '2026-04-02 12:56:54.079330', '2026-04-02 12:56:54.079330', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExMzkxNCwiZXhwIjoxNzc1MTE0ODE0fQ.gGShtLpWzGPJ0gF1OH0zdSgVAFBmDk0y7alBjoTJThQ', '2026-04-02 13:11:54', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('82fdf9ed-8287-4448-8b05-72c4dc44508b', '2026-04-02 13:16:52.157191', '2026-04-02 13:16:52.157191', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNTExMiwiZXhwIjoxNzc1MTE2MDEyfQ.1Lc_T1i-sSo6ZjoGTaq5kljHMVn7eRC9pP-LZ2sO7wE', '2026-04-02 13:31:52', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('9043c792-c239-4597-8578-ce196cb0176b', '2026-04-02 11:29:25.772481', '2026-04-02 11:29:25.772481', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTEwODY2NSwiZXhwIjoxNzc1MTA5NTY1fQ.a1QL4TcoYCpd6E7p1a0JDjbe8VnZ0foG4JkD_Y8COhU', '2026-04-02 11:44:25', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('94754b99-6e84-474d-8067-92b92fcb1062', '2026-04-02 13:25:00.784090', '2026-04-02 13:25:00.784090', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNTYwMCwiZXhwIjoxNzc1MTE2NTAwfQ.WquKWZeuMCpQENsf6i4gk46yd82igDwydiCyAdQ3ZkI', '2026-04-02 13:40:00', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('a9469010-f1b6-4d76-be7d-9e1aa9e4f48a', '2026-04-02 12:54:43.654136', '2026-04-02 12:54:43.654136', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExMzc4MywiZXhwIjoxNzc1MTE0NjgzfQ.p8Jb9yAvwhVOLiIkdCKMV0ua6fwBTfmQHCbrnAUeuRI', '2026-04-02 13:09:43', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('acfe3275-4799-4d5f-be41-2b3f6a2462f8', '2026-04-02 21:59:39.651052', '2026-04-02 21:59:39.651052', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NjQ3OSwiZXhwIjoxNzc1MTQ3Mzc5fQ.1MDh0noyjwlpQlcAa2hWVbMnI8GgO9VPf3Y-Z3vuaw4', '2026-04-02 22:14:39', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('aed055af-1e83-4c9f-a9ee-759b5285d7fb', '2026-04-02 13:43:10.466073', '2026-04-02 13:43:10.466073', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNjY5MCwiZXhwIjoxNzc1MTE3NTkwfQ.J4GweDCDEbw9Z9-lsjCRx7kwOVN5cW87ASyQETeGmMA', '2026-04-02 13:58:10', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('aef86d79-ce4e-4c90-a89a-e242ea42f3e4', '2026-04-02 21:23:10.116532', '2026-04-02 21:23:10.116532', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NDI5MCwiZXhwIjoxNzc1MTQ1MTkwfQ.LmbkCsouvUlclGb9pSFI1dDKnOfLPzBHp2fHaHHlgY0', '2026-04-02 21:38:10', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('c122ea12-fa2e-42ba-aad5-23cfd1a12765', '2026-04-02 13:28:34.335958', '2026-04-02 13:28:34.335958', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNTgxNCwiZXhwIjoxNzc1MTE2NzE0fQ.wuXcfH6zQ_lbcNS91skrbc4DnyMUNHBkEYp8_Dfxwvc', '2026-04-02 13:43:34', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('c3410113-0738-4492-8dcf-42c67f2d2d83', '2026-04-02 13:34:31.833751', '2026-04-02 13:34:31.833751', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNjE3MSwiZXhwIjoxNzc1MTE3MDcxfQ.yw9j0fMifEYChUozLtlECL8X9HMcWttB0B6RWodeHxQ', '2026-04-02 13:49:31', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('e7e25cb0-a3a3-4c64-88cf-14236b1e60ee', '2026-04-02 20:39:17.502893', '2026-04-02 20:39:17.502893', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0MTY1NywiZXhwIjoxNzc1MTQyNTU3fQ.ohTGfOaRRvjwqjuZ6uGvIm-xI1kH5U0HorPIFRCCtxI', '2026-04-02 20:54:17', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('f2370409-cbfe-4510-a1e2-89491fa5ea17', '2026-04-02 21:56:12.366675', '2026-04-02 21:56:12.366675', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NjI3MiwiZXhwIjoxNzc1MTQ3MTcyfQ.oHn4F0CupOf3IMw-a_qXMP5B7-tC-6IVj078AhThwDs', '2026-04-02 22:11:12', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0);
 
 -- --------------------------------------------------------
 
@@ -95,14 +104,14 @@ INSERT INTO `access_tokens` (`id`, `createdAt`, `updatedAt`, `createdById`, `mod
 
 CREATE TABLE `assets` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
   `asset_library_id` varchar(36) NOT NULL,
-  `image_path` text,
-  `image_url` text,
-  `display_order` int NOT NULL,
+  `image_path` text DEFAULT NULL,
+  `image_url` text DEFAULT NULL,
+  `display_order` int(11) NOT NULL,
   `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -114,15 +123,15 @@ CREATE TABLE `assets` (
 
 CREATE TABLE `asset_library` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
-  `flagship_event_version_id` varchar(36) NOT NULL,
   `source_table` enum('hero_sections','gallery_items','achievement_metrics','speakers','team_members') NOT NULL,
   `source_table_id` varchar(36) NOT NULL,
-  `max_image_upload` int NOT NULL DEFAULT '1',
-  `extra_options` json DEFAULT NULL
+  `max_image_upload` int(11) NOT NULL DEFAULT 1,
+  `flagship_event_version_id` varchar(36) NOT NULL,
+  `extra_options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`extra_options`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -133,8 +142,8 @@ CREATE TABLE `asset_library` (
 
 CREATE TABLE `audit_logs` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
   `logType` enum('info','error') NOT NULL,
@@ -151,56 +160,58 @@ CREATE TABLE `audit_logs` (
 --
 
 INSERT INTO `audit_logs` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `logType`, `userId`, `logActionType`, `message`, `versionId`, `scope`, `ipAddress`) VALUES
-('14602d20-ea4c-4470-ba52-c8f0651d25d9', '2026-03-07 20:50:11.313974', '2026-03-07 20:50:11.313974', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::1'),
-('164392b9-eb63-4b61-a653-db6a2a9600bb', '2026-03-03 10:17:24.372246', '2026-03-03 10:17:24.372246', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 671aefad-5712-4f1d-8837-3d3029caed3a created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('1729bd09-ea06-43ea-b581-23e51688ff7d', '2026-03-03 10:05:28.565422', '2026-03-03 10:05:28.565422', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('176f0cd9-cbba-4dda-916a-3e033e4c5d47', '2026-03-03 10:20:14.422634', '2026-03-03 10:20:14.422634', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration aaf652e3-9576-405b-b7ba-a560641d3f94 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('1967860c-6b46-4984-a522-9e66a9798ca4', '2026-03-03 10:09:15.272408', '2026-03-03 10:09:15.272408', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration caa9ba36-f7b2-4667-9f65-46bdf4147ad0 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('1bd7962e-3f94-4d0b-80b8-4a3bf4d96ce4', '2026-03-03 10:08:50.421322', '2026-03-03 10:08:50.421322', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('1e64ed24-a427-4b76-8bf6-373702d23faa', '2026-03-03 10:09:33.748468', '2026-03-03 10:09:33.748468', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 3693f0f1-d48b-4e30-90ba-44595e9a5d6e created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('2171a367-d12f-4a19-b735-cfa5c222b2fc', '2026-03-03 10:03:25.661683', '2026-03-03 10:03:25.661683', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Flagship event version created successfully', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'flagship_event', '::1'),
-('31ca1bf4-2b05-45ef-878c-45378345b40a', '2026-03-03 10:17:25.493167', '2026-03-03 10:17:25.493167', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 953b7303-9af4-425e-a907-9f6e3dc28978 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('32b34bfb-9ab0-4882-83ca-dfabd21c75f4', '2026-03-03 10:18:13.311100', '2026-03-03 10:18:13.311100', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('33f6b8ea-9a87-422e-a137-f1f02144ccd4', '2026-03-03 10:03:42.362258', '2026-03-03 10:03:42.362258', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Category 8356978b-f5f3-477e-93cb-798fc4e48375 created successfully', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'events', '::1'),
-('3845da1f-3faf-46b2-a9dc-ea69bcee25c6', '2026-03-03 10:20:35.018568', '2026-03-03 10:20:35.018568', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('3974dc3c-0fa9-45d6-9304-62dc919d2c57', '2026-03-03 10:17:14.196313', '2026-03-03 10:17:14.196313', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration d376da8e-a244-44e8-8c41-5279ed5a521c created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', NULL),
-('3a78932a-c3ae-4163-b294-90139cf51430', '2026-03-03 10:19:13.159998', '2026-03-03 10:19:13.159998', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('3cd82661-8c1f-4a70-9ff3-586f20980797', '2026-03-03 10:03:24.450192', '2026-03-03 10:03:24.450192', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::1'),
-('4e7e5178-04fd-4b58-a21e-cc7ae0b81399', '2026-03-03 10:09:30.743266', '2026-03-03 10:09:30.743266', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('5c2366f4-463e-40ee-bf44-b144dbcaa03a', '2026-03-03 10:05:05.252931', '2026-03-03 10:05:05.252931', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('5f62a41c-f47e-4845-b319-131a377e8ab4', '2026-03-03 10:09:11.156815', '2026-03-03 10:09:11.156815', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('606a9557-1b3b-46a0-8d8d-b2f304b72a4f', '2026-03-03 10:08:09.115006', '2026-03-03 10:08:09.115006', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('61fea601-284b-4c0f-a712-501327cc124e', '2026-03-03 10:20:43.817716', '2026-03-03 10:20:43.817716', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'delete', 'Event Registration 0f1ce477-ec1b-4783-8d9f-9f654b0f95ca deleted successfully', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('7002dae6-bd26-4b18-a367-69ea3bddf731', '2026-03-03 10:06:48.385987', '2026-03-03 10:06:48.385987', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('73059f49-a02a-4aaf-9fae-f4135d32800c', '2026-03-03 10:06:51.415704', '2026-03-03 10:06:51.415704', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 825ca9a9-aeb6-4f51-ae62-50d027e333dc created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('7319f843-d7e7-4c28-80d2-1a82b8967179', '2026-03-03 10:19:32.352321', '2026-03-03 10:19:32.352321', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 7cdb89b5-2cb5-4882-a484-56d92b37e027 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('75276eef-687a-4962-95d1-50c529bb36f0', '2026-03-03 10:18:16.573687', '2026-03-03 10:18:16.573687', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration c2331d00-e9c2-4aa6-8e8a-2160077c40d3 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('7b0809a0-5b26-490a-a016-1014eaea5516', '2026-03-03 10:20:19.713589', '2026-03-03 10:20:19.713589', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('7dd49a37-64e7-48d8-8e2c-4f5476bf4d6f', '2026-03-03 10:19:16.440773', '2026-03-03 10:19:16.440773', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 29ceba43-dafc-453d-a6e4-27161512c6e0 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('873c2426-2201-4a6b-bbc4-8482834ec830', '2026-03-03 10:20:39.512989', '2026-03-03 10:20:39.512989', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 0f1ce477-ec1b-4783-8d9f-9f654b0f95ca created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('8c74a014-4921-468c-8db3-bc87ee6356f1', '2026-03-03 10:20:18.542898', '2026-03-03 10:20:18.542898', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'update', 'Event Registration 1af2ffdf-e384-4c17-b64b-e042316851c9 updated successfully', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('8c99c70c-be1e-4791-8513-5bd4c8cc0dd2', '2026-03-03 10:18:21.612470', '2026-03-03 10:18:21.612470', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'update', 'Event Registration 1af2ffdf-e384-4c17-b64b-e042316851c9 updated successfully', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('8d9c4f39-269e-4eee-84ed-4af55faad5d2', '2026-03-03 10:19:35.163017', '2026-03-03 10:19:35.163017', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration d538de01-502b-42dc-85db-acc29befc286 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('91b57dc1-3a3d-4c82-822c-7db97d5eb779', '2026-03-03 10:18:17.599765', '2026-03-03 10:18:17.599765', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 1f3be7bc-3f3f-4744-bc8b-4ed6a4c4f703 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('9350a25d-b46f-443e-8de2-b71d834b68cd', '2026-03-03 10:17:11.068937', '2026-03-03 10:17:11.068937', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('961085a5-e3b5-4cda-8450-c5197e43a666', '2026-03-03 10:09:14.102180', '2026-03-03 10:09:14.102180', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 1af2ffdf-e384-4c17-b64b-e042316851c9 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('9e574e88-ca8a-4e6e-aff6-890547856dca', '2026-03-03 10:04:20.574618', '2026-03-03 10:04:20.574618', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event f8b51ee0-1561-4d1e-9cd2-827ac6488a57 created successfully', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'events', '::1'),
-('a15ea9cc-e399-4bda-b5cc-963b80087e85', '2026-03-03 10:20:13.231741', '2026-03-03 10:20:13.231741', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 1d90d02c-9f25-4676-bab3-a268a43bcd3a created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('a44866fd-4ee2-43ea-a20b-40519f999252', '2026-03-03 10:04:39.529656', '2026-03-03 10:04:39.529656', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('aa45e70a-9360-4260-82a2-3b42b63d82de', '2026-03-03 10:19:27.057408', '2026-03-03 10:19:27.057408', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'update', 'Event Registration 1af2ffdf-e384-4c17-b64b-e042316851c9 updated successfully', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('ac64132c-4591-4838-b417-1e457eb99596', '2026-03-03 10:19:30.944407', '2026-03-03 10:19:30.944407', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('cdd054be-44d1-460d-a394-3b8916dce541', '2026-03-03 10:20:22.182821', '2026-03-03 10:20:22.182821', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 4c134017-77b0-408a-8f23-f6cb9a7a3975 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('d6866b7f-28a6-4b81-b65b-4f08df7def24', '2026-03-03 10:19:23.752748', '2026-03-03 10:19:23.752748', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration ee517349-5156-4e1c-ac8e-4f51f94dda21 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('d968eec3-4681-4332-b6b6-e8b7eee817c6', '2026-03-03 10:20:38.141887', '2026-03-03 10:20:38.141887', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 8be0b889-6b21-46c3-83a1-fe0cf7e65417 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('d9c544a6-71e7-4595-b44a-1f4daf5eddca', '2026-03-03 10:06:52.424424', '2026-03-03 10:06:52.424424', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration d4a32fc0-a47c-4325-bc13-7bd901ec77b7 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('e882c7b6-4a61-4a90-acfd-411edbf3e12c', '2026-03-03 10:06:12.859390', '2026-03-03 10:06:12.859390', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('ea69d607-d6cc-40f6-99f8-cf3ae473f8f9', '2026-03-03 10:20:43.781132', '2026-03-03 10:20:43.781132', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'update', 'Event Registration 0f1ce477-ec1b-4783-8d9f-9f654b0f95ca updated successfully', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('ec8d77a3-51f1-4723-ac21-7992ce086300', '2026-03-03 10:17:21.526991', '2026-03-03 10:17:21.526991', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('f1e14551-ae0b-4bd2-9a5d-36fb548bc72e', '2026-03-03 10:05:50.915955', '2026-03-03 10:05:50.915955', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('f220ceb0-7c07-4a5a-a1ef-a964bd69c338', '2026-03-03 10:06:29.214164', '2026-03-03 10:06:29.214164', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('f30e8eb9-57c1-4e49-80c6-2f3330c981db', '2026-03-03 10:09:34.865910', '2026-03-03 10:09:34.865910', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 4fedfa97-c405-4551-b6a3-d701318b7567 created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1'),
-('f8fd46f3-e63e-4b12-bda5-26852d99be95', '2026-03-03 10:20:09.730872', '2026-03-03 10:20:09.730872', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'login', 'User logged in successfully', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'users', '::ffff:127.0.0.1'),
-('ff40e76e-41da-4d13-a1f2-48463e91a0a9', '2026-03-03 10:20:20.947711', '2026-03-03 10:20:20.947711', NULL, NULL, 'info', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'create', 'Event Registration 47133962-650f-4867-9615-da40e452714c created', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'event_registrations', '::ffff:127.0.0.1');
+('01cd2b80-dc5c-4915-8e4a-e63c1541410d', '2026-04-02 13:34:31.854689', '2026-04-02 13:34:31.854689', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('059a509e-19fd-4f72-858c-71bdd76c39ad', '2026-04-02 13:28:34.361577', '2026-04-02 13:28:34.361577', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('0e5e5dcf-0b8b-4187-85ca-d31ca11b6485', '2026-04-02 21:46:20.762163', '2026-04-02 21:46:20.762163', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'update', 'Flagship event version updated successfully', '146aad9c-2203-4ce4-b38f-247676349a02', 'flagship_event', '::1'),
+('0f160535-aaa9-435d-b7d2-ba16b426388d', '2026-04-02 21:23:10.173705', '2026-04-02 21:23:10.173705', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('1571490d-2bec-4765-9aed-f820778f9028', '2026-04-02 20:39:17.576916', '2026-04-02 20:39:17.576916', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('1f4066f1-bff8-4166-b9f9-c52e5e55ccf9', '2026-04-02 13:30:04.011021', '2026-04-02 13:30:04.011021', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('23de18b9-9009-4137-8be7-cbaa1a9492fc', '2026-04-02 20:55:12.107102', '2026-04-02 20:55:12.107102', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'update', 'Flagship event version updated successfully', '4dbb52af-4318-4a4d-9c7c-761f9a01a4ec', 'flagship_event', '::1'),
+('27480917-a53d-4177-9b69-6560a62ea564', '2026-04-02 13:25:00.817441', '2026-04-02 13:25:00.817441', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('2782f878-272e-46a8-b067-a2c66a92065c', '2026-04-02 21:41:01.157734', '2026-04-02 21:41:01.157734', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Flagship event version created successfully', 'a47bfe45-08d5-42aa-91e0-fb76b45832b3', 'flagship_event', '::1'),
+('356e2dfd-3c28-4105-a7bb-0ba43e7700d3', '2026-04-02 20:42:03.856168', '2026-04-02 20:42:03.856168', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'delete', 'Sponsor 04df59ed-fe57-453f-87b7-595a41f30a7d deleted successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('388233c8-fcd0-4be6-bf29-17f8b3ee09ca', '2026-04-02 11:29:25.800148', '2026-04-02 11:29:25.800148', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('3b08f55b-8b9c-44a6-b3fc-0c12248383d0', '2026-04-02 12:54:43.702498', '2026-04-02 12:54:43.702498', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('414830d6-4626-4fae-b628-c6a2233cda97', '2026-04-02 12:52:29.007334', '2026-04-02 12:52:29.007334', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('41def24b-6817-48c0-a634-2fc87b6a87e8', '2026-04-02 20:53:02.387369', '2026-04-02 20:53:02.387369', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Flagship event version created successfully', '4dbb52af-4318-4a4d-9c7c-761f9a01a4ec', 'flagship_event', '::1'),
+('47a779f5-9929-4c35-9833-a6f5ea3d69a5', '2026-04-02 13:31:43.928252', '2026-04-02 13:31:43.928252', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'delete', 'About section deleted successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'about_sections', '::1'),
+('4817d85a-8a8f-4889-864a-bcbfb7c86290', '2026-04-02 13:55:42.245640', '2026-04-02 13:55:42.245640', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('51d48c7f-b94a-4a74-953b-c1e639eeacab', '2026-04-02 12:56:54.118450', '2026-04-02 12:56:54.118450', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('5516004c-dd85-46b3-a634-b25501205108', '2026-04-02 20:41:26.408997', '2026-04-02 20:41:26.408997', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'update', 'Sponsor 04df59ed-fe57-453f-87b7-595a41f30a7d updated successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('585403ad-2596-4437-bb04-6f2b97b10f5b', '2026-04-02 20:34:53.608653', '2026-04-02 20:34:53.608653', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('59ecb115-5439-4d8c-a2f9-eaf7020d3924', '2026-04-02 21:40:25.341046', '2026-04-02 21:40:25.341046', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('5a1dd461-635d-46bb-b937-643c9116cfd6', '2026-04-02 21:23:56.999933', '2026-04-02 21:23:56.999933', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Sponsor category 876ef7d1-5d29-4868-a6b5-e8f529af6ccd created successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('65463b3f-2b21-4b7c-bae5-0fa3a4ae8fee', '2026-04-02 21:56:12.429673', '2026-04-02 21:56:12.429673', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('704efcaf-4d81-4bf4-be5a-b77d220468e6', '2026-04-02 20:43:13.101124', '2026-04-02 20:43:13.101124', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'update', 'Sponsor category 138c956a-29a2-4fed-864d-1ce1d99b818c updated successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('759476ae-1cb4-4d2e-986c-226c28632f67', '2026-04-02 21:24:34.558499', '2026-04-02 21:24:34.558499', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Sponsor 16ddbfad-0c14-433e-968c-7e8a30b37bff created successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('82a3d4a4-e601-4df6-9e01-46f77078fb49', '2026-04-02 20:55:27.331228', '2026-04-02 20:55:27.331228', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'delete', 'Flagship event version deleted successfully', '4dbb52af-4318-4a4d-9c7c-761f9a01a4ec', 'flagship_event', '::1'),
+('84ec7f0f-a94f-472b-bb2a-938085319d85', '2026-04-02 20:54:38.767843', '2026-04-02 20:54:38.767843', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'delete', 'Flagship event version deleted successfully', '321b930f-b315-4d1c-80d9-5ce57d0eff5e', 'flagship_event', '::1'),
+('87c6d512-d57e-4b29-bebe-e8492d5f5bae', '2026-04-02 21:27:10.101059', '2026-04-02 21:27:10.101059', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Sponsor 80b78e3d-7608-4021-bb2c-03a921c8326f created successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('883d86d3-748d-4635-a7d5-81bb472a29fd', '2026-04-02 21:41:14.548089', '2026-04-02 21:41:14.548089', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'delete', 'Flagship event version deleted successfully', 'a47bfe45-08d5-42aa-91e0-fb76b45832b3', 'flagship_event', '::1'),
+('9771ac97-fe79-4af3-b4d3-6c599c602847', '2026-04-02 21:21:06.845185', '2026-04-02 21:21:06.845185', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('99266ce3-7ad4-433f-bb8f-6e24ca332abd', '2026-04-02 20:43:33.118588', '2026-04-02 20:43:33.118588', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'delete', 'Sponsor category 138c956a-29a2-4fed-864d-1ce1d99b818c deleted successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('99504595-bed3-4749-a332-e80068981157', '2026-04-02 21:45:41.583336', '2026-04-02 21:45:41.583336', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Flagship event version created successfully', '146aad9c-2203-4ce4-b38f-247676349a02', 'flagship_event', '::1'),
+('996d6eda-0caa-48b5-8f25-f16d5d3c3cd1', '2026-04-02 20:52:15.834153', '2026-04-02 20:52:15.834153', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('9c2fb8c9-d98f-4986-87bf-387b280ab29b', '2026-04-02 13:07:43.431040', '2026-04-02 13:07:43.431040', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('9d5e04d9-95fc-489e-88e8-e992deaaba23', '2026-04-02 22:04:40.141678', '2026-04-02 22:04:40.141678', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'update', 'Flagship event version updated successfully', '559b25e2-8eca-4cc4-961e-3bfc6495b5c0', 'flagship_event', '::1'),
+('9dea10e8-edea-4904-b4c6-df478850f512', '2026-04-02 21:59:39.701721', '2026-04-02 21:59:39.701721', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('a23b39b3-bc54-4f05-9ab6-791a4c4396e3', '2026-04-02 13:35:18.098616', '2026-04-02 13:35:18.098616', NULL, NULL, 'info', 'system', 'create', 'Faq created successfully', 'ffeca256-fa86-4ec1-a179-d14f4e8aa5c4', 'faq', '::1'),
+('a3b1bbb7-2e51-4121-b51e-ff4d2a47c5fe', '2026-04-02 12:59:43.756270', '2026-04-02 12:59:43.756270', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('a7ab637a-fc4d-4329-93ee-b688ad8691fa', '2026-04-02 21:43:04.707449', '2026-04-02 21:43:04.707449', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::ffff:127.0.0.1'),
+('b43c9a12-dd61-48d0-9a65-a5b1b44f092f', '2026-04-02 21:46:25.179962', '2026-04-02 21:46:25.179962', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'delete', 'Flagship event version deleted successfully', '146aad9c-2203-4ce4-b38f-247676349a02', 'flagship_event', '::1'),
+('b6271998-7fe7-4490-a8bd-92a46638dd43', '2026-04-02 13:10:27.343174', '2026-04-02 13:10:27.343174', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('b9e618fe-bfe0-426f-9a16-99e454c144eb', '2026-04-02 21:25:08.393180', '2026-04-02 21:25:08.393180', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'delete', 'Sponsor 16ddbfad-0c14-433e-968c-7e8a30b37bff deleted successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('bb5621ed-6bc9-4e39-8d8d-5950860778d9', '2026-04-02 13:36:33.682890', '2026-04-02 13:36:33.682890', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Sponsor category 138c956a-29a2-4fed-864d-1ce1d99b818c created successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('c2138341-fb49-4464-96ab-502d68d5c709', '2026-04-02 22:05:07.086984', '2026-04-02 22:05:07.086984', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'delete', 'Flagship event version deleted successfully', '559b25e2-8eca-4cc4-961e-3bfc6495b5c0', 'flagship_event', '::1'),
+('d669eb91-abde-4cfb-9e4d-b036f3457708', '2026-04-02 21:43:32.414242', '2026-04-02 21:43:32.414242', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Flagship event version created successfully', 'a5a030a3-2f08-44de-9bff-06e9c49b89d8', 'flagship_event', '::1'),
+('dbf29289-4400-4bac-9510-7e3ed6bbf6a8', '2026-04-02 13:31:53.172191', '2026-04-02 13:31:53.172191', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'About section created successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'about_sections', '::1'),
+('e092bd98-1a76-4d02-8394-a56bc6fbdbf8', '2026-04-02 13:25:29.341413', '2026-04-02 13:25:29.341413', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Flagship event version created successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'flagship_event', '::1'),
+('e34733e5-fd6d-4cfd-8e38-9e722dd7d056', '2026-04-02 13:43:10.501780', '2026-04-02 13:43:10.501780', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('ece8e239-b133-4050-900c-13cc2a801064', '2026-04-02 22:01:51.614757', '2026-04-02 22:01:51.614757', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Flagship event version created successfully', '559b25e2-8eca-4cc4-961e-3bfc6495b5c0', 'flagship_event', '::1'),
+('f069e0bc-e937-4fe6-aa5d-04b6cc2bf6f7', '2026-04-02 13:29:04.545478', '2026-04-02 13:29:04.545478', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'About section created successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'about_sections', '::1'),
+('f973f347-62b6-4a25-9ace-6a0525a88558', '2026-04-02 20:40:15.637893', '2026-04-02 20:40:15.637893', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Sponsor 04df59ed-fe57-453f-87b7-595a41f30a7d created successfully', '7d286505-6579-4cf7-9f0e-03363c5a314f', 'sponsors', '::1'),
+('fb13d3dd-758a-4312-b138-f43d98ac7c2a', '2026-04-02 13:16:52.178233', '2026-04-02 13:16:52.178233', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'login', 'User logged in successfully', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'users', '::1'),
+('fc3a1000-3943-46d3-a79d-bb0338ce6c2a', '2026-04-02 20:54:13.169877', '2026-04-02 20:54:13.169877', NULL, NULL, 'info', '8c9bbd1b-7d13-472f-9374-52074bde1225', 'create', 'Flagship event version created successfully', '321b930f-b315-4d1c-80d9-5ce57d0eff5e', 'flagship_event', '::1');
 
 -- --------------------------------------------------------
 
@@ -210,22 +221,22 @@ INSERT INTO `audit_logs` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifi
 
 CREATE TABLE `category` (
   `id` varchar(36) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
-  `display_order` int NOT NULL DEFAULT '0',
-  `type` enum('teams','designations','events','speakers','sponsors') NOT NULL,
-  `displayName` varchar(100) NOT NULL
+  `type` enum('team_members','designations','events','speakers','sponsors') NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `displayName` varchar(100) NOT NULL,
+  `display_order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `category`
 --
 
-INSERT INTO `category` (`id`, `name`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `display_order`, `type`, `displayName`) VALUES
-('8356978b-f5f3-477e-93cb-798fc4e48375', 'Main Events', '2026-03-03 10:03:42.346417', '2026-03-03 10:03:42.346417', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', NULL, 1, 'events', 'Main Events');
+INSERT INTO `category` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `type`, `name`, `displayName`, `display_order`) VALUES
+('876ef7d1-5d29-4868-a6b5-e8f529af6ccd', '2026-04-02 21:23:56.981921', '2026-04-02 21:23:56.981921', '8c9bbd1b-7d13-472f-9374-52074bde1225', NULL, 'sponsors', 'Platinum', 'string', 1);
 
 -- --------------------------------------------------------
 
@@ -235,8 +246,8 @@ INSERT INTO `category` (`id`, `name`, `createdAt`, `updatedAt`, `createdById`, `
 
 CREATE TABLE `designations` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
   `name` varchar(255) NOT NULL
@@ -250,12 +261,14 @@ CREATE TABLE `designations` (
 
 CREATE TABLE `events` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
+  `trackingId` varchar(150) NOT NULL,
   `title` varchar(150) NOT NULL,
-  `description` varchar(255) NOT NULL,
+  `subtitle` varchar(150) NOT NULL,
+  `description` text NOT NULL,
   `image_path` varchar(255) NOT NULL,
   `start_time` time DEFAULT NULL,
   `end_time` time DEFAULT NULL,
@@ -263,22 +276,15 @@ CREATE TABLE `events` (
   `category_id` varchar(36) NOT NULL,
   `version_id` varchar(36) NOT NULL,
   `speaker_id` varchar(36) DEFAULT NULL,
-  `total_seats` int NOT NULL DEFAULT '0',
-  `feeType` enum('free','paid') NOT NULL,
-  `fee` decimal(10,2) NOT NULL,
+  `total_seats` int(11) NOT NULL DEFAULT 0,
+  `fee_type` enum('free','paid') NOT NULL,
+  `fee` varchar(255) NOT NULL,
   `location` varchar(255) NOT NULL,
   `status` enum('draft','published','archived') NOT NULL,
-  `registration_deadline` timestamp NOT NULL,
-  `display_order` int NOT NULL DEFAULT '0',
-  `is_highlighted` tinyint NOT NULL DEFAULT '0'
+  `registration_deadline` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `display_order` int(11) NOT NULL DEFAULT 0,
+  `is_highlighted` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `events`
---
-
-INSERT INTO `events` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `title`, `description`, `image_path`, `start_time`, `end_time`, `date`, `category_id`, `version_id`, `speaker_id`, `total_seats`, `feeType`, `fee`, `location`, `status`, `registration_deadline`, `display_order`, `is_highlighted`) VALUES
-('f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '2026-03-03 10:04:20.551270', '2026-03-03 10:04:20.551270', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', NULL, 'Tech Talk 1', 'A talk about AI', '/public/assets/ICT Meetup 2026/events/1772511557735-55850a3d-6a29-419b-9a3a-8457925ace7b.png', '10:00:00', '12:00:00', '2026-06-02', '8356978b-f5f3-477e-93cb-798fc4e48375', '5ce563bb-a5ef-414b-852e-af069acf55f4', NULL, 50, 'free', 0.00, 'Hall A', 'published', '2026-06-01 23:59:59', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -288,52 +294,25 @@ INSERT INTO `events` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedBy
 
 CREATE TABLE `event_registration` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
   `username` varchar(150) NOT NULL,
   `email` varchar(150) NOT NULL,
   `contactNumber` varchar(150) NOT NULL,
-  `isStudent` tinyint NOT NULL,
+  `isStudent` tinyint(4) NOT NULL,
   `educationLevel` varchar(150) DEFAULT NULL,
   `faculty` varchar(150) DEFAULT NULL,
-  `year` int DEFAULT NULL,
+  `year` int(11) DEFAULT NULL,
   `attachedPaymentScreenshot` varchar(150) NOT NULL,
   `eventId` varchar(150) NOT NULL,
   `versionId` varchar(150) NOT NULL,
   `status` enum('pending','approved','rejected') NOT NULL,
+  `deleted_at` datetime(6) DEFAULT NULL,
   `event_id` varchar(36) DEFAULT NULL,
-  `version_id` varchar(36) DEFAULT NULL,
-  `deleted_at` datetime(6) DEFAULT NULL
+  `version_id` varchar(36) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `event_registration`
---
-
-INSERT INTO `event_registration` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `username`, `email`, `contactNumber`, `isStudent`, `educationLevel`, `faculty`, `year`, `attachedPaymentScreenshot`, `eventId`, `versionId`, `status`, `event_id`, `version_id`, `deleted_at`) VALUES
-('0f1ce477-ec1b-4783-8d9f-9f654b0f95ca', '2026-03-03 10:20:39.502055', '2026-03-03 10:20:43.000000', NULL, NULL, 'professional_user', 'pro_1772512535043@example.com', '9812345678', 0, NULL, NULL, NULL, '/public/assets/ICT Meetup 2026/event-registrations/1772512538160-af360548-7b65-44b9-b8bc-e9ea25c69d66.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'approved', NULL, NULL, '2026-03-03 10:20:43.000000'),
-('1af2ffdf-e384-4c17-b64b-e042316851c9', '2026-03-03 10:09:14.086702', '2026-03-03 10:18:21.000000', NULL, NULL, 'student_user', 'student_1772511851181@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772511851200-018c459c-132e-4050-bc31-22f84d9cd2b6.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'approved', NULL, NULL, NULL),
-('1d90d02c-9f25-4676-bab3-a268a43bcd3a', '2026-03-03 10:20:13.213124', '2026-03-03 10:20:13.213124', NULL, NULL, 'student_user', 'student_1772512509750@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772512509770-3afb9339-0426-47aa-8175-6a3f32cda6ab.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('1f3be7bc-3f3f-4744-bc8b-4ed6a4c4f703', '2026-03-03 10:18:17.582896', '2026-03-03 10:18:17.582896', NULL, NULL, 'professional_user', 'pro_1772512393335@example.com', '9812345678', 0, NULL, NULL, NULL, '/public/assets/ICT Meetup 2026/event-registrations/1772512396593-1656288e-bc80-4d49-a5a7-6be75088d407.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('29ceba43-dafc-453d-a6e4-27161512c6e0', '2026-03-03 10:19:16.421952', '2026-03-03 10:19:16.421952', NULL, NULL, 'student_user', 'student_1772512453181@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772512453198-a9570dcd-268b-4eb5-bcdc-874b9eff3cec.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('3693f0f1-d48b-4e30-90ba-44595e9a5d6e', '2026-03-03 10:09:33.737563', '2026-03-03 10:09:33.737563', NULL, NULL, 'student_user', 'student_1772511870763@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772511870781-e8fe6e8b-edf5-47cd-9c28-edf831a6fba0.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('47133962-650f-4867-9615-da40e452714c', '2026-03-03 10:20:20.929371', '2026-03-03 10:20:20.929371', NULL, NULL, 'student_user', 'student_1772512519735@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772512519746-73d2d772-86e8-46ea-944a-51db86eb8a6a.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('4c134017-77b0-408a-8f23-f6cb9a7a3975', '2026-03-03 10:20:22.164829', '2026-03-03 10:20:22.164829', NULL, NULL, 'professional_user', 'pro_1772512519735@example.com', '9812345678', 0, NULL, NULL, NULL, '/public/assets/ICT Meetup 2026/event-registrations/1772512520965-5b41f3cb-3617-47d9-963c-b6bb0188e41a.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('4fedfa97-c405-4551-b6a3-d701318b7567', '2026-03-03 10:09:34.848559', '2026-03-03 10:09:34.848559', NULL, NULL, 'professional_user', 'pro_1772511870763@example.com', '9812345678', 0, NULL, NULL, NULL, '/public/assets/ICT Meetup 2026/event-registrations/1772511873768-9c3af958-1300-44b2-8beb-1b793cf746d8.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('671aefad-5712-4f1d-8837-3d3029caed3a', '2026-03-03 10:17:24.353047', '2026-03-03 10:17:24.353047', NULL, NULL, 'student_user', 'student_1772512341544@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772512341555-c4bbef5a-3a75-4bf3-9922-a81d52538cdd.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('7cdb89b5-2cb5-4882-a484-56d92b37e027', '2026-03-03 10:19:32.334964', '2026-03-03 10:19:32.334964', NULL, NULL, 'student_user', 'student_1772512470962@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772512470974-b4efe683-7a15-4f00-a4da-140ca55a2494.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('825ca9a9-aeb6-4f51-ae62-50d027e333dc', '2026-03-03 10:06:51.393839', '2026-03-03 10:06:51.393839', NULL, NULL, 'student_user', 'student@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, 'screenshot.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('8be0b889-6b21-46c3-83a1-fe0cf7e65417', '2026-03-03 10:20:38.130738', '2026-03-03 10:20:38.130738', NULL, NULL, 'student_user', 'student_1772512535043@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772512535067-15247ae9-4fe4-497d-b9a2-552e092e419d.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('953b7303-9af4-425e-a907-9f6e3dc28978', '2026-03-03 10:17:25.474062', '2026-03-03 10:17:25.474062', NULL, NULL, 'professional_user', 'pro_1772512341544@example.com', '9812345678', 0, NULL, NULL, NULL, '/public/assets/ICT Meetup 2026/event-registrations/1772512344393-b8806065-248e-4aab-beea-7174492d5ec9.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('aaf652e3-9576-405b-b7ba-a560641d3f94', '2026-03-03 10:20:14.410111', '2026-03-03 10:20:14.410111', NULL, NULL, 'professional_user', 'pro_1772512509750@example.com', '9812345678', 0, NULL, NULL, NULL, '/public/assets/ICT Meetup 2026/event-registrations/1772512513250-88bdf9c2-8d45-4212-a840-c73c99eca7bb.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('c2331d00-e9c2-4aa6-8e8a-2160077c40d3', '2026-03-03 10:18:16.554270', '2026-03-03 10:18:16.554270', NULL, NULL, 'student_user', 'student_1772512393335@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772512393358-da553da0-7bf6-4fdd-a74c-8c870eb12d94.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('caa9ba36-f7b2-4667-9f65-46bdf4147ad0', '2026-03-03 10:09:15.260074', '2026-03-03 10:09:15.260074', NULL, NULL, 'professional_user', 'pro_1772511851181@example.com', '9812345678', 0, NULL, NULL, NULL, '/public/assets/ICT Meetup 2026/event-registrations/1772511854123-fb3eac6f-be1e-4074-8e49-73eacfeede2d.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('d376da8e-a244-44e8-8c41-5279ed5a521c', '2026-03-03 10:17:14.185556', '2026-03-03 10:17:14.185556', NULL, NULL, 'student_user', 'student_1772512331090@example.com', '9876543210', 1, 'Bachelor', 'Computer Science', 2024, '/public/assets/ICT Meetup 2026/event-registrations/1772512331113-bf1349ad-d9a8-41ea-ab77-f02155e0521e.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('d4a32fc0-a47c-4325-bc13-7bd901ec77b7', '2026-03-03 10:06:52.412031', '2026-03-03 10:06:52.412031', NULL, NULL, 'professional_user', 'pro@example.com', '9812345678', 0, NULL, NULL, NULL, 'screenshot.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('d538de01-502b-42dc-85db-acc29befc286', '2026-03-03 10:19:35.143576', '2026-03-03 10:19:35.143576', NULL, NULL, 'professional_user', 'pro_1772512470962@example.com', '9812345678', 0, NULL, NULL, NULL, '/public/assets/ICT Meetup 2026/event-registrations/1772512472370-2625471c-e441-4749-a2ee-9e4dd3d8d5b6.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL),
-('ee517349-5156-4e1c-ac8e-4f51f94dda21', '2026-03-03 10:19:23.737666', '2026-03-03 10:19:23.737666', NULL, NULL, 'professional_user', 'pro_1772512453181@example.com', '9812345678', 0, NULL, NULL, NULL, '/public/assets/ICT Meetup 2026/event-registrations/1772512456461-bd232b8f-4ae9-4aee-806c-75be1a3a2bed.png', 'f8b51ee0-1561-4d1e-9cd2-827ac6488a57', '5ce563bb-a5ef-414b-852e-af069acf55f4', 'pending', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -343,14 +322,21 @@ INSERT INTO `event_registration` (`id`, `createdAt`, `updatedAt`, `createdById`,
 
 CREATE TABLE `faqs` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
-  `flagship_event_version_id` varchar(36) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `description` text
+  `description` text DEFAULT NULL,
+  `flagship_event_version_id` varchar(36) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `faqs`
+--
+
+INSERT INTO `faqs` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `title`, `description`, `flagship_event_version_id`) VALUES
+('ffeca256-fa86-4ec1-a179-d14f4e8aa5c4', '2026-04-02 13:35:18.086558', '2026-04-02 13:35:18.086558', 'system', NULL, 'What is ICT?', 'This year iCT', '7d286505-6579-4cf7-9f0e-03363c5a314f');
 
 -- --------------------------------------------------------
 
@@ -360,25 +346,45 @@ CREATE TABLE `faqs` (
 
 CREATE TABLE `flagship_event_versions` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
+  `modifiedById` varchar(36) DEFAULT NULL,
   `version_name` varchar(50) NOT NULL,
   `slug` varchar(50) NOT NULL,
   `version_number` decimal(3,1) NOT NULL,
   `status` enum('draft','active','archived') NOT NULL DEFAULT 'draft',
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
-  `is_current` tinyint NOT NULL DEFAULT '0',
-  `modifiedById` varchar(36) DEFAULT NULL
+  `is_current` tinyint(4) NOT NULL DEFAULT 0,
+  `logo` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `flagship_event_versions`
 --
 
-INSERT INTO `flagship_event_versions` (`id`, `createdAt`, `updatedAt`, `createdById`, `version_name`, `slug`, `version_number`, `status`, `start_date`, `end_date`, `is_current`, `modifiedById`) VALUES
-('5ce563bb-a5ef-414b-852e-af069acf55f4', '2026-03-03 10:03:25.651032', '2026-03-03 10:03:25.651032', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', 'ICT Meetup 2026', 'ict-meetup-2026', 1.0, 'active', '2026-06-01', '2026-06-05', 1, NULL);
+INSERT INTO `flagship_event_versions` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `version_name`, `slug`, `version_number`, `status`, `start_date`, `end_date`, `is_current`, `logo`) VALUES
+('7d286505-6579-4cf7-9f0e-03363c5a314f', '2026-04-02 13:25:29.331344', '2026-04-02 20:53:02.000000', '8c9bbd1b-7d13-472f-9374-52074bde1225', NULL, 'ict-meetup-v7', 'string', 7.0, 'archived', '2026-04-02', '2026-04-12', 0, ''),
+('a5a030a3-2f08-44de-9bff-06e9c49b89d8', '2026-04-02 21:43:32.392857', '2026-04-02 21:45:41.000000', '8c9bbd1b-7d13-472f-9374-52074bde1225', NULL, 'ictmeetuop', 'stringsss', 2.0, 'archived', '2026-04-02', '2026-04-12', 0, '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gallery_images`
+--
+
+CREATE TABLE `gallery_images` (
+  `id` varchar(36) NOT NULL,
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
+  `createdById` varchar(36) DEFAULT NULL,
+  `modifiedById` varchar(36) DEFAULT NULL,
+  `imagePath` varchar(255) NOT NULL,
+  `cloudImageUrl` varchar(255) DEFAULT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `flagship_event_version_id` varchar(36) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -388,14 +394,14 @@ INSERT INTO `flagship_event_versions` (`id`, `createdAt`, `updatedAt`, `createdB
 
 CREATE TABLE `hero_sections` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
+  `heading` text DEFAULT NULL,
+  `paragraph` text DEFAULT NULL,
   `flagship_event_version_id` varchar(36) NOT NULL,
-  `heading` text,
-  `paragraph` text,
-  `extra_options` json DEFAULT NULL
+  `extra_options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`extra_options`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -405,8 +411,8 @@ CREATE TABLE `hero_sections` (
 --
 
 CREATE TABLE `migrations` (
-  `id` int NOT NULL,
-  `timestamp` bigint NOT NULL,
+  `id` int(11) NOT NULL,
+  `timestamp` bigint(20) NOT NULL,
   `name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -415,8 +421,13 @@ CREATE TABLE `migrations` (
 --
 
 INSERT INTO `migrations` (`id`, `timestamp`, `name`) VALUES
-(1, 1771808520235, 'AddDesignationTable1771808520235'),
-(2, 1772449780055, 'NewMigration1772449780055');
+(1, 1775108573553, ' $npmConfigName1775108573553'),
+(2, 1775109549208, ' $npmConfigName1775109549208'),
+(3, 1775113247263, ' $npmConfigName1775113247263'),
+(4, 1775114521922, ' $npmConfigName1775114521922'),
+(5, 1775115487979, ' $npmConfigName1775115487979'),
+(6, 1775143058036, ' $npmConfigName1775143058036'),
+(7, 1775146203593, ' $npmConfigName1775146203593');
 
 -- --------------------------------------------------------
 
@@ -426,8 +437,8 @@ INSERT INTO `migrations` (`id`, `timestamp`, `name`) VALUES
 
 CREATE TABLE `refresh_tokens` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
   `token` varchar(500) NOT NULL,
@@ -435,7 +446,7 @@ CREATE TABLE `refresh_tokens` (
   `userId` varchar(36) NOT NULL,
   `ipAddress` varchar(255) NOT NULL,
   `userAgent` varchar(255) NOT NULL,
-  `isRevoked` tinyint NOT NULL DEFAULT '0'
+  `isRevoked` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -443,27 +454,29 @@ CREATE TABLE `refresh_tokens` (
 --
 
 INSERT INTO `refresh_tokens` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `token`, `expiresAt`, `userId`, `ipAddress`, `userAgent`, `isRevoked`) VALUES
-('06397237-a705-4661-80a8-97cab1ad6203', '2026-03-03 10:06:48.371473', '2026-03-03 10:06:48.371473', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTcwOCwiZXhwIjoxNzczMTE2NTA4fQ.8KDfumHyqFpBg4miimVcLRsAah06dBwEMNJOWOM82A4', '2026-03-10 10:06:48', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('07b706d0-1cb1-40ea-b827-3d0a8c0731f6', '2026-03-03 10:20:09.715030', '2026-03-03 10:20:09.715030', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjUwOSwiZXhwIjoxNzczMTE3MzA5fQ.DZHJJWURtWaksnLWuoO50hWSIyRH2mw_ZabbDpsSO_k', '2026-03-10 10:20:10', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('0f2766b6-c109-45d0-ae99-e79ad7025f66', '2026-03-07 20:50:11.296579', '2026-03-07 20:50:11.296579', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3Mjg5NTkxMSwiZXhwIjoxNzczNTAwNzExfQ.VKzgiNPTKyz-dxTzQQNFIHdy6QYHolZt5ZawIOIKIJM', '2026-03-14 20:50:11', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 0),
-('18f6c561-1185-43bf-a0af-c9b27297567f', '2026-03-03 10:17:11.054569', '2026-03-03 10:17:11.054569', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjMzMSwiZXhwIjoxNzczMTE3MTMxfQ.ig-qblfb2lrJ0aJvkbuWhSjntGpi021umaGqPLWS_4c', '2026-03-10 10:17:11', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('1bc214da-eeb0-461c-9e11-a3e86e97b2f5', '2026-03-03 10:08:50.399345', '2026-03-03 10:08:50.399345', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTgzMCwiZXhwIjoxNzczMTE2NjMwfQ.ikT7vhY7Rp7F_4EB7RcqMVmLuQ8WdVqQKwwNnGBVfC0', '2026-03-10 10:08:50', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('23c2a39a-12f6-40a6-9f93-ad543e2b6a22', '2026-03-03 10:18:13.298415', '2026-03-03 10:18:13.298415', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjM5MywiZXhwIjoxNzczMTE3MTkzfQ.-iFmsUk6HRbkjyRlk60PhzJ4teoW5illqiVKyfV_Z5k', '2026-03-10 10:18:13', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('2b9943ef-573f-4706-9825-ce3b5fe66d5b', '2026-03-03 10:09:11.141540', '2026-03-03 10:09:11.141540', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTg1MSwiZXhwIjoxNzczMTE2NjUxfQ.XKsQPzN4XHhPxgE5-iq6lHhaS5Id6tsQN8CwuLJMESo', '2026-03-10 10:09:11', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('56fe4497-8c12-4ab2-a709-d8846c6374e3', '2026-03-03 10:05:28.549815', '2026-03-03 10:05:28.549815', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTYyOCwiZXhwIjoxNzczMTE2NDI4fQ.WN4MVch6vXr17Po02jxUnlFToyZvJqrChVV5qDghG2w', '2026-03-10 10:05:29', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('5c61660a-cd94-443c-b3cf-dc14c58b2fda', '2026-03-03 10:08:09.100225', '2026-03-03 10:08:09.100225', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTc4OSwiZXhwIjoxNzczMTE2NTg5fQ.iJ5yK6v7R5RZlBU-zKBbUtJJ8UXitORaTOI4nGyMG0k', '2026-03-10 10:08:09', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('68ab2335-5e3c-496f-a819-5f5b41481391', '2026-03-03 10:05:05.237209', '2026-03-03 10:05:05.237209', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTYwNSwiZXhwIjoxNzczMTE2NDA1fQ.BihBmUCR_0EIBJ0kPPnxdWZVoPFI8wIeShoZEvUQw4g', '2026-03-10 10:05:05', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('6fc5ce90-741c-4e10-a3c3-e14cd6db59b1', '2026-03-03 10:20:35.005007', '2026-03-03 10:20:35.005007', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjUzNCwiZXhwIjoxNzczMTE3MzM0fQ.yzf-_R6cHq007OlFMkyUJjkz8rZUQOXTXBqLOizGwsQ', '2026-03-10 10:20:35', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('7d26bf0f-7a01-459d-aaae-f72647175a81', '2026-03-03 10:19:13.142953', '2026-03-03 10:19:13.142953', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjQ1MywiZXhwIjoxNzczMTE3MjUzfQ.8MI5_FF2ewYSwc-s6yvXH2q08iwMpQWxdYfdikwur2A', '2026-03-10 10:19:13', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('802b226e-35bb-46d3-ae5d-2456736f6367', '2026-03-03 10:06:29.200733', '2026-03-03 10:06:29.200733', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTY4OSwiZXhwIjoxNzczMTE2NDg5fQ.HmtE3P5nyN59z2nXIuSWcyKbASUyudGaQ0Or5O7tWKo', '2026-03-10 10:06:29', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('81e27846-e0db-4191-b0df-21d96d7d57b6', '2026-03-03 10:09:30.728280', '2026-03-03 10:09:30.728280', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTg3MCwiZXhwIjoxNzczMTE2NjcwfQ._pXLYJ8WAwGUe4gslRMfeClAsJ2HZCquYMPYZ9FbeMU', '2026-03-10 10:09:31', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('86e46747-fd1e-4d21-949b-d8f8dd28ce8f', '2026-03-03 10:19:30.933056', '2026-03-03 10:19:30.933056', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjQ3MCwiZXhwIjoxNzczMTE3MjcwfQ.HUWuFPxHp-V4lD84-Sf6N49pqthZexmsjuD__qDgEBQ', '2026-03-10 10:19:31', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('9728988d-d212-44e7-a4c2-12c693993e58', '2026-03-03 10:06:12.843938', '2026-03-03 10:06:12.843938', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTY3MiwiZXhwIjoxNzczMTE2NDcyfQ.Q22GWGPlWbOlIch-NCV40Pk4RHhgc0QqO9J9EIV3So0', '2026-03-10 10:06:13', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('b8ce1557-1c7a-42e5-9e50-db1316804dde', '2026-03-03 10:20:19.701583', '2026-03-03 10:20:19.701583', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjUxOSwiZXhwIjoxNzczMTE3MzE5fQ.fgrbvtj6aRmEYLqAFVRPBS4z_UVOe_CJGhZo4_gzRjo', '2026-03-10 10:20:20', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('c0162939-44bd-4e63-969f-15620350aed7', '2026-03-03 10:05:50.899128', '2026-03-03 10:05:50.899128', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTY1MCwiZXhwIjoxNzczMTE2NDUwfQ.gB0PKr1Ni6AjIrbxxu2CJL-cv_PRzP_ulgZ7hSTCp7k', '2026-03-10 10:05:51', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('cec5b2e6-e81d-4bba-80b5-4b9072cf85d5', '2026-03-03 10:04:39.515627', '2026-03-03 10:04:39.515627', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTU3OSwiZXhwIjoxNzczMTE2Mzc5fQ.-7uqvHoq6e-U0jEQzavAoZLR_oF5DZw8kT0jKUR1_oI', '2026-03-10 10:04:40', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('f68c3eec-3bd8-4aee-ab90-19be8befd3af', '2026-03-03 10:17:21.513151', '2026-03-03 10:17:21.513151', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMjM0MSwiZXhwIjoxNzczMTE3MTQxfQ.SdTQ8qopPaYm7qmPK_-7yESKB31CYNDXdwD00AJJmPA', '2026-03-10 10:17:22', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::ffff:127.0.0.1', 'node', 0),
-('fd9c7bc9-b56b-4aa8-957c-753c83646b61', '2026-03-03 10:03:24.432736', '2026-03-03 10:03:24.432736', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWY2OGI2Zi0wYzcxLTQ4ZWItYThmMi1hODAxMzY3NTU1ZTEiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3MjUxMTUwNCwiZXhwIjoxNzczMTE2MzA0fQ.RWeFCJZQYYhu2gPGbEdJJ57LWNSVqhK5xXHg-UiL6e0', '2026-03-10 10:03:24', 'eaf68b6f-0c71-48eb-a8f2-a801367555e1', '::1', 'curl/8.5.0', 0);
+('02a438b6-c657-44ce-84d8-b250a27e9edc', '2026-04-02 21:59:39.680465', '2026-04-02 21:59:39.680465', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NjQ3OSwiZXhwIjoxNzc1NzUxMjc5fQ.rOfE322t4HKgDv3fLZbTguQygCbhJjYcdM8ZYb4WsJA', '2026-04-09 21:59:39', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('14edbe23-8879-49ab-bca2-a4ef57abd2ef', '2026-04-02 13:43:10.484389', '2026-04-02 13:43:10.484389', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNjY5MCwiZXhwIjoxNzc1NzIxNDkwfQ.uM1837tTwv2BUps9FTTT8dIF_xll9sloi6UwGlQWU_U', '2026-04-09 13:43:10', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('1cd85cc1-c072-461d-b9aa-21ab44d81aa6', '2026-04-02 13:55:42.232502', '2026-04-02 13:55:42.232502', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNzQ0MiwiZXhwIjoxNzc1NzIyMjQyfQ.WqzbtpfuDzKkdmDKYVNBabcgOXHIhf0LJM7JfZCX9OM', '2026-04-09 13:55:42', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('21b7bd8e-e8ac-4485-8c43-804658f0f3dd', '2026-04-02 13:16:52.169675', '2026-04-02 13:16:52.169675', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNTExMiwiZXhwIjoxNzc1NzE5OTEyfQ.ZZvZdcAa9orpz5bc8gX37nTABXi_SYHJdtiOIjsuQlo', '2026-04-09 13:16:52', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('3822c14b-2f0e-4699-a6e8-796ded5ee014', '2026-04-02 21:23:10.147205', '2026-04-02 21:23:10.147205', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NDI5MCwiZXhwIjoxNzc1NzQ5MDkwfQ.DivtywhcvR2El-2w6_lnjGriFlwxLF__9zUdnlbeoIE', '2026-04-09 21:23:10', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('3a4ef1e4-2963-4437-b9a4-31cca2675f97', '2026-04-02 12:54:43.681404', '2026-04-02 12:54:43.681404', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExMzc4MywiZXhwIjoxNzc1NzE4NTgzfQ.4EfZiRj3RXCquk5Eaz6nwkKklJKRQ4UA1gofHdSAqwA', '2026-04-09 12:54:43', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('441d9316-ca3f-4ff8-8857-4d3eb4de3ab7', '2026-04-02 12:52:28.993343', '2026-04-02 12:52:28.993343', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExMzY0OCwiZXhwIjoxNzc1NzE4NDQ4fQ.wbrWSSZfXIngvrAqDqfnrcw3UBwpvcA696rBIOlSv5g', '2026-04-09 12:52:28', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('45cf86bc-5780-4200-9d06-ee5b864bfc17', '2026-04-02 21:21:06.820016', '2026-04-02 21:21:06.820016', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NDE2NiwiZXhwIjoxNzc1NzQ4OTY2fQ.hsw3-HvbuYN4_ZnH3lZzp_4_573kSVnIa3nibw8IVnk', '2026-04-09 21:21:06', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('48a998d4-fdd6-4dba-9330-a597bc7241d0', '2026-04-02 13:34:31.843943', '2026-04-02 13:34:31.843943', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNjE3MSwiZXhwIjoxNzc1NzIwOTcxfQ.8Lz1aovdW15K9PLE1QqLVpRCqK0ZMd4x1tnfvhNxjfY', '2026-04-09 13:34:31', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('57de7293-317f-4b1c-b1a9-8462535d2e60', '2026-04-02 13:30:04.000084', '2026-04-02 13:30:04.000084', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNTkwMywiZXhwIjoxNzc1NzIwNzAzfQ.Vbe9UM6iCj2gFDw5Qoi6SUw_5T0jDU62t4V8EdwcsOs', '2026-04-09 13:30:03', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('6b3d7f57-9443-4801-bf15-8a8f6b720289', '2026-04-02 21:40:25.312481', '2026-04-02 21:40:25.312481', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NTMyNSwiZXhwIjoxNzc1NzUwMTI1fQ.jpjna-ZHGIDxIqQ8FMfArna8sPR_CMeNm4iUj3JguLk', '2026-04-09 21:40:25', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('6e5cdcff-9f46-41d1-bfed-a54fd986cc14', '2026-04-02 21:56:12.400283', '2026-04-02 21:56:12.400283', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NjI3MiwiZXhwIjoxNzc1NzUxMDcyfQ.IfSOm0BrKsWSpxcUgSrMGo7MEMJNpdmAggVs7wNlFGM', '2026-04-09 21:56:12', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('714967b0-623d-4877-a84e-8c679bd3b4d3', '2026-04-02 11:29:25.784736', '2026-04-02 11:29:25.784736', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTEwODY2NSwiZXhwIjoxNzc1NzEzNDY1fQ.yHPNYkIQrJwQftnV24l3M5964p_FJ8d0-hlB0pfXg28', '2026-04-09 11:29:25', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('7194eaa2-ec17-442c-94f5-41d06c827ce5', '2026-04-02 20:39:17.547483', '2026-04-02 20:39:17.547483', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0MTY1NywiZXhwIjoxNzc1NzQ2NDU3fQ.6sxgukB0YFgngibu1hp5QLHomDvGEHNwQTtuatrGzfw', '2026-04-09 20:39:17', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('75aad1d0-6f22-4b58-b0a7-f4bcbc568522', '2026-04-02 12:59:43.743368', '2026-04-02 12:59:43.743368', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNDA4MywiZXhwIjoxNzc1NzE4ODgzfQ.iwFuQmMU3Xh0sz2ImuPyO6sTQCldnX8ccH7XdRJrBqg', '2026-04-09 12:59:43', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('7b497dc0-d328-4085-99db-1e08e3348abd', '2026-04-02 13:28:34.348903', '2026-04-02 13:28:34.348903', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNTgxNCwiZXhwIjoxNzc1NzIwNjE0fQ.iB_5MEymKaDqk792AquHUqcqPl19pWRLYiFWiYnPoNk', '2026-04-09 13:28:34', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('8934cb1d-bc09-48cc-bfce-727006eb2e49', '2026-04-02 12:56:54.100857', '2026-04-02 12:56:54.100857', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExMzkxNCwiZXhwIjoxNzc1NzE4NzE0fQ.hmEtm8Lwte3WfCogEHz2q56muRBoAoSYZnJGPipuuh4', '2026-04-09 12:56:54', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('8d26b36f-da47-4676-8e42-e1418436f975', '2026-04-02 13:07:43.416264', '2026-04-02 13:07:43.416264', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNDU2MywiZXhwIjoxNzc1NzE5MzYzfQ.QxmGUfsBtFeoYG_TC2bp-X-7OZr-CTtQoenWkCYTsxc', '2026-04-09 13:07:43', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('9afa3034-c51e-4ff1-9a3a-2d430f574383', '2026-04-02 13:10:27.330111', '2026-04-02 13:10:27.330111', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNDcyNywiZXhwIjoxNzc1NzE5NTI3fQ.NEz8GwGyfoXXhYTReJbAa8QnnPtI6eEyjhAyfwOjNjY', '2026-04-09 13:10:27', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('b0f4b086-37cf-4cca-b3d8-074431a79164', '2026-04-02 20:52:15.809163', '2026-04-02 20:52:15.809163', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0MjQzNSwiZXhwIjoxNzc1NzQ3MjM1fQ.kyAjfQ0q0KH7Y9vdtCLdGoti81mgAJVHCcCBvQ-XmlY', '2026-04-09 20:52:15', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('c64d9102-9b7f-46c8-a9c7-48f0cb0dee33', '2026-04-02 20:34:53.575178', '2026-04-02 20:34:53.575178', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0MTM5MywiZXhwIjoxNzc1NzQ2MTkzfQ.yF6FDmQmXTK3SpgaUvcXXzlRBvtj9mhvyuS613vCz7s', '2026-04-09 20:34:53', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('c8679172-b581-4a4c-be2d-11ef1ffaf794', '2026-04-02 13:25:00.804420', '2026-04-02 13:25:00.804420', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTExNTYwMCwiZXhwIjoxNzc1NzIwNDAwfQ.GBWkZs5xGW6diJnF6OxE95A1KaRoMmqRrUSd-tMqXk8', '2026-04-09 13:25:00', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0),
+('dcbd22f8-7780-4cbf-8966-325c692cc68b', '2026-04-02 21:43:04.673545', '2026-04-02 21:43:04.673545', NULL, NULL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YzliYmQxYi03ZDEzLTQ3MmYtOTM3NC01MjA3NGJkZTEyMjUiLCJlbWFpbCI6ImNyZWF0aXZlaHViQGljdG1lZXR1cC5jb20iLCJyb2xlIjoic3VwZXJhZG1pbiIsImlhdCI6MTc3NTE0NTQ4NCwiZXhwIjoxNzc1NzUwMjg0fQ.mw7R9US2DkCzDwcW8vEDmUKBIOB9GYNT16V6XmHaEiQ', '2026-04-09 21:43:04', '8c9bbd1b-7d13-472f-9374-52074bde1225', '::ffff:127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 0);
 
 -- --------------------------------------------------------
 
@@ -473,8 +486,8 @@ INSERT INTO `refresh_tokens` (`id`, `createdAt`, `updatedAt`, `createdById`, `mo
 
 CREATE TABLE `speakers` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
   `name` varchar(150) NOT NULL,
@@ -483,8 +496,8 @@ CREATE TABLE `speakers` (
   `company` varchar(150) DEFAULT NULL,
   `version_id` varchar(36) NOT NULL,
   `category_id` varchar(36) NOT NULL,
-  `display_order` int NOT NULL DEFAULT '0',
-  `socialLinks` json DEFAULT NULL
+  `display_order` int(11) NOT NULL DEFAULT 0,
+  `socialLinks` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`socialLinks`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -495,8 +508,8 @@ CREATE TABLE `speakers` (
 
 CREATE TABLE `sponsors` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
   `version_id` varchar(255) NOT NULL,
@@ -504,8 +517,15 @@ CREATE TABLE `sponsors` (
   `name` varchar(150) NOT NULL,
   `link` varchar(255) DEFAULT NULL,
   `category_id` varchar(36) NOT NULL,
-  `display_order` int NOT NULL DEFAULT '0'
+  `display_order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sponsors`
+--
+
+INSERT INTO `sponsors` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `version_id`, `image_path`, `name`, `link`, `category_id`, `display_order`) VALUES
+('80b78e3d-7608-4021-bb2c-03a921c8326f', '2026-04-02 21:27:10.069922', '2026-04-02 21:27:10.069922', '8c9bbd1b-7d13-472f-9374-52074bde1225', NULL, '7d286505-6579-4cf7-9f0e-03363c5a314f', 'C:\\Users\\Mandip Shrestha\\Desktop\\ict-meetup-api\\public\\assets\\ict-meetup-v7\\sponsors\\1775144525143-713a4115-c0bf-43e8-9330-4e179a8cc22f.jpeg', 'Ncell', NULL, '876ef7d1-5d29-4868-a6b5-e8f529af6ccd', 1);
 
 -- --------------------------------------------------------
 
@@ -515,19 +535,18 @@ CREATE TABLE `sponsors` (
 
 CREATE TABLE `team_members` (
   `id` varchar(36) NOT NULL,
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
+  `createdById` varchar(36) DEFAULT NULL,
+  `modifiedById` varchar(36) DEFAULT NULL,
   `version_id` varchar(255) NOT NULL,
   `category_id` varchar(255) NOT NULL,
   `name` varchar(150) NOT NULL,
-  `role` varchar(100) NOT NULL,
   `image_path` varchar(255) NOT NULL,
   `image_url` varchar(255) DEFAULT NULL,
-  `socialLinks` json NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-  `createdById` varchar(36) DEFAULT NULL,
-  `modifiedById` varchar(36) DEFAULT NULL,
-  `display_order` int NOT NULL DEFAULT '1',
-  `designation_id` varchar(255) NOT NULL
+  `display_order` int(11) NOT NULL DEFAULT 1,
+  `designation_id` varchar(255) NOT NULL,
+  `socialLinks` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`socialLinks`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -538,8 +557,8 @@ CREATE TABLE `team_members` (
 
 CREATE TABLE `users` (
   `id` varchar(36) NOT NULL,
-  `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `createdAt` datetime(6) DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `createdById` varchar(36) DEFAULT NULL,
   `modifiedById` varchar(36) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
@@ -553,7 +572,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `createdAt`, `updatedAt`, `createdById`, `modifiedById`, `name`, `email`, `password`, `role`) VALUES
-('eaf68b6f-0c71-48eb-a8f2-a801367555e1', '2026-03-03 10:03:17.092187', '2026-03-03 10:03:17.092187', NULL, NULL, 'creativehubadmin', 'creativehub@ictmeetup.com', '$2b$10$DfAPU/0wsi1wXjv38iKwfuNqQSrAVVRURvSp36zm5POBwZASMRadK', 'superadmin');
+('8c9bbd1b-7d13-472f-9374-52074bde1225', '2026-04-02 11:28:58.823240', '2026-04-02 11:28:58.823240', NULL, NULL, 'creativehubadmin', 'creativehub@ictmeetup.com', '$2b$10$krcB/bCS3P9T82.uDL4KxOBzkwQvS1Pwnm8gWywLQwZUv3qgrfTHW', 'superadmin');
 
 --
 -- Indexes for dumped tables
@@ -680,6 +699,16 @@ ALTER TABLE `flagship_event_versions`
   ADD KEY `IDX_b8dca07d23afa7980d787d1f37` (`updatedAt`);
 
 --
+-- Indexes for table `gallery_images`
+--
+ALTER TABLE `gallery_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_9b1601c4bdad7456bb12636dd1` (`id`),
+  ADD KEY `IDX_615d8de46b8d60334ccb52d492` (`createdAt`),
+  ADD KEY `IDX_a5691ced91ee4659fe405c05c7` (`updatedAt`),
+  ADD KEY `IDX_0d9b24dcbc361b0613e3cbf35c` (`flagship_event_version_id`);
+
+--
 -- Indexes for table `hero_sections`
 --
 ALTER TABLE `hero_sections`
@@ -734,11 +763,11 @@ ALTER TABLE `sponsors`
 --
 ALTER TABLE `team_members`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `IDX_b075a04749a5969dfa73f8e4db` (`version_id`),
-  ADD KEY `IDX_80c1bc4ded05bd07883fffb30c` (`category_id`),
   ADD KEY `IDX_ca3eae89dcf20c9fd95bf7460a` (`id`),
   ADD KEY `IDX_33692aeb17710f5c6c8d58ee73` (`createdAt`),
   ADD KEY `IDX_b652f5b22b5487f4f1f1f9fbde` (`updatedAt`),
+  ADD KEY `IDX_b075a04749a5969dfa73f8e4db` (`version_id`),
+  ADD KEY `IDX_80c1bc4ded05bd07883fffb30c` (`category_id`),
   ADD KEY `IDX_369d86343d1e0db80fb9ac9788` (`designation_id`);
 
 --
@@ -759,7 +788,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
@@ -769,80 +798,86 @@ ALTER TABLE `migrations`
 -- Constraints for table `about_sections`
 --
 ALTER TABLE `about_sections`
-  ADD CONSTRAINT `FK_f2bc0c7b791530383185fa16e12` FOREIGN KEY (`flagship_event_version_id`) REFERENCES `flagship_event_versions` (`id`);
+  ADD CONSTRAINT `FK_f2bc0c7b791530383185fa16e12` FOREIGN KEY (`flagship_event_version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `access_tokens`
 --
 ALTER TABLE `access_tokens`
-  ADD CONSTRAINT `FK_343a101d109c86071f2b2fb43e7` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `FK_343a101d109c86071f2b2fb43e7` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `assets`
 --
 ALTER TABLE `assets`
-  ADD CONSTRAINT `FK_9061d55e0afb8aa37ce5f0e9eb1` FOREIGN KEY (`asset_library_id`) REFERENCES `asset_library` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_9061d55e0afb8aa37ce5f0e9eb1` FOREIGN KEY (`asset_library_id`) REFERENCES `asset_library` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `asset_library`
 --
 ALTER TABLE `asset_library`
-  ADD CONSTRAINT `FK_39f849765556da15fba70e045b6` FOREIGN KEY (`flagship_event_version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_39f849765556da15fba70e045b6` FOREIGN KEY (`flagship_event_version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `events`
 --
 ALTER TABLE `events`
-  ADD CONSTRAINT `FK_58145e5ce743859cc1e01cc8db8` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `FK_643188b30e049632f80367be4e1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `FK_815f74eeebec35f9c0ab96eb148` FOREIGN KEY (`speaker_id`) REFERENCES `speakers` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `FK_58145e5ce743859cc1e01cc8db8` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_643188b30e049632f80367be4e1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_815f74eeebec35f9c0ab96eb148` FOREIGN KEY (`speaker_id`) REFERENCES `speakers` (`id`) ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `event_registration`
 --
 ALTER TABLE `event_registration`
-  ADD CONSTRAINT `FK_d42836e8ed00e2586af913934a6` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `FK_dd19c9aee647b85117cd6b14ac1` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `FK_d42836e8ed00e2586af913934a6` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_dd19c9aee647b85117cd6b14ac1` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `faqs`
 --
 ALTER TABLE `faqs`
-  ADD CONSTRAINT `FK_08afb9a6481ba19d5ff82c17546` FOREIGN KEY (`flagship_event_version_id`) REFERENCES `flagship_event_versions` (`id`);
+  ADD CONSTRAINT `FK_08afb9a6481ba19d5ff82c17546` FOREIGN KEY (`flagship_event_version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `gallery_images`
+--
+ALTER TABLE `gallery_images`
+  ADD CONSTRAINT `FK_0d9b24dcbc361b0613e3cbf35c0` FOREIGN KEY (`flagship_event_version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `hero_sections`
 --
 ALTER TABLE `hero_sections`
-  ADD CONSTRAINT `FK_6cce9bbd2662cf132bb5fd719be` FOREIGN KEY (`flagship_event_version_id`) REFERENCES `flagship_event_versions` (`id`);
+  ADD CONSTRAINT `FK_6cce9bbd2662cf132bb5fd719be` FOREIGN KEY (`flagship_event_version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
-  ADD CONSTRAINT `FK_610102b60fea1455310ccd299de` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `FK_610102b60fea1455310ccd299de` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `speakers`
 --
 ALTER TABLE `speakers`
-  ADD CONSTRAINT `FK_0dfe7e56f20f556e3f04ece9d91` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `FK_0e21b8c3902f3487632401239db` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `FK_0dfe7e56f20f556e3f04ece9d91` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_0e21b8c3902f3487632401239db` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `sponsors`
 --
 ALTER TABLE `sponsors`
-  ADD CONSTRAINT `FK_675fa02095fef93fe312fd575db` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_87cd36c0a72271648acaf04ad73` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `FK_675fa02095fef93fe312fd575db` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_87cd36c0a72271648acaf04ad73` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `team_members`
 --
 ALTER TABLE `team_members`
-  ADD CONSTRAINT `FK_369d86343d1e0db80fb9ac9788a` FOREIGN KEY (`designation_id`) REFERENCES `designations` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `FK_80c1bc4ded05bd07883fffb30c7` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `FK_b075a04749a5969dfa73f8e4db8` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_369d86343d1e0db80fb9ac9788a` FOREIGN KEY (`designation_id`) REFERENCES `designations` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_80c1bc4ded05bd07883fffb30c7` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_b075a04749a5969dfa73f8e4db8` FOREIGN KEY (`version_id`) REFERENCES `flagship_event_versions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -27,9 +27,9 @@ const createFaqRouter = (dataSource: DataSource) => {
    *         application/json:
    *           schema:
    *             type: object
-   *             required: [flagshipEventVersionId, title]
+   *             required: [versionId, title]
    *             properties:
-   *               flagshipEventVersionId: { type: string, format: uuid }
+   *               versionId: { type: string, format: uuid }
    *               title: { type: string, minLength: 1, maxLength: 255 }
    *               description: { type: string }
    *     responses:
@@ -46,7 +46,7 @@ const createFaqRouter = (dataSource: DataSource) => {
    *     tags: [FAQs]
    *     parameters:
    *       - in: query
-   *         name: flagshipEventVersionId
+   *         name: versionId
    *         schema: { type: string, format: uuid }
    *     responses:
    *       200:
@@ -88,7 +88,7 @@ const createFaqRouter = (dataSource: DataSource) => {
    *           schema:
    *             type: object
    *             properties:
-   *               flagshipEventVersionId: { type: string, format: uuid }
+   *               versionId: { type: string, format: uuid }
    *               title: { type: string, minLength: 1, maxLength: 255 }
    *               description: { type: string }
    *     responses:

@@ -21,7 +21,7 @@ export class FaqService {
 
     const versionExists = await this.dataSource
       .getRepository(FlagshipEventVersion)
-      .findOne({ where: { id: data.flagshipEventVersionId } });
+      .findOne({ where: { id: data.versionId } });
 
     if (!versionExists) {
       throw new AppError('Flagship event version not found', 404);
@@ -47,8 +47,8 @@ export class FaqService {
       query,
     });
 
-    const { flagshipEventVersionId, page = 1, limit = 10 } = query;
-    const where = flagshipEventVersionId ? { flagshipEventVersionId } : {};
+    const { versionId, page = 1, limit = 10 } = query;
+    const where = versionId ? { versionId } : {};
     const skip = (Number(page) - 1) * Number(limit);
 
     const [items, total] = await this.faqRepository.findAndCount({
@@ -88,7 +88,7 @@ export class FaqService {
       module: 'FaqService',
     });
 
-    const versionId = data.flagshipEventVersionId || faq.flagshipEventVersionId;
+    const versionId = data.versionId || faq.versionId;
     const versionExists = await this.dataSource
       .getRepository(FlagshipEventVersion)
       .findOne({ where: { id: versionId } });

@@ -4,6 +4,7 @@ import { FlagshipEventVersionController } from "../controllers/flagship-event.co
 import { validateRequestBody, validateRequestQuery } from "../../../shared/validators/request.validator";
 import { flagshipEventVersionSchema, updateFlagshipEventVersionSchema, flagshipEventQuerySchema } from "../validators/flagship-event.validator";
 import { createAuthenticate } from "../../../shared/middlewares/auth.middleware";
+import { imageUploadHandler } from "../../../shared/utils/helpers/imageUpload.helper";
 
 const createVersionRouter = (dataSource: DataSource) => {
       const versionRouter = Router();
@@ -19,7 +20,7 @@ const createVersionRouter = (dataSource: DataSource) => {
        *     requestBody:
        *       required: true
        *       content:
-       *         application/json:
+       *         multipart/form-data:
        *           schema:
        *             type: object
        *             required:
@@ -28,6 +29,7 @@ const createVersionRouter = (dataSource: DataSource) => {
        *               - version_number
        *               - start_date
        *               - end_date
+       *               - logo
        *             properties:
        *               version_name:
        *                 type: string
@@ -51,11 +53,14 @@ const createVersionRouter = (dataSource: DataSource) => {
        *                 type: string
        *               is_current:
        *                 type: boolean
+       *               logo:
+       *                 type: string
+       *                 format: binary
        *     responses:
        *       201:
        *         description: Created
        */
-      versionRouter.post("/", authenticate, validateRequestBody(flagshipEventVersionSchema), controller.create);
+      versionRouter.post("/", authenticate, imageUploadHandler({ fieldName: "logo", multiple: false }), validateRequestBody(flagshipEventVersionSchema), controller.create);
 
       /**
        * @swagger
@@ -144,14 +149,40 @@ const createVersionRouter = (dataSource: DataSource) => {
        *         schema: { type: string, format: uuid }
        *     requestBody:
        *       content:
-       *         application/json:
+       *         multipart/form-data:
        *           schema:
        *             type: object
+       *             properties:
+       *               version_name:
+       *                 type: string
+       *               slug:
+       *                 type: string
+       *               version_number:
+       *                 type: number
+       *               start_date:
+       *                 type: string
+       *                 format: date
+       *               end_date:
+       *                 type: string
+       *                 format: date
+       *               status:
+       *                 type: string
+       *                 enum:
+       *                   - draft
+       *                   - active
+       *                   - archived
+       *               tagline:
+       *                 type: string
+       *               is_current:
+       *                 type: boolean
+       *               logo:
+       *                 type: string
+       *                 format: binary
        *     responses:
        *       200:
        *         description: OK
        */
-      versionRouter.patch("/:id", authenticate, validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
+      versionRouter.patch("/:id", authenticate, imageUploadHandler({ fieldName: "logo", multiple: false, optional: true }), validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
 
       /**
        * @swagger

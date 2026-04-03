@@ -27,10 +27,10 @@ const createSponsorRouter = (dataSource: DataSource) => {
        *             required: [name, image, versionId, categoryId]
        *             properties:
        *               name: { type: string }
-       *               image: { type: string, format: binary }
        *               link: { type: string }
        *               versionId: { type: string, format: uuid }
        *               categoryId: { type: string, format: uuid }
+       *               image: { type: string, format: binary }
        *               displayOrder: { type: number, default: 0 }
       
        *     responses:
@@ -223,10 +223,10 @@ const createSponsorRouter = (dataSource: DataSource) => {
        *             type: object
        *             properties:
        *               name: { type: string }
-       *               image: { type: string, format: binary }
        *               link: { type: string }
        *               versionId: { type: string, format: uuid }
        *               categoryId: { type: string, format: uuid }
+       *               image: { type: string, format: binary }
        *               displayOrder: { type: number }
        *     responses:
        *       200:
