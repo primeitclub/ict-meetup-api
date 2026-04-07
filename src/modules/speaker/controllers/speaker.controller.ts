@@ -5,20 +5,14 @@ import { removeFile } from "../../../shared/utils/helpers/imageUpload.helper";
 import { responseHandler } from "../../../shared/utils/helpers/response.helper";
 import { AuditLogActionType, AuditLogScope, AuditLogType } from "../../../shared/constants/audit-log.constants";
 import { NextFunction, Request, Response } from "express";
-import { CategoryType } from "../../category/entities/category.entity";
-import { CategoryService } from "../../category/services/category.service";
-import { FlagshipEventVersionService } from "../../flagship-event/services/flagship-event.service";
+
 
 export class SpeakerController extends BaseController {
       protected moduleName = 'SpeakerService';
       private service: SpeakerService;
-      private serviceForCategory: CategoryService;
-      private flagshipEventVersion: FlagshipEventVersionService;
       constructor(dataSource: DataSource) {
             super(dataSource);
             this.service = new SpeakerService(dataSource);
-            this.serviceForCategory = new CategoryService(dataSource);
-            this.flagshipEventVersion = new FlagshipEventVersionService(dataSource);
       }
 
       create = async (req: Request, res: Response, next: NextFunction) => {
@@ -132,127 +126,5 @@ export class SpeakerController extends BaseController {
       };
 
 
-      createForCategory = async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                  const userId = req.user!.userId || 'system';
-                  const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-                  if (!isVersionExist) {
-                        return responseHandler(res)('Version not found', null, 404);
-                  }
-                  const result = await this.serviceForCategory.create(req.body, CategoryType.SPEAKER, userId);
-                  await this.createAuditLog(
-                        AuditLogType.INFO,
-                        AuditLogActionType.CREATE,
-                        `Category ${result.id} created successfully`,
-                        req.body.versionId,
-                        AuditLogScope.TEAM_MEMBERS,
-                        req.ip,
-                        userId
-                  );
-                  return responseHandler(res)(
-                        'Category created successfully',
-                        result,
-                        201
-                  );
-            } catch (error) {
-                  next(error);
-            }
-      };
 
-      updateForCategory = async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                  const userId = req.user!.userId || 'system';
-                  const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-                  if (!isVersionExist) {
-                        return responseHandler(res)('Version not found', null, 404);
-                  }
-                  const result = await this.serviceForCategory.update(
-                        req.params.id,
-                        CategoryType.SPEAKER,
-                        req.body,
-                        userId
-                  );
-                  await this.createAuditLog(
-                        AuditLogType.INFO,
-                        AuditLogActionType.UPDATE,
-                        `Category ${result.id} updated successfully`,
-                        req.body.versionId,
-                        AuditLogScope.TEAM_MEMBERS,
-                        req.ip,
-                        userId
-                  );
-                  return responseHandler(res)(
-                        'Category updated successfully',
-                        null,
-                        200
-                  );
-            } catch (error) {
-                  next(error);
-            }
-      };
-
-      deleteForCategory = async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                  const userId = req.user!.userId || 'system';
-                  const { versionId } = req.query as any;
-                  const isVersionExist = await this.flagshipEventVersion.findById(versionId);
-                  if (!isVersionExist) {
-                        return responseHandler(res)('Version not found', null, 404);
-                  }
-                  await this.serviceForCategory.delete(
-                        req.params.id,
-                        CategoryType.SPEAKER,
-                        userId
-                  );
-                  await this.createAuditLog(
-                        AuditLogType.INFO,
-                        AuditLogActionType.DELETE,
-                        `Category ${req.params.id} deleted successfully`,
-                        versionId,
-                        AuditLogScope.TEAM_MEMBERS,
-                        req.ip,
-                        userId
-                  );
-                  return responseHandler(res)('Category deleted successfully', null, 200);
-            } catch (error) {
-                  next(error);
-            }
-      };
-
-      getAllForCategory = async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                  const result = await this.serviceForCategory.findAll(
-                        req.query as any,
-                        CategoryType.SPEAKER
-                  );
-                  if (!result.items.length) {
-                        return responseHandler(res)('Categories not found', result, 200);
-                  }
-                  return responseHandler(res)(
-                        'Categories fetched successfully',
-                        result,
-                        200
-                  );
-            } catch (error) {
-                  next(error);
-            }
-      };
-
-      getByIdForCategory = async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                  const result = await this.serviceForCategory.findById(
-                        req.params.id,
-                  );
-                  if (!result) {
-                        return responseHandler(res)('Category not found', null, 200);
-                  }
-                  return responseHandler(res)(
-                        'Category fetched successfully',
-                        result,
-                        200
-                  );
-            } catch (error) {
-                  next(error);
-            }
-      };
 } 
