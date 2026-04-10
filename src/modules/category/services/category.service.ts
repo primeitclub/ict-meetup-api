@@ -195,15 +195,22 @@ export class CategoryService {
       module: 'CategoryService',
     });
 
-    await this.categoryRepository.remove(category);
+    try {
+      await this.categoryRepository.remove(category);
 
-    await this.createAuditLog(
-      'category',
-      id,
-      'DELETE',
-      userId,
-      { deleted_category: category }
-    );
+      await this.createAuditLog(
+        'category',
+        id,
+        'DELETE',
+        userId,
+        { deleted_category: category }
+      );
+    } catch (error: any) {
+      if (error?.code === '23503' || error?.code === 'ER_ROW_IS_REFERENCED_2' || error?.errno === 1451 || String(error).toLowerCase().includes('foreign key')) {
+        throw new AppError('Cannot delete this category because it is currently assigned to one or more items', 409);
+      }
+      throw error;
+    }
 
     return;
   }

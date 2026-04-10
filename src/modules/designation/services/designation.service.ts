@@ -48,6 +48,11 @@ export class DesignationService {
 
       update = async (id: string, data: UpdateDesignationDTO, userId: string) => {
             try {
+                  const designationToUpdate = await this.designationRepository.findOne({ where: { id } });
+                  if (!designationToUpdate) {
+                        throw new AppError('Designation not found', 404);
+                  }
+
                   if (data.name) {
                         const existingDesignation = await this.designationRepository.findOne({ where: { name: data.name } });
                         if (existingDesignation && existingDesignation.id !== id) {
@@ -88,7 +93,10 @@ export class DesignationService {
                         existingDesignation
                   );
                   return designation;
-            } catch (error) {
+            } catch (error: any) {
+                  if (error?.code === '23503' || error?.code === 'ER_ROW_IS_REFERENCED_2' || error?.errno === 1451 || String(error).toLowerCase().includes('foreign key')) {
+                        throw new AppError('Cannot delete this designation because it is still assigned to one or more members', 409);
+                  }
                   throw error;
             }
       }
