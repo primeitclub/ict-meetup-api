@@ -34,9 +34,6 @@ export class TeamMemberService {
     if (!versionExists) {
       throw new AppError('Flagship event version not found', 404);
     }
-    if (versionExists.status !== EventVersionStatus.DRAFT) {
-      throw new AppError('Can only create team members for a flagship event version that is in "draft" status', 400);
-    }
 
     const categoryExists = await this.categoryRepository.findOne({ where: { id: data.categoryId } });
     if (!categoryExists) {
@@ -47,15 +44,17 @@ export class TeamMemberService {
       throw new AppError('Only categories of type "teams" can be assigned to team members', 400);
     }
 
-    const displayOrderExists = await this.teamMemberRepository.findOne({
-      where: {
-        categoryId: data.categoryId,
-        displayOrder: data.displayOrder || 0
-      }
-    });
+    if (data.displayOrder) {
+      const displayOrderExists = await this.teamMemberRepository.findOne({
+        where: {
+          categoryId: data.categoryId,
+          displayOrder: data.displayOrder
+        }
+      });
 
-    if (displayOrderExists) {
-      throw new AppError(`A member with display order ${data.displayOrder || 0} already exists in this category`, 400);
+      if (displayOrderExists) {
+        throw new AppError(`A member with display order ${data.displayOrder} already exists in this category`, 400);
+      }
     }
 
     const designationExists = await this.designationRepository.findOne({ where: { id: data.designationId } });
@@ -78,22 +77,36 @@ export class TeamMemberService {
       query,
     });
     const { versionId, categoryId, ...rest } = query;
-    const where: any = {};
-    if (versionId) where.versionId = versionId;
-    if (categoryId) where.categoryId = categoryId;
-    where.category = { type: CategoryType.TEAM };
-
     const { page = 1, limit = 10 } = rest;
     const skip = (Number(page) - 1) * Number(limit);
+    
     const queryBuilder = this.teamMemberRepository.createQueryBuilder('teamMember');
     queryBuilder
       .leftJoinAndSelect('teamMember.category', 'category')
       .leftJoinAndSelect('teamMember.flagshipEvent', 'flagshipEvent')
       .leftJoinAndSelect('teamMember.designation', 'designation')
-      .where(where)
-      .orderBy('category.displayOrder = 0', 'ASC')
+      .where('category.type = :categoryType', { categoryType: CategoryType.TEAM });
+
+    if (versionId) {
+      queryBuilder.andWhere('teamMember.versionId = :versionId', { versionId });
+    }
+    if (categoryId) {
+      queryBuilder.andWhere('teamMember.categoryId = :categoryId', { categoryId });
+    }
+
+    queryBuilder.addSelect(
+      'CASE WHEN category.display_order = 0 THEN 1 ELSE 0 END',
+      'is_category_zero_order'
+    );
+    queryBuilder.addSelect(
+      'CASE WHEN teamMember.display_order = 0 THEN 1 ELSE 0 END',
+      'is_team_zero_order'
+    );
+
+    queryBuilder
+      .orderBy('is_category_zero_order', 'ASC')
       .addOrderBy('category.displayOrder', 'ASC')
-      .addOrderBy('teamMember.displayOrder = 0', 'ASC')
+      .addOrderBy('is_team_zero_order', 'ASC')
       .addOrderBy('teamMember.displayOrder', 'ASC')
       .addOrderBy('teamMember.createdAt', 'DESC')
       .skip(skip)
@@ -140,9 +153,6 @@ export class TeamMemberService {
       if (!versionExists) {
         throw new AppError('Flagship event version not found', 404);
       }
-      if (versionExists.status === EventVersionStatus.ARCHIVED) {
-        throw new AppError('Cannot update team members for an archived flagship event version', 400);
-      }
     }
 
     if (data.categoryId && data.categoryId !== teamMember.categoryId) {
@@ -187,7 +197,7 @@ export class TeamMemberService {
       }
 
       // 2. Check unique displayOrder in category
-      if (orderChanged || categoryChanged) {
+      if ((orderChanged || categoryChanged) && displayOrder) {
         const orderMatch = await this.teamMemberRepository.findOne({
           where: {
             categoryId,

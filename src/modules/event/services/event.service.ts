@@ -66,7 +66,7 @@ export class EventService {
                   date: rest.date,
                   totalSeats: rest.totalSeats,
                   feeType: rest.feeType,
-                  fee: rest.fee,
+                  fee: rest.fee ?? "",
                   location: rest.location,
                   status: rest.status,
                   registrationDeadline: rest.registrationDeadline,
@@ -243,6 +243,7 @@ export class EventService {
                   versionId: data.versionId || event.versionId,
                   categoryId: data.categoryId || event.categoryId,
                   speakerId: data.speakerId || event.speakerId,
+                  fee: data.fee === null ? "" : (data.fee === undefined ? event.fee : data.fee),
                   modifiedById: userId,
             });
 

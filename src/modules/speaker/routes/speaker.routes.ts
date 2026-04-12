@@ -23,14 +23,14 @@ const createSpeakerRouter = (dataSource: DataSource) => {
        *         multipart/form-data:
        *           schema:
        *             type: object
-       *             required: [name, versionId, image, designation, company]
+       *             required: [name, versionId, image, designation]
        *             properties:
        *               name: { type: string }
        *               versionId: { type: string, format: uuid }
        *               image: { type: string, format: binary }
        *               designation: { type: string }
        *               company: { type: string }
-       *               displayOrder: { type: number, default: 0 }
+       *               displayOrder: { type: number, default: 0, description: "Display order for speaker. Defaults to 0 if left blank. System prevents manual entry of 0." }
        *               socialLinks:
        *                 type: object
        *                 properties:
@@ -89,7 +89,7 @@ const createSpeakerRouter = (dataSource: DataSource) => {
       /**
        * @swagger
        * /api/speakers/{id}:
-       *   put:
+       *   patch:
        *     summary: Update an existing speaker
        *     tags: [Speakers]
        *     parameters:
@@ -108,7 +108,7 @@ const createSpeakerRouter = (dataSource: DataSource) => {
        *               image: { type: string, format: binary }
        *               designation: { type: string }
        *               company: { type: string }
-       *               displayOrder: { type: number }
+       *               displayOrder: { type: number, description: "Display order for speaker. System prevents manual entry of 0." }
        *               socialLinks:
        *                 type: object
        *                 properties:
@@ -123,7 +123,7 @@ const createSpeakerRouter = (dataSource: DataSource) => {
        *       404:
        *         description: Speaker not found
        */
-      router.put('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false, optional: true }), validateRequestBody(updateSpeakerSchema), controller.update);
+      router.patch('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false, optional: true }), validateRequestBody(updateSpeakerSchema), controller.update);
 
       /**
        * @swagger

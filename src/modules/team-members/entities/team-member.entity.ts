@@ -47,7 +47,7 @@ export class TeamMember extends BaseEntity {
     portfolio?: string;
   };
 
-  @Column({ name: 'display_order', type: 'int', default: 1 })
+  @Column({ name: 'display_order', type: 'int', default: 0 })
   displayOrder: number;
 
   @Index()

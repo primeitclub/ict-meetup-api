@@ -9,8 +9,11 @@ export const createTeamMemberSchema = z.object({
   imagePath: z.string(),
   imageUrl: z.string().optional(),
   displayOrder: z.preprocess(
-    (val) => (typeof val === 'string' ? Number(val) : val),
-    z.number().int().min(1)
+    (val) => {
+      if (val === undefined || val === null || val === '') return undefined;
+      return typeof val === 'string' ? Number(val) : val;
+    },
+    z.number().int().min(1).optional()
   ),
   socialLinks: z.preprocess(
     (val) => {

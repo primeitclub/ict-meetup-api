@@ -4,10 +4,13 @@ import { paginationShape } from "../../../shared/validators/pagination.validator
 export const createSpeakerSchema = z.object({
       name: z.string().trim().min(1, 'Name is required'),
       designation: z.string().trim().min(1, 'Designation is required'),
-      company: z.string().trim().min(1, 'Company is required'),
+      company: z.string().trim().optional(),
       versionId: z.uuid(),
       imagePath: z.string().min(1,'Image path is required'),
-      displayOrder: z.coerce.number().min(1, 'Display order must be positive'),
+      displayOrder: z.preprocess(
+            (val) => (val === "" || val === undefined || val === null ? undefined : val),
+            z.coerce.number().int().min(1, 'Display order must be positive').optional().default(0)
+      ),
       socialLinks: z.preprocess(
             (val) => {
                   if (typeof val === 'string') {
