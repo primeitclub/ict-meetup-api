@@ -6,7 +6,7 @@ import { AppError } from "../../../shared/utils/error.utils";
 
 export class DesignationService {
       private designationRepository: Repository<Designation>;
-      constructor(dataSource: DataSource) {
+      constructor(private dataSource: DataSource) {
             this.designationRepository = dataSource.getRepository(Designation);
       }
       private async createAuditLog(
@@ -79,26 +79,28 @@ export class DesignationService {
       }
 
       delete = async (id: string, userId: string) => {
-            try {
-                  const existingDesignation = await this.designationRepository.findOne({ where: { id } });
-                  if (!existingDesignation) {
-                        throw new AppError('Designation not found', 404);
-                  }
-                  const designation = await this.designationRepository.delete(id);
-                  await this.createAuditLog(
-                        'designations',
-                        id,
-                        'DELETE',
-                        userId,
-                        existingDesignation
-                  );
-                  return designation;
-            } catch (error: any) {
-                  if (error?.code === '23503' || error?.code === 'ER_ROW_IS_REFERENCED_2' || error?.errno === 1451 || String(error).toLowerCase().includes('foreign key')) {
-                        throw new AppError('Cannot delete this designation because it is still assigned to one or more members', 409);
-                  }
-                  throw error;
+            const existingDesignation = await this.designationRepository.findOne({ where: { id } });
+            if (!existingDesignation) {
+                  throw new AppError('Designation not found', 404);
             }
+
+            // check if designation has members
+            const teamMemberRepository = this.dataSource.getRepository('team_members');
+            const membersCount = await teamMemberRepository.count({ where: { designationId: id } });
+
+            if (membersCount > 0) {
+                  throw new AppError('Cannot delete this designation because it is still assigned to one or more members', 409);
+            }
+
+            const designation = await this.designationRepository.delete(id);
+            await this.createAuditLog(
+                  'designations',
+                  id,
+                  'DELETE',
+                  userId,
+                  existingDesignation
+            );
+            return designation;
       }
 
       findAll = async (query: any = {}) => {

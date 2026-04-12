@@ -176,14 +176,14 @@ async function runTests() {
                   console.error(`❌ GET /speakers/${speaker.id} failed:`, getByIdRes.data);
             }
 
-            // UPDATE (PUT)
+            // UPDATE (PATCH)
             const updateName = `${speaker.name} (Updated)`;
             const formData = new FormData();
             formData.append('name', updateName);
             formData.append('designation', 'Senior Consultant');
 
             const resUpdate = await apiRequest(`/speakers/${speaker.id}`, {
-                  method: 'PUT',
+                  method: 'PATCH',
                   body: formData
             });
 

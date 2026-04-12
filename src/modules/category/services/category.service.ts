@@ -7,7 +7,7 @@ import { CreateCategoryDto, UpdateCategoryDto } from '../validators/category.val
 export class CategoryService {
   private categoryRepository: Repository<Category>;
 
-  constructor(dataSource: DataSource) {
+  constructor(private dataSource: DataSource) {
     this.categoryRepository = dataSource.getRepository(Category);
   }
 
@@ -195,22 +195,50 @@ export class CategoryService {
       module: 'CategoryService',
     });
 
-    try {
-      await this.categoryRepository.remove(category);
+    let hasDependencies = false;
+    let dependencyTable = '';
 
-      await this.createAuditLog(
-        'category',
-        id,
-        'DELETE',
-        userId,
-        { deleted_category: category }
-      );
-    } catch (error: any) {
-      if (error?.code === '23503' || error?.code === 'ER_ROW_IS_REFERENCED_2' || error?.errno === 1451 || String(error).toLowerCase().includes('foreign key')) {
-        throw new AppError('Cannot delete this category because it is currently assigned to one or more items', 409);
-      }
-      throw error;
+    switch (type) {
+      case CategoryType.TEAM:
+        dependencyTable = 'team_members';
+        break;
+      case CategoryType.EVENT:
+        dependencyTable = 'events';
+        break;
+      case CategoryType.SPONSOR:
+        dependencyTable = 'sponsors';
+        break;
+      case CategoryType.SPEAKER:
+        dependencyTable = 'speakers';
+        break;
     }
+
+    if (dependencyTable) {
+      const repo = this.dataSource.getRepository(dependencyTable);
+      try {
+        const count = await repo.count({ where: { categoryId: id } } as any);
+        if (count > 0) {
+          hasDependencies = true;
+        }
+      } catch (e: any) {
+        // If column doesn't exist, we assume no dependency for now
+        logger.debug(`Could not check dependencies for category in ${dependencyTable}: ${e.message}`);
+      }
+    }
+
+    if (hasDependencies) {
+      throw new AppError('Cannot delete this category because it is currently assigned to one or more items', 409);
+    }
+
+    await this.categoryRepository.remove(category);
+
+    await this.createAuditLog(
+      'category',
+      id,
+      'DELETE',
+      userId,
+      { deleted_category: category }
+    );
 
     return;
   }

@@ -21,12 +21,14 @@ export class SpeakerService {
             if (!versionExists) {
                   throw new AppError('Version not found', 404);
             }
-            const existingOrder = await this.speakerRepository.findOne({
-                  where: { versionId: data.versionId, displayOrder: data.displayOrder }
-            });
+            if (data.displayOrder) {
+                  const existingOrder = await this.speakerRepository.findOne({
+                        where: { versionId: data.versionId, displayOrder: data.displayOrder }
+                  });
 
-            if (existingOrder) {
-                  throw new AppError(`Display order ${data.displayOrder} is already taken in this version`, 400);
+                  if (existingOrder) {
+                        throw new AppError(`Display order ${data.displayOrder} is already taken in this version`, 400);
+                  }
             }
 
             const speaker = this.speakerRepository.create(data);
