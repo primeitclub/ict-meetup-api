@@ -65,6 +65,10 @@ const options: swaggerJSDoc.Options = {
                   {
                         name: "Gallery",
                          description: "API for managing galleries"
+                  },
+                  {
+                        name: "Setting",
+                        description:"API for managing settings "
                   }
 ],
       },

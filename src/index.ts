@@ -25,6 +25,7 @@ import createSpeakerRouter from "./modules/speaker/routes/speaker.routes";
 import createSponsorRouter from "./modules/sponsor/routes/sponsor.routes";
 import createEventRegistrationRouter from "./modules/event-registration/routes/event-registration.routes";
 import createGalleryRouter from "./modules/gallery/routes/gallery.routes";
+import createSettingsRouter from "./modules/settings/routes/settings.routes";
 
 
 dotenv.config();
@@ -69,6 +70,7 @@ connectDatabase.initialize()
     app.use("/api/sponsors", createSponsorRouter(connectDatabase));
     app.use("/api/event-registrations", createEventRegistrationRouter(connectDatabase));
     app.use("/api/gallery", createGalleryRouter(connectDatabase));
+    app.use("/api/settings", createSettingsRouter(connectDatabase));
 
     app.use(errorHandler);
 

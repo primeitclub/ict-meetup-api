@@ -20,6 +20,7 @@ import { Speaker } from "../../../modules/speaker/entities/speaker.entity";
 import { Sponsor } from "../../../modules/sponsor/entities/sponsor.entity";
 import { EventRegistration } from "../../../modules/event-registration/entities/event-registration.entity";
 import { GalleryImage } from "../../../modules/gallery/entities/gallery.entity";
+import { Settings } from "../../../modules/settings/entities/settings.entity";
 
 
 dotenv.config();
@@ -43,7 +44,7 @@ const connectDatabase = new DataSource({
   database: dbConfigOptions.database,
   synchronize: dbConfigOptions.synchronize,
   logging: dbConfigOptions.logging,
-  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember, AssetLibrary, Asset, Designation, HeroSection, AboutSection, Faq, Event, Speaker, Sponsor, EventRegistration, GalleryImage],
+  entities: [User, FlagshipEventVersion, AuditLog, AccessToken, RefreshToken, Category, TeamMember, AssetLibrary, Asset, Designation, HeroSection, AboutSection, Faq, Event, Speaker, Sponsor, EventRegistration, GalleryImage,Settings],
 
   migrations: [__dirname + '/../typeorm/migrations/*{.ts,.js}'],
 });
