@@ -119,9 +119,10 @@ id: true,
             }
 
             if (data.displayOrder) {
+                  const targetVersionId = data.versionId || speaker.versionId;
                   const existingOrder = await this.speakerRepository.findOne({
                         where: {
-                              versionId: speaker.versionId,
+                              versionId: targetVersionId,
                               displayOrder: data.displayOrder
                         }
                   });
