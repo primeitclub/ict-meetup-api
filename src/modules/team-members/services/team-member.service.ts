@@ -48,12 +48,13 @@ export class TeamMemberService {
       const displayOrderExists = await this.teamMemberRepository.findOne({
         where: {
           categoryId: data.categoryId,
+          versionId: data.versionId,
           displayOrder: data.displayOrder
         }
       });
 
       if (displayOrderExists) {
-        throw new AppError(`A member with display order ${data.displayOrder} already exists in this category`, 400);
+        throw new AppError(`A member with display order ${data.displayOrder} already exists in this category for this version`, 400);
       }
     }
 
@@ -174,38 +175,42 @@ export class TeamMemberService {
 
     const nameChanged = data.name && data.name !== teamMember.name;
     const categoryChanged = data.categoryId && data.categoryId !== teamMember.categoryId;
+    const versionChanged = data.versionId && data.versionId !== teamMember.versionId;
     const orderChanged = data.displayOrder !== undefined && data.displayOrder !== teamMember.displayOrder;
 
-    if (nameChanged || categoryChanged || orderChanged) {
+    if (nameChanged || categoryChanged || orderChanged || versionChanged) {
       const categoryId = data.categoryId || teamMember.categoryId;
+      const versionId = data.versionId || teamMember.versionId;
       const displayOrder = data.displayOrder !== undefined ? data.displayOrder : teamMember.displayOrder;
 
       // 1. Check unique name in category
-      if (nameChanged || categoryChanged) {
+      if (nameChanged || categoryChanged || versionChanged) {
         const nameMatch = await this.teamMemberRepository.findOne({
           where: {
             name: data.name || teamMember.name,
             categoryId,
+            versionId,
           },
         });
         if (nameMatch && nameMatch.id !== id) {
           throw new AppError(
-            `Team member with name '${data.name || teamMember.name}' already exists in this category`,
+            `Team member with name '${data.name || teamMember.name}' already exists in this category for this version`,
             400
           );
         }
       }
 
       // 2. Check unique displayOrder in category
-      if ((orderChanged || categoryChanged) && displayOrder) {
+      if ((orderChanged || categoryChanged || versionChanged) && displayOrder) {
         const orderMatch = await this.teamMemberRepository.findOne({
           where: {
             categoryId,
+            versionId,
             displayOrder
           }
         });
         if (orderMatch && orderMatch.id !== id) {
-          throw new AppError(`A member with display order ${displayOrder} already exists in this category`, 400);
+          throw new AppError(`A member with display order ${displayOrder} already exists in this category for this version`, 400);
         }
       }
     }
