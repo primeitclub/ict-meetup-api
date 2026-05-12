@@ -3,11 +3,15 @@ import { DataSource } from "typeorm";
 import { FlagshipEventVersionService } from "../services/flagship-event.service";
 import { responseHandler } from "../../../shared/utils/helpers/response.helper";
 import { BaseController } from "../../../shared/base/base.controller";
-import { AuditLogActionType, AuditLogScope, AuditLogType } from "../../../shared/constants/audit-log.constants";
+import {
+  AuditLogActionType,
+  AuditLogScope,
+  AuditLogType,
+} from "../../../shared/constants/audit-log.constants";
 
 export class FlagshipEventVersionController extends BaseController {
   private service: FlagshipEventVersionService;
-  protected moduleName = 'FlagshipEventService';
+  protected moduleName = "FlagshipEventService";
   constructor(dataSource: DataSource) {
     super(dataSource);
     this.service = new FlagshipEventVersionService(dataSource);
@@ -27,12 +31,12 @@ export class FlagshipEventVersionController extends BaseController {
         result.id,
         AuditLogScope.FLAGSHIP_EVENT,
         req.ip,
-        userId
+        userId,
       );
       return responseHandler(res)(
         "Flagship event version created successfully",
         result,
-        201
+        201,
       );
     } catch (error) {
       next(error);
@@ -46,13 +50,13 @@ export class FlagshipEventVersionController extends BaseController {
         return responseHandler(res)(
           "No flagship event versions found",
           result,
-          200
+          200,
         );
       }
       return responseHandler(res)(
         "Fetch all versions successfully",
         result,
-        200
+        200,
       );
     } catch (error) {
       next(error);
@@ -66,13 +70,13 @@ export class FlagshipEventVersionController extends BaseController {
         return responseHandler(res)(
           "No flagship event version found",
           null,
-          200
+          200,
         );
       }
       return responseHandler(res)(
         "Fetch version by id successfully",
         result,
-        200
+        200,
       );
     } catch (error) {
       next(error);
@@ -86,13 +90,13 @@ export class FlagshipEventVersionController extends BaseController {
         return responseHandler(res)(
           "No flagship event version found",
           null,
-          200
+          200,
         );
       }
       return responseHandler(res)(
         "Fetch version by slug successfully",
         result,
-        200
+        200,
       );
     } catch (error) {
       next(error);
@@ -106,13 +110,13 @@ export class FlagshipEventVersionController extends BaseController {
         return responseHandler(res)(
           "No active flagship event version found",
           null,
-          200
+          200,
         );
       }
       return responseHandler(res)(
         "Fetch current active version successfully",
         result,
-        200
+        200,
       );
     } catch (error) {
       next(error);
@@ -125,11 +129,7 @@ export class FlagshipEventVersionController extends BaseController {
       if (req.body.imageUrl) {
         req.body.logo = req.body.imageUrl;
       }
-      const result = await this.service.update(
-        req.params.id,
-        req.body,
-        userId
-      );
+      const result = await this.service.update(req.params.id, req.body, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.UPDATE,
@@ -137,12 +137,12 @@ export class FlagshipEventVersionController extends BaseController {
         result.id,
         AuditLogScope.FLAGSHIP_EVENT,
         req.ip,
-        userId
+        userId,
       );
       return responseHandler(res)(
         "Flagship event version updated successfully",
         result,
-        200
+        200,
       );
     } catch (error) {
       next(error);
@@ -160,7 +160,7 @@ export class FlagshipEventVersionController extends BaseController {
         req.params.id,
         AuditLogScope.FLAGSHIP_EVENT,
         req.ip,
-        userId
+        userId,
       );
       return responseHandler(res)(result.message, null, 200);
     } catch (error) {

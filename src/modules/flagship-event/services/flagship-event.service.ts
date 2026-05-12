@@ -30,7 +30,7 @@ export class FlagshipEventVersionService {
     if (existing) {
       throw new AppError(
         "Version with this slug or version number already exists",
-        400
+        400,
       );
     }
 
@@ -74,7 +74,7 @@ export class FlagshipEventVersionService {
         page: Number(page),
         limit: Number(limit),
         totalPages: Math.ceil(total / Number(limit)),
-      }
+      },
     };
   }
 
@@ -103,13 +103,13 @@ export class FlagshipEventVersionService {
   async update(
     id: string,
     data: Partial<FlagshipEventVersion>,
-    userId: string
+    userId: string,
   ) {
     const version = await this.findById(id);
 
-    if (version.status === EventVersionStatus.ARCHIVED) {
-      throw new AppError("Archived versions cannot be updated", 400);
-    }
+    // if (version.status === EventVersionStatus.ARCHIVED) {
+    //   throw new AppError("Archived versions cannot be updated", 400);
+    // }
 
     logger.info(`Updating flagship event version: ${id}`, {
       module: "FlagshipEventVersionService",
@@ -134,7 +134,7 @@ export class FlagshipEventVersionService {
    */
   private async handleStatusTransition(
     version: FlagshipEventVersion,
-    newStatus: EventVersionStatus
+    newStatus: EventVersionStatus,
   ) {
     if (newStatus === EventVersionStatus.ACTIVE) {
       const currentActive = await this.findCurrent();

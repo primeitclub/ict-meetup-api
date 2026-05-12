@@ -26,7 +26,7 @@ const baseFlagshipEventVersionSchema = z.object({
     .refine((val) => !isNaN(Date.parse(val)), "Invalid end date format (use YYYY-MM-DD)")
     .transform((val) => new Date(val)),
   is_current: z.coerce.boolean().default(false),
-  logo: z.string().min(1, "Logo is required"),
+  logo: z.any().optional(),
 });
 
 export const flagshipEventVersionSchema = baseFlagshipEventVersionSchema.refine(

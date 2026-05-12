@@ -60,7 +60,7 @@ const createVersionRouter = (dataSource: DataSource) => {
        *       201:
        *         description: Created
        */
-      versionRouter.post("/", authenticate, imageUploadHandler({ fieldName: "logo", multiple: false }), validateRequestBody(flagshipEventVersionSchema), controller.create);
+      versionRouter.post("/", authenticate, imageUploadHandler({ fieldName: "logo", multiple: false,optional:true }), validateRequestBody(flagshipEventVersionSchema), controller.create);
 
       /**
        * @swagger
