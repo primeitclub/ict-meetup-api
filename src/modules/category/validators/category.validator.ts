@@ -3,7 +3,6 @@ import { paginationShape } from '../../../shared/validators/pagination.validator
 
 export const createCategorySchema = z.object({
   name: z.string().trim().min(1).max(100),
-  versionId: z.uuid(),
   displayName: z.string().trim().min(1).max(100),
   displayOrder: z.preprocess(
     (val) => (typeof val === 'string' ? Number(val) : val),
@@ -19,7 +18,6 @@ export const categoryIdParamSchema = z.object({
 
 export const categoryQuerySchema = z.object({
   ...paginationShape,
-  versionId: z.uuid().optional(),
 });
 
 export type CreateCategoryDto = z.infer<typeof createCategorySchema>;

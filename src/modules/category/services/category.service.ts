@@ -69,35 +69,11 @@ export class CategoryService {
       query,
     });
 
-    const { page = 1, limit = 10, versionId } = query;
+    const { page = 1, limit = 10 } = query;
     const skip = (Number(page) - 1) * Number(limit);
 
     const queryBuilder = this.categoryRepository.createQueryBuilder('category');
     queryBuilder.where('category.type = :type', { type });
-
-    if (versionId) {
-      let tableName = '';
-      switch (type) {
-        case CategoryType.TEAM:
-          tableName = 'team_members';
-          break;
-        case CategoryType.EVENT:
-          tableName = 'events';
-          break;
-        case CategoryType.SPEAKER:
-          tableName = 'speakers';
-          break;
-        default:
-          break;
-      }
-
-      if (tableName) {
-        queryBuilder
-          .innerJoin(tableName, 'target', 'target.category_id = category.id')
-          .andWhere('target.version_id = :versionId', { versionId })
-          .groupBy('category.id');
-      }
-    }
 
     queryBuilder.addSelect(
       'CASE WHEN category.display_order = 0 THEN 1 ELSE 0 END',

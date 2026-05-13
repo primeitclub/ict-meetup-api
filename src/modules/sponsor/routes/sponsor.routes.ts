@@ -81,7 +81,6 @@ const createSponsorRouter = (dataSource: DataSource) => {
        *             required: true
        *             properties:
        *               name: { type: string }
-       *               versionId: { type: string, format: uuid }
        *               displayName: { type: string, minLength: 1, maxLength: 150 }
        *               displayOrder: { type: number, default: 1 }
        *     responses:
@@ -148,7 +147,6 @@ const createSponsorRouter = (dataSource: DataSource) => {
        *             type: object
        *             properties:
        *               name: { type: string }
-       *               versionId: { type: string, format: uuid }
        *               displayName: { type: string, minLength: 1, maxLength: 150 }
        *               displayOrder: { type: number }
        *     responses:
@@ -170,10 +168,6 @@ const createSponsorRouter = (dataSource: DataSource) => {
        *     parameters:
        *       - in: path
        *         name: id
-       *         required: true
-       *         schema: { type: string, format: uuid }
-       *       - in: query
-       *         name: versionId
        *         required: true
        *         schema: { type: string, format: uuid }
        *     responses:

@@ -102,16 +102,12 @@ export class SponsorController extends BaseController {
       createForCategory = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const userId = req.user!.userId || 'system';
-                  const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-                  if (!isVersionExist) {
-                        return responseHandler(res)('Version not found', null, 404);
-                  }
                   const result = await this.categoryService.create(req.body, CategoryType.SPONSOR, userId);
                   await this.createAuditLog(
                         AuditLogType.INFO,
                         AuditLogActionType.CREATE,
                         `Sponsor category ${result.id} created successfully`,
-                        req.body.versionId,
+                        null,
                         AuditLogScope.SPONSORS,
                         req.ip,
                         userId
@@ -125,10 +121,6 @@ export class SponsorController extends BaseController {
       updateForCategory = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const userId = req.user!.userId || 'system';
-                  const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-                  if (!isVersionExist) {
-                        return responseHandler(res)('Version not found', null, 404);
-                  }
                   const result = await this.categoryService.update(
                         req.params.id,
                         CategoryType.SPONSOR,
@@ -139,7 +131,7 @@ export class SponsorController extends BaseController {
                         AuditLogType.INFO,
                         AuditLogActionType.UPDATE,
                         `Sponsor category ${result.id} updated successfully`,
-                        req.body.versionId,
+                        null,
                         AuditLogScope.SPONSORS,
                         req.ip,
                         userId
@@ -153,17 +145,12 @@ export class SponsorController extends BaseController {
       deleteForCategory = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const userId = req.user!.userId || 'system';
-                  const { versionId } = req.query as any;
-                  const isVersionExist = await this.flagshipEventVersion.findById(versionId);
-                  if (!isVersionExist) {
-                        return responseHandler(res)('Version not found', null, 404);
-                  }
                   await this.categoryService.delete(req.params.id, CategoryType.SPONSOR, userId);
                   await this.createAuditLog(
                         AuditLogType.INFO,
                         AuditLogActionType.DELETE,
                         `Sponsor category ${req.params.id} deleted successfully`,
-                        versionId,
+                        null,
                         AuditLogScope.SPONSORS,
                         req.ip,
                         userId

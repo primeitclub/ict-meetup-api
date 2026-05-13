@@ -137,16 +137,12 @@ export class TeamMemberController extends BaseController {
   createForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId || 'system';
-      const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-      if (!isVersionExist) {
-        return responseHandler(res)('Version not found', null, 404);
-      }
       const result = await this.serviceForCategory.create(req.body, CategoryType.TEAM, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.CREATE,
         `Category ${result.id} created successfully`,
-        req.body.versionId,
+        null,
         AuditLogScope.TEAM_MEMBERS,
         req.ip,
         userId
@@ -164,10 +160,6 @@ export class TeamMemberController extends BaseController {
   updateForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId || 'system';
-      const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-      if (!isVersionExist) {
-        return responseHandler(res)('Version not found', null, 404);
-      }
       const result = await this.serviceForCategory.update(
         req.params.id,
         CategoryType.TEAM,
@@ -178,7 +170,7 @@ export class TeamMemberController extends BaseController {
         AuditLogType.INFO,
         AuditLogActionType.UPDATE,
         `Category ${result.id} updated successfully`,
-        req.body.versionId,
+        null,
         AuditLogScope.TEAM_MEMBERS,
         req.ip,
         userId
@@ -196,17 +188,12 @@ export class TeamMemberController extends BaseController {
   deleteForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any).user?.id || 'system';
-      const { versionId } = req.query as any;
-      const isVersionExist = await this.flagshipEventVersion.findById(versionId);
-      if (!isVersionExist) {
-        return responseHandler(res)('Version not found', null, 404);
-      }
       await this.serviceForCategory.delete(req.params.id, CategoryType.TEAM, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.DELETE,
         `Category ${req.params.id} deleted successfully`,
-        versionId,
+        null,
         AuditLogScope.TEAM_MEMBERS,
         req.ip,
         userId
@@ -219,11 +206,6 @@ export class TeamMemberController extends BaseController {
 
   getAllForCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { versionId } = req.query as any;
-      const isVersionExist = await this.flagshipEventVersion.findById(versionId);
-      if (!isVersionExist) {
-        return responseHandler(res)('Version not found', null, 404);
-      }
       const result = await this.serviceForCategory.findAll(req.query as any, CategoryType.TEAM);
       if (!result.items.length) {
         return responseHandler(res)('Categories not found', result, 200);
