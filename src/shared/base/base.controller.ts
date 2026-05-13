@@ -15,7 +15,7 @@ export abstract class BaseController {
             logType: AuditLogType,
             logActionType: AuditLogActionType,
             message: string,
-            versionId: string,
+            versionId: string | null,
             scope: AuditLogScope,
             ipAddress: string | undefined,
             userId: string,

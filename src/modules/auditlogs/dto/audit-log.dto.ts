@@ -5,7 +5,7 @@ export interface CreateAuditLogDto {
       userId?: string;
       logActionType: AuditLogActionType;
       message: string;
-      versionId?: string;
+      versionId?: string | null;
       scope: AuditLogScope;
       ipAddress?: string;
 }

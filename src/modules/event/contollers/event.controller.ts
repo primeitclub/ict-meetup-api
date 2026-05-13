@@ -110,16 +110,12 @@ export class EventController extends BaseController {
       createForCategory = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const userId = req.user!.userId || 'system';
-                  const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-                  if (!isVersionExist) {
-                        return responseHandler(res)('Version not found', null, 404);
-                  }
                   const result = await this.serviceForCategory.create(req.body, CategoryType.EVENT, userId);
                   await this.createAuditLog(
                         AuditLogType.INFO,
                         AuditLogActionType.CREATE,
                         `Category ${result.id} created successfully`,
-                        req.body.versionId,
+                        null,
                         AuditLogScope.EVENTS,
                         req.ip,
                         userId
@@ -133,10 +129,6 @@ export class EventController extends BaseController {
       updateForCategory = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const userId = req.user!.userId || 'system';
-                  const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-                  if (!isVersionExist) {
-                        return responseHandler(res)('Version not found', null, 404);
-                  }
                   const result = await this.serviceForCategory.update(
                         req.params.id,
                         CategoryType.EVENT,
@@ -147,7 +139,7 @@ export class EventController extends BaseController {
                         AuditLogType.INFO,
                         AuditLogActionType.UPDATE,
                         `Category ${result.id} updated successfully`,
-                        req.body.versionId,
+                        null,
                         AuditLogScope.EVENTS,
                         req.ip,
                         userId
@@ -161,17 +153,12 @@ export class EventController extends BaseController {
       deleteForCategory = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const userId = req.user!.userId || 'system';
-                  const { versionId } = req.query as any;
-                  const isVersionExist = await this.flagshipEventVersion.findById(versionId);
-                  if (!isVersionExist) {
-                        return responseHandler(res)('Version not found', null, 404);
-                  }
                   await this.serviceForCategory.delete(req.params.id, CategoryType.EVENT, userId);
                   await this.createAuditLog(
                         AuditLogType.INFO,
                         AuditLogActionType.DELETE,
                         `Category ${req.params.id} deleted successfully`,
-                        versionId,
+                        null,
                         AuditLogScope.EVENTS,
                         req.ip,
                         userId

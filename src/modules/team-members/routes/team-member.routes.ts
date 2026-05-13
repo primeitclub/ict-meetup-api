@@ -99,9 +99,8 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *         application/json:
    *           schema:
    *             type: object
-   *             required: [versionId, name, displayName]
+   *             required: [name, displayName]
    *             properties:
-   *               versionId: { type: string, format: uuid }
    *               name: { type: string, minLength: 1, maxLength: 150 }
    *               displayName: { type: string, minLength: 1, maxLength: 150 }
    *               displayOrder: { type: integer, minimum: 1}
@@ -118,9 +117,6 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *     summary: Get all team categories
    *     tags: [TeamMemberCategories]
    *     parameters: 
-   *       - in: query
-   *         name: versionId
-   *         schema: { type: string, format: uuid }
    *       - in: query
    *         name: page
    *         schema: { type: number , default: 1 }
@@ -159,7 +155,6 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *           schema:
    *             type: object
    *             properties:
-   *               versionId: { type: string, format: uuid }
    *               name: { type: string, minLength: 1, maxLength: 150 }
    *               displayName: { type: string, minLength: 1, maxLength: 150 }
    *               displayOrder: { type: integer, minimum: 1}
