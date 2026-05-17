@@ -15,7 +15,7 @@ export const aboutSectionIdParamSchema = z.object({
 });
 
 export const aboutSectionQuerySchema = z.object({
-  versionId: z.uuid(),
+  versionId: z.string().uuid().optional(),
 });
 
 export type CreateAboutSectionDto = z.infer<typeof createAboutSectionSchema>;
