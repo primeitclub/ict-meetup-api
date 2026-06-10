@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { Faq } from '../entities/faq.entity';
@@ -14,8 +14,8 @@ export class FaqService {
     this.faqRepository = dataSource.getRepository(Faq);
   }
 
-  async create(data: CreateFaqDto, userId: string): Promise<Faq> {
-    logger.info(`Creating new faq: ${data.title}`, {
+  async create(data: CreateFaqDto, userId: string): Promise<Faq[]> {
+    logger.info(`Creating ${data.faqs.length} faq(s) for version ${data.versionId}`, {
       module: 'FaqService',
     });
 
@@ -31,14 +31,16 @@ export class FaqService {
       throw new AppError('Can only create faqs for a flagship event version that is in "draft" status', 400);
     }
 
-    const payload = {
-      ...data,
-      createdById: userId
-    };
-    const newFaq = this.faqRepository.create(payload);
-    const savedFaq = await this.faqRepository.save(newFaq);
+    const newFaqs = data.faqs.map((item) =>
+      this.faqRepository.create({
+        versionId: data.versionId,
+        title: item.title,
+        description: item.description,
+        createdById: userId,
+      })
+    );
 
-    return savedFaq;
+    return this.faqRepository.save(newFaqs);
   }
 
   async findAll(query: any = {}): Promise<any> {
@@ -69,6 +71,46 @@ export class FaqService {
     };
   }
 
+  // Returns every faq bucketed under its version — one call powers a
+  // "version → its faqs" table on the frontend.
+  async findAllGroupedByVersion(): Promise<any> {
+    logger.debug('Fetching all faqs grouped by version', {
+      module: 'FaqService',
+    });
+
+    const faqs = await this.faqRepository.find({
+      relations: ['flagshipEventVersion'],
+      order: { createdAt: 'DESC' },
+    });
+
+    const groups = new Map<string, any>();
+    for (const faq of faqs) {
+      const version = faq.flagshipEventVersion;
+      if (!groups.has(faq.versionId)) {
+        groups.set(faq.versionId, {
+          versionId: faq.versionId,
+          versionName: version?.version_name ?? null,
+          versionNumber: version?.version_number ?? null,
+          status: version?.status ?? null,
+          faqs: [],
+        });
+      }
+      groups.get(faq.versionId).faqs.push({
+        id: faq.id,
+        title: faq.title,
+        description: faq.description,
+        createdAt: faq.createdAt,
+        updatedAt: faq.updatedAt,
+      });
+    }
+
+    const items = Array.from(groups.values()).sort(
+      (a, b) => (Number(b.versionNumber) || 0) - (Number(a.versionNumber) || 0)
+    );
+
+    return { items, meta: { totalVersions: items.length } };
+  }
+
   async findById(id: string): Promise<Faq> {
     const faq = await this.faqRepository.findOne({ where: { id } });
     if (!faq) {
@@ -77,18 +119,18 @@ export class FaqService {
     return faq;
   }
 
-  async update(
-    id: string,
-    data: UpdateFaqDto,
+  // Version-based sync: the submitted array becomes the full set of faqs for the
+  // version — items with an id are updated, items without an id are created, and
+  // any existing faq omitted from the array is deleted. All in one transaction.
+  async syncByVersion(
+    versionId: string,
+    faqs: UpdateFaqDto['faqs'],
     userId: string
-  ): Promise<Faq> {
-    const faq = await this.findById(id);
-
-    logger.info(`Updating faq: ${id}`, {
+  ): Promise<Faq[]> {
+    logger.info(`Syncing ${faqs.length} faq(s) for version ${versionId}`, {
       module: 'FaqService',
     });
 
-    const versionId = data.versionId || faq.versionId;
     const versionExists = await this.dataSource
       .getRepository(FlagshipEventVersion)
       .findOne({ where: { id: versionId } });
@@ -101,27 +143,62 @@ export class FaqService {
       throw new AppError('Cannot update faqs for an archived flagship event version', 400);
     }
 
-    const oldState = { ...faq };
+    return this.dataSource.transaction(async (manager) => {
+      const repo = manager.getRepository(Faq);
+      const existing = await repo.find({ where: { versionId } });
+      const existingById = new Map(existing.map((faq) => [faq.id, faq]));
 
-    const payload = {
-      ...data,
-      modifiedById: userId
-    };
-    Object.assign(faq, payload);
-    const updatedFaq = await this.faqRepository.save(faq);
+      const incomingIds = new Set(
+        faqs.filter((item) => item.id).map((item) => item.id as string)
+      );
 
-    return updatedFaq;
+      // Every provided id must already belong to this version.
+      for (const id of incomingIds) {
+        if (!existingById.has(id)) {
+          throw new AppError(`Faq ${id} does not belong to this version`, 400);
+        }
+      }
+
+      // Delete faqs the client removed from the array.
+      const toDelete = existing.filter((faq) => !incomingIds.has(faq.id));
+      if (toDelete.length) {
+        await repo.remove(toDelete);
+      }
+
+      // Update existing + create new.
+      const toSave = faqs.map((item) => {
+        if (item.id) {
+          const current = existingById.get(item.id)!;
+          current.title = item.title;
+          current.description = item.description;
+          current.modifiedById = userId;
+          return current;
+        }
+        return repo.create({
+          versionId,
+          title: item.title,
+          description: item.description,
+          createdById: userId,
+        });
+      });
+
+      return toSave.length ? repo.save(toSave) : [];
+    });
   }
 
-  async delete(id: string, userId: string): Promise<void> {
-    const faq = await this.findById(id);
+  // Delete every faq belonging to a version. Used when its parent flagship
+  // event version is deleted (cascade). Pass `manager` to run inside the
+  // version-delete transaction. Faqs hold no files, so this is rows-only.
+  async deleteByVersion(versionId: string, manager?: EntityManager): Promise<void> {
+    const repo = manager ? manager.getRepository(Faq) : this.faqRepository;
+    const rows = await repo.find({ where: { versionId } });
+    if (!rows.length) return;
 
-    logger.warn(`Deleting faq: ${id}`, {
+    logger.warn(`Deleting ${rows.length} faq(s) for version ${versionId}`, {
       module: 'FaqService',
     });
 
-    await this.faqRepository.remove(faq);
-
-    return;
+    await repo.remove(rows);
   }
+
 }

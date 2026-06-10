@@ -104,7 +104,7 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.put('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(updateAboutSectionSchema), controller.update);
+  router.put('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false, optional: true }), validateRequestBody(updateAboutSectionSchema), controller.update);
 
   /**
   * @swagger

@@ -52,11 +52,11 @@ export class GalleryController extends BaseController {
     }
   };
 
-  getById = async (req: Request, res: Response, next: NextFunction) => {
+  getByVersion = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.service.findById(req.params.id);
+      const result = await this.service.findByVersion(req.params.version_id);
       return responseHandler(res)(
-        'Gallery image fetched successfully',
+        'Gallery fetched successfully',
         result,
         200
       );
@@ -70,8 +70,8 @@ export class GalleryController extends BaseController {
       const userId = req.user!.userId;
       const versionId = req.params.version_id;
       const result = await this.service.bulkUpdate(
-        versionId, 
-        { items: req.body.data, uploadedImages: req.body.uploadedImages }, 
+        versionId,
+        { items: req.body.data, uploadedImages: req.body.uploadedImages },
         userId
       );
 
@@ -95,23 +95,23 @@ export class GalleryController extends BaseController {
     }
   };
 
-  delete = async (req: Request, res: Response, next: NextFunction) => {
+  deleteImage = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId;
-      const image = await this.service.findById(req.params.id);
-      await this.service.delete(req.params.id, userId);
+      const { version_id, image_id } = req.params;
+      const result = await this.service.deleteImage(version_id, image_id, userId);
 
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.DELETE,
         "Gallery image deleted successfully",
-        image.flagshipEventVersionId,
+        version_id,
         AuditLogScope.GALLERY_ITEMS,
         req.ip,
         userId
       );
 
-      return responseHandler(res)('Gallery image deleted successfully', null, 200);
+      return responseHandler(res)('Gallery image deleted successfully', result, 200);
     } catch (error) {
       next(error);
     }

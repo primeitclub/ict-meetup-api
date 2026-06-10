@@ -16,6 +16,9 @@ export class Sponsor extends BaseEntity {
       @Column({ name: 'image_path', type: 'varchar', length: 255 })
       imagePath: string;
 
+      @Column({ name: 'image_url', type: 'varchar', length: 255, nullable: true })
+      imageUrl: string;
+
       @Column({ type: 'varchar', length: 150 })
       name: string;
 

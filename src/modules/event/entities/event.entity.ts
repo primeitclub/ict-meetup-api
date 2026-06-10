@@ -32,6 +32,9 @@ export class Event extends BaseEntity {
       @Column({ name: 'image_path', type: 'varchar' })
       imagePath: string;
 
+      @Column({ name: 'image_url', type: 'varchar', nullable: true })
+      imageUrl: string;
+
       @Column({ name: 'start_time', type: 'time', nullable: true })
       startTime: string;
 

@@ -26,7 +26,7 @@ import createSponsorRouter from "./modules/sponsor/routes/sponsor.routes";
 import createEventRegistrationRouter from "./modules/event-registration/routes/event-registration.routes";
 import createGalleryRouter from "./modules/gallery/routes/gallery.routes";
 import createSettingsRouter from "./modules/settings/routes/settings.routes";
-
+import createContentRouter from "./modules/content/routes/content.routes";
 
 dotenv.config();
 
@@ -35,28 +35,32 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin: ["http://localhost:5173", "http://localhost:5174"],
     credentials: true,
-  })
+  }),
 );
 
 app.use(cookieParser());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/api-docs.json', (req: Request, res: Response) => {
+app.use("/api-docs.json", (req: Request, res: Response) => {
   res.json(swaggerSpec);
 });
 
 app.use(errorHandler);
 
-connectDatabase.initialize()
+connectDatabase
+  .initialize()
   .then(() => {
-    console.log('Database connected successfully.');
+    console.log("Database connected successfully.");
 
     // Register routes AFTER DB is initialized — safe to create repositories
     app.use("/api/auth", createAuthRouter(connectDatabase));
-    app.use("/api/flagship-event/versions", createVersionRouter(connectDatabase));
+    app.use(
+      "/api/flagship-event/versions",
+      createVersionRouter(connectDatabase),
+    );
     app.use("/api/team-members", createTeamMemberRouter(connectDatabase));
     app.use("/api/asset-library", createAssetLibraryRouter(connectDatabase));
     app.use("/api/seeds", createSeedRouter(connectDatabase));
@@ -68,9 +72,13 @@ connectDatabase.initialize()
     app.use("/api/events", createEventRouter(connectDatabase));
     app.use("/api/speakers", createSpeakerRouter(connectDatabase));
     app.use("/api/sponsors", createSponsorRouter(connectDatabase));
-    app.use("/api/event-registrations", createEventRegistrationRouter(connectDatabase));
+    app.use(
+      "/api/event-registrations",
+      createEventRegistrationRouter(connectDatabase),
+    );
     app.use("/api/gallery", createGalleryRouter(connectDatabase));
     app.use("/api/settings", createSettingsRouter(connectDatabase));
+    app.use("/api/content", createContentRouter(connectDatabase));
 
     app.use(errorHandler);
 
@@ -83,5 +91,5 @@ connectDatabase.initialize()
     });
   })
   .catch((error) => {
-    console.error('Error connecting to the database', error);
+    console.error("Error connecting to the database", error);
   });

@@ -1,5 +1,5 @@
 import { imageUploadHandler } from '../../../shared/utils/helpers/imageUpload.helper';
-import { NextFunction, Request, Response, Router } from 'express';
+import { Router } from 'express';
 import { DataSource } from 'typeorm';
 import { GalleryController } from '../controllers/gallery.controller';
 import { validateRequestBody, validateRequestQuery, validateRequestParams } from '../../../shared/validators/request.validator';
@@ -7,8 +7,8 @@ import {
   createGallerySchema,
   bulkUpdateGallerySchema,
   galleryQuerySchema,
-  galleryIdParamSchema,
   galleryVersionParamSchema,
+  galleryImageParamSchema,
 } from '../validators/gallery.validator';
 import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
 
@@ -21,7 +21,7 @@ const createGalleryRouter = (dataSource: DataSource) => {
   * @swagger
   * /api/gallery:
   *   post:
-  *     summary: Upload new gallery images (1-7)
+  *     summary: Add gallery images to a version (creates the version's gallery if absent, 1-7 total)
   *     tags: [Gallery]
   *     consumes:
   *       - multipart/form-data
@@ -66,7 +66,7 @@ const createGalleryRouter = (dataSource: DataSource) => {
   * @swagger
   * /api/gallery:
   *   get:
-  *     summary: Get all gallery images
+  *     summary: List galleries (one row per version)
   *     tags: [Gallery]
   *     parameters:
   *       - in: query
@@ -92,13 +92,13 @@ const createGalleryRouter = (dataSource: DataSource) => {
 
   /**
   * @swagger
-  * /api/gallery/{id}:
+  * /api/gallery/{version_id}:
   *   get:
-  *     summary: Get gallery image by ID
+  *     summary: Get the gallery (image array) for a version
   *     tags: [Gallery]
   *     parameters:
   *       - in: path
-  *         name: id
+  *         name: version_id
   *         required: true
   *         schema:
   *           type: string
@@ -107,13 +107,13 @@ const createGalleryRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.get('/:id', validateRequestParams(galleryIdParamSchema), controller.getById);
+  router.get('/:version_id', validateRequestParams(galleryVersionParamSchema), controller.getByVersion);
 
   /**
   * @swagger
   * /api/gallery/{version_id}:
   *   put:
-  *     summary: Bulk update gallery images for a version
+  *     summary: Bulk update the gallery image array for a version
   *     tags: [Gallery]
   *     consumes:
   *       - multipart/form-data
@@ -155,13 +155,19 @@ const createGalleryRouter = (dataSource: DataSource) => {
 
   /**
   * @swagger
-  * /api/gallery/{id}:
+  * /api/gallery/{version_id}/images/{image_id}:
   *   delete:
-  *     summary: Delete a gallery image
+  *     summary: Delete a single image from a version's gallery
   *     tags: [Gallery]
   *     parameters:
   *       - in: path
-  *         name: id
+  *         name: version_id
+  *         required: true
+  *         schema:
+  *           type: string
+  *           format: uuid
+  *       - in: path
+  *         name: image_id
   *         required: true
   *         schema:
   *           type: string
@@ -170,13 +176,18 @@ const createGalleryRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.delete('/:id', authenticate, validateRequestParams(galleryIdParamSchema), controller.delete);
+  router.delete(
+    '/:version_id/images/:image_id',
+    authenticate,
+    validateRequestParams(galleryImageParamSchema),
+    controller.deleteImage
+  );
 
   /**
   * @swagger
-  * /api/gallery/version/{version_id}:
+  * /api/gallery/{version_id}:
   *   delete:
-  *     summary: Delete all gallery images for a flagship event version
+  *     summary: Delete the entire gallery for a flagship event version
   *     tags: [Gallery]
   *     parameters:
   *       - in: path
@@ -189,10 +200,9 @@ const createGalleryRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.delete('/version/:version_id', authenticate, validateRequestParams(galleryVersionParamSchema), controller.deleteByVersion);
+  router.delete('/:version_id', authenticate, validateRequestParams(galleryVersionParamSchema), controller.deleteByVersion);
 
   return router;
 };
 
 export default createGalleryRouter;
-

@@ -1,7 +1,8 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
-import { GalleryImage } from '../entities/gallery.entity';
+import { Gallery, GalleryImageItem } from '../entities/gallery.entity';
 import { CreateGalleryDto, BulkUpdateGalleryDto } from '../validators/gallery.validator';
 import { FlagshipEventVersion } from '../../flagship-event/entities/flagship-event.entity';
 import fs from 'fs';
@@ -19,13 +20,13 @@ interface UploadedImage {
 }
 
 export class GalleryService {
-  private galleryRepository: Repository<GalleryImage>;
+  private galleryRepository: Repository<Gallery>;
   private versionRepository: Repository<FlagshipEventVersion>;
   private dataSource: DataSource;
 
   constructor(dataSource: DataSource) {
     this.dataSource = dataSource;
-    this.galleryRepository = dataSource.getRepository(GalleryImage);
+    this.galleryRepository = dataSource.getRepository(Gallery);
     this.versionRepository = dataSource.getRepository(FlagshipEventVersion);
   }
 
@@ -37,27 +38,29 @@ export class GalleryService {
     return version;
   }
 
-  private async getImageCount(versionId: string): Promise<number> {
-    return await this.galleryRepository.count({ where: { flagshipEventVersionId: versionId } });
-  }
-
-  private async validateImageCount(versionId: string, additionalCount: number = 0): Promise<void> {
-    const currentCount = await this.getImageCount(versionId);
-    const totalCount = currentCount + additionalCount;
-
-    if (totalCount < MIN_IMAGES) {
+  private validateImageCount(count: number): void {
+    if (count < MIN_IMAGES) {
       throw new AppError(`Please upload at least ${MIN_IMAGES} image to the gallery.`, 400);
     }
-
-    if (totalCount > MAX_IMAGES) {
+    if (count > MAX_IMAGES) {
       throw new AppError(`A maximum of ${MAX_IMAGES} images can be uploaded to the gallery.`, 400);
     }
   }
 
+  private async getByVersionOrNull(versionId: string): Promise<Gallery | null> {
+    return await this.galleryRepository.findOne({
+      where: { flagshipEventVersionId: versionId },
+    });
+  }
+
+  /**
+   * Add images to a version's gallery. Creates the version's gallery row if it
+   * does not exist yet, otherwise appends to the existing `images` array.
+   */
   async create(
-    data: CreateGalleryDto & { uploadedImages?: any[] },
+    data: CreateGalleryDto & { uploadedImages?: UploadedImage[] },
     userId: string
-  ): Promise<GalleryImage[]> {
+  ): Promise<Gallery> {
     const uploadedImages = data.uploadedImages || [];
 
     logger.info(`Creating gallery images for version: ${data.flagshipEventVersionId}`, {
@@ -71,37 +74,41 @@ export class GalleryService {
       throw new AppError('Please upload at least one image to the gallery.', 400);
     }
 
-    if (uploadedImages.length > MAX_IMAGES) {
-      throw new AppError(`A maximum of ${MAX_IMAGES} images can be uploaded to the gallery.`, 400);
+    let gallery = await this.getByVersionOrNull(data.flagshipEventVersionId);
+    const existingImages = gallery?.images || [];
+
+    const newImages: GalleryImageItem[] = uploadedImages.map((uploadedImage) => ({
+      id: uuidv4(),
+      imagePath: uploadedImage.localUrl,
+      cloudImageUrl: uploadedImage.cloudUrl,
+      link: data.link || null,
+    }));
+
+    const combined = [...existingImages, ...newImages];
+    this.validateImageCount(combined.length);
+
+    if (gallery) {
+      gallery.images = combined;
+      gallery.modifiedById = userId;
+    } else {
+      gallery = new Gallery();
+      gallery.flagshipEventVersionId = data.flagshipEventVersionId;
+      gallery.images = combined;
+      gallery.createdById = userId;
     }
 
-    await this.validateImageCount(data.flagshipEventVersionId, uploadedImages.length);
+    const saved = await this.galleryRepository.save(gallery);
 
-    const savedImages: GalleryImage[] = [];
-
-    for (const uploadedImage of uploadedImages) {
-      const image = new GalleryImage();
-      image.flagshipEventVersionId = data.flagshipEventVersionId;
-  
-      image.imagePath = uploadedImage.localUrl;
-      image.cloudImageUrl = uploadedImage.cloudUrl;
-      image.link = data.link || undefined;
-      image.createdById = userId;
-
-      const savedImage = await this.galleryRepository.save(image);
-      savedImages.push(savedImage);
-    }
-
-    logger.info(`Created ${savedImages.length} gallery images`, {
+    logger.info(`Gallery now holds ${saved.images.length} images`, {
       module: 'GalleryService',
       versionId: data.flagshipEventVersionId,
     });
 
-    return savedImages;
+    return saved;
   }
 
-  async findAll(query: { version_id?: string; page?: number; limit?: number }): Promise<{ items: GalleryImage[]; meta: any }> {
-    logger.debug('Fetching all gallery images', {
+  async findAll(query: { version_id?: string; page?: number; limit?: number }): Promise<{ items: Gallery[]; meta: any }> {
+    logger.debug('Fetching gallery rows', {
       module: 'GalleryService',
       query,
     });
@@ -129,25 +136,31 @@ export class GalleryService {
     };
   }
 
-  async findById(id: string): Promise<GalleryImage> {
-    const image = await this.galleryRepository.findOne({
-      where: { id },
+  async findByVersion(versionId: string): Promise<Gallery> {
+    const gallery = await this.galleryRepository.findOne({
+      where: { flagshipEventVersionId: versionId },
       relations: ['flagshipEventVersion'],
     });
 
-    if (!image) {
-      throw new AppError('Gallery image not found', 404);
+    if (!gallery) {
+      throw new AppError('Gallery not found for this version', 404);
     }
 
-    return image;
+    return gallery;
   }
 
+  /**
+   * Replace a version's image list with the submitted one. The `items` array is
+   * the desired final state: items with an `id` are kept (link updated), items
+   * without an `id` consume the next uploaded file (matched by order), and any
+   * existing image absent from `items` is removed (file deleted from storage).
+   */
   async bulkUpdate(
     versionId: string,
     data: { items: BulkUpdateGalleryDto; uploadedImages?: UploadedImage[] },
     userId: string
-  ): Promise<GalleryImage[]> {
-    logger.info(`Bulk updating gallery images for version: ${versionId}`, {
+  ): Promise<Gallery> {
+    logger.info(`Bulk updating gallery for version: ${versionId}`, {
       module: 'GalleryService',
       submittedCount: data.items.length,
     });
@@ -156,116 +169,130 @@ export class GalleryService {
 
     const uploadedImages: UploadedImage[] = data.uploadedImages || [];
 
-    const existingImages = await this.galleryRepository.find({
-      where: { flagshipEventVersionId: versionId },
-    });
+    const gallery = await this.getByVersionOrNull(versionId);
+    const existingImages = gallery?.images || [];
 
-    const existingImageIds = new Set(existingImages.map(img => img.id));
-    const results: GalleryImage[] = [];
+    const keptIds = new Set<string>();
+    const nextImages: GalleryImageItem[] = [];
     let fileIndex = 0;
 
     for (const item of data.items) {
       if (item.id) {
-        const existingImage = existingImages.find(img => img.id === item.id);
-
-        if (existingImage) {
+        const existing = existingImages.find((img) => img.id === item.id);
+        if (existing) {
           if (item.link !== undefined) {
-            existingImage.link = item.link;
-            existingImage.modifiedById = userId;
+            existing.link = item.link;
           }
-          const updated = await this.galleryRepository.save(existingImage);
-          results.push(updated);
-          existingImageIds.delete(item.id);
+          nextImages.push(existing);
+          keptIds.add(existing.id);
         }
       } else {
         if (fileIndex < uploadedImages.length) {
-          const newUploadedImage = uploadedImages[fileIndex];
-
-          const newImage = new GalleryImage();
-          newImage.flagshipEventVersionId = versionId;
-          newImage.imagePath = newUploadedImage.localUrl;
-          newImage.cloudImageUrl = newUploadedImage.cloudUrl;
-          newImage.link = item.link || undefined;
-          newImage.createdById = userId;
-
-          const saved = await this.galleryRepository.save(newImage);
-          results.push(saved);
+          const uploaded = uploadedImages[fileIndex];
+          nextImages.push({
+            id: uuidv4(),
+            imagePath: uploaded.localUrl,
+            cloudImageUrl: uploaded.cloudUrl,
+            link: item.link || null,
+          });
           fileIndex++;
         }
       }
     }
 
-    // Clean up unused new uploads (orphans) - e.g. if user sent more files than needed
+    // Clean up unused new uploads (orphans) - e.g. if more files were sent than referenced
     for (let i = fileIndex; i < uploadedImages.length; i++) {
       const orphan = uploadedImages[i];
-      await this.deleteFileFromDisk(versionId, orphan.localPath, orphan.cloudUrl);
+      await this.deleteFileFromDisk(versionId, orphan.localUrl, orphan.cloudUrl);
     }
 
-    // Identify images removed from the list to delete them
-    for (const imageId of existingImageIds) {
-      const imageToDelete = existingImages.find(img => img.id === imageId);
-      if (imageToDelete) {
-        await this.deleteFileFromDisk(imageToDelete.flagshipEventVersionId, imageToDelete.imagePath, imageToDelete.cloudImageUrl);
-        await this.galleryRepository.remove(imageToDelete);
+    // Delete files for images that were dropped from the list
+    for (const img of existingImages) {
+      if (!keptIds.has(img.id)) {
+        await this.deleteFileFromDisk(versionId, img.imagePath, img.cloudImageUrl);
       }
     }
 
-    if (results.length < MIN_IMAGES) {
-      throw new AppError(`Please upload at least ${MIN_IMAGES} image to the gallery.`, 400);
+    this.validateImageCount(nextImages.length);
+
+    let saved: Gallery;
+    if (gallery) {
+      gallery.images = nextImages;
+      gallery.modifiedById = userId;
+      saved = await this.galleryRepository.save(gallery);
+    } else {
+      const created = new Gallery();
+      created.flagshipEventVersionId = versionId;
+      created.images = nextImages;
+      created.createdById = userId;
+      saved = await this.galleryRepository.save(created);
     }
 
-    if (results.length > MAX_IMAGES) {
-      throw new AppError(`A maximum of ${MAX_IMAGES} images can be uploaded to the gallery.`, 400);
-    }
-
-    logger.info(`Bulk update complete. Final count: ${results.length}`, {
+    logger.info(`Bulk update complete. Final count: ${saved.images.length}`, {
       module: 'GalleryService',
       versionId,
     });
 
-    return results;
+    return saved;
   }
 
-  async delete(id: string, userId: string): Promise<void> {
-    logger.warn(`Deleting gallery image: ${id}`, {
+  /**
+   * Remove a single image from a version's gallery (by the image's array id).
+   */
+  async deleteImage(versionId: string, imageId: string, userId: string): Promise<Gallery> {
+    logger.warn(`Deleting gallery image ${imageId} from version: ${versionId}`, {
       module: 'GalleryService',
     });
 
-    const image = await this.findById(id);
-    const versionId = image.flagshipEventVersionId;
+    const gallery = await this.findByVersion(versionId);
 
-    const finalCount = await this.getImageCount(versionId);
-    if (finalCount - 1 < MIN_IMAGES) {
+    const target = gallery.images.find((img) => img.id === imageId);
+    if (!target) {
+      throw new AppError('Gallery image not found', 404);
+    }
+
+    if (gallery.images.length - 1 < MIN_IMAGES) {
       throw new AppError(`Please upload at least ${MIN_IMAGES} image to the gallery.`, 400);
     }
 
-    await this.deleteFileFromDisk(image.flagshipEventVersionId, image.imagePath, image.cloudImageUrl);
+    await this.deleteFileFromDisk(versionId, target.imagePath, target.cloudImageUrl);
 
-    await this.galleryRepository.remove(image);
+    gallery.images = gallery.images.filter((img) => img.id !== imageId);
+    gallery.modifiedById = userId;
+    const saved = await this.galleryRepository.save(gallery);
 
-    logger.info(`Gallery image deleted: ${id}`, {
+    logger.info(`Gallery image deleted: ${imageId}`, {
       module: 'GalleryService',
     });
+
+    return saved;
   }
 
-  async deleteByVersion(versionId: string, userId: string): Promise<void> {
-    logger.warn(`Deleting all gallery images for version: ${versionId}`, {
+  async deleteByVersion(versionId: string, userId: string, manager?: EntityManager): Promise<void> {
+    logger.warn(`Deleting gallery for version: ${versionId}`, {
       module: 'GalleryService',
     });
 
-    await this.validateVersion(versionId);
-
-    const images = await this.galleryRepository.find({
-      where: { flagshipEventVersionId: versionId },
-    });
-
-    for (const image of images) {
-      await this.deleteFileFromDisk(image.flagshipEventVersionId, image.imagePath, image.cloudImageUrl);
+    // Skip the existence check when cascading from a version delete (the version
+    // is being removed in the same transaction); keep it for the standalone endpoint.
+    if (!manager) {
+      await this.validateVersion(versionId);
     }
 
-    await this.galleryRepository.remove(images);
+    const repo = manager ? manager.getRepository(Gallery) : this.galleryRepository;
 
-    logger.info(`Deleted ${images.length} gallery images for version: ${versionId}`, {
+    const gallery = await repo.findOne({ where: { flagshipEventVersionId: versionId } });
+    if (!gallery) {
+      return;
+    }
+
+    for (const img of gallery.images) {
+      await this.deleteFileFromDisk(versionId, img.imagePath, img.cloudImageUrl);
+    }
+
+    await repo.remove(gallery);
+
+    logger.info(`Deleted gallery (${gallery.images.length} images) for version: ${versionId}`, {
       module: 'GalleryService',
     });
   }
@@ -278,13 +305,13 @@ export class GalleryService {
         const version = await this.versionRepository.findOne({ where: { id: versionId } });
         const versionName = version?.version_name || versionId;
         const publicId = `assets/${versionName}/gallery/${filename}`;
-        
+
         await cloudinary.uploader.destroy(publicId);
         logger.info(`Deleted from Cloudinary: ${publicId}`, {
           module: 'GalleryService',
         });
       }
-      
+
       let fullPath = imagePath;
       if (imagePath.startsWith('/public')) {
         fullPath = path.join(process.cwd(), imagePath);
@@ -306,4 +333,3 @@ export class GalleryService {
     }
   }
 }
-

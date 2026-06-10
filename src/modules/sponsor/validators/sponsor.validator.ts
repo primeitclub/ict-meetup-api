@@ -7,6 +7,7 @@ export const baseSponsorSchema = z.object({
       categoryId: z.uuid(),
       versionId: z.uuid(),
       imagePath: z.string().min(1).max(255),
+      imageUrl: z.string().optional(),
       displayOrder: z.preprocess(
             (val) => (typeof val === 'string' ? Number(val) : val),
             z.number().int().min(0).max(100).default(0)

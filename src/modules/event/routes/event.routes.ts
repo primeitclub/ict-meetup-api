@@ -90,7 +90,7 @@ const createEventRouter = (dataSource: DataSource) => {
        *       401:
        *         description: Unauthorized
        */
-      router.patch('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(updateEventSchema), eventController.update);
+      router.patch('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false, optional: true }), validateRequestBody(updateEventSchema), eventController.update);
 
       /**
        * @swagger

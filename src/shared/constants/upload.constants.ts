@@ -9,4 +9,4 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   "image/x-png",
 ];
 
-export const MAX_IMAGE_SIZE = 150 * 1024;
+export const MAX_IMAGE_SIZE = 2 * 1024 * 1024;

@@ -1,7 +1,11 @@
-import { Router } from 'express';
-import { DataSource } from 'typeorm';
-import { TeamMemberController } from '../controllers/team-member.controller';
-import { validateRequestBody, validateRequestQuery, validateRequestParams } from '../../../shared/validators/request.validator';
+import { Router } from "express";
+import { DataSource } from "typeorm";
+import { TeamMemberController } from "../controllers/team-member.controller";
+import {
+  validateRequestBody,
+  validateRequestQuery,
+  validateRequestParams,
+} from "../../../shared/validators/request.validator";
 import {
   createTeamMemberSchema,
   updateTeamMemberSchema,
@@ -11,10 +15,15 @@ import {
   updateTeamMemberDesignationSchema,
   teamMemberDesignationIdParamSchema,
   teamMemberDesignationQuerySchema,
-} from '../validators/team-member.validator';
-import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
-import { imageUploadHandler } from '../../../shared/utils/helpers/imageUpload.helper';
-import { categoryIdParamSchema, categoryQuerySchema, createCategorySchema, updateCategorySchema } from '../../category/validators/category.validator';
+} from "../validators/team-member.validator";
+import { createAuthenticate } from "../../../shared/middlewares/auth.middleware";
+import { imageUploadHandler } from "../../../shared/utils/helpers/imageUpload.helper";
+import {
+  categoryIdParamSchema,
+  categoryQuerySchema,
+  createCategorySchema,
+  updateCategorySchema,
+} from "../../category/validators/category.validator";
 
 const createTeamMemberRouter = (dataSource: DataSource) => {
   const router = Router();
@@ -51,7 +60,13 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       201:
    *         description: Created
    */
-  router.post('/', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestBody(createTeamMemberSchema), controller.create);
+  router.post(
+    "/",
+    authenticate,
+    imageUploadHandler({ fieldName: "image", multiple: false }),
+    validateRequestBody(createTeamMemberSchema),
+    controller.create,
+  );
 
   /**
    * @swagger
@@ -85,7 +100,11 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.get('/', validateRequestQuery(teamMemberQuerySchema), controller.getAll);
+  router.get(
+    "/",
+    validateRequestQuery(teamMemberQuerySchema),
+    controller.getAll,
+  );
 
   /**
    * @swagger
@@ -108,7 +127,12 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       201:
    *         description: Created
    */
-  router.post('/category', authenticate, validateRequestBody(createCategorySchema), controller.createForCategory);
+  router.post(
+    "/category",
+    authenticate,
+    validateRequestBody(createCategorySchema),
+    controller.createForCategory,
+  );
 
   /**
    * @swagger
@@ -116,7 +140,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *   get:
    *     summary: Get all team categories
    *     tags: [TeamMemberCategories]
-   *     parameters: 
+   *     parameters:
    *       - in: query
    *         name: page
    *         schema: { type: number , default: 1 }
@@ -136,7 +160,32 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.get('/category', validateRequestQuery(categoryQuerySchema), controller.getAllForCategory);
+  router.get(
+    "/category",
+    validateRequestQuery(categoryQuerySchema),
+    controller.getAllForCategory,
+  );
+
+  /**
+   * @swagger
+   * /api/team-members/category/{id}:
+   *   get:
+   *     summary: Get a team category by ID
+   *     tags: [TeamMemberCategories]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema: { type: string, format: uuid }
+   *     responses:
+   *       200:
+   *         description: OK
+   */
+  router.get(
+    "/category/:id",
+    validateRequestParams(categoryIdParamSchema),
+    controller.getByIdForCategory,
+  );
 
   /**
    * @swagger
@@ -162,7 +211,13 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.patch('/category/:id', authenticate, validateRequestParams(categoryIdParamSchema), validateRequestBody(updateCategorySchema), controller.updateForCategory);
+  router.patch(
+    "/category/:id",
+    authenticate,
+    validateRequestParams(categoryIdParamSchema),
+    validateRequestBody(updateCategorySchema),
+    controller.updateForCategory,
+  );
 
   /**
    * @swagger
@@ -179,8 +234,12 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.delete('/category/:id', authenticate, validateRequestParams(categoryIdParamSchema), controller.deleteForCategory);
-
+  router.delete(
+    "/category/:id",
+    authenticate,
+    validateRequestParams(categoryIdParamSchema),
+    controller.deleteForCategory,
+  );
 
   /**
    * @swagger
@@ -194,15 +253,19 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *         application/json:
    *           schema:
    *             type: object
-   *             required: [name, versionId]
+   *             required: [name]
    *             properties:
    *               name: { type: string, minLength: 1, maxLength: 150 }
-   *               versionId: { type: string, format: uuid }
    *     responses:
    *       201:
    *         description: Created
    */
-  router.post('/designation', authenticate, validateRequestBody(createTeamMemberDesignationSchema), controller.createForDesignation);
+  router.post(
+    "/designation",
+    authenticate,
+    validateRequestBody(createTeamMemberDesignationSchema),
+    controller.createForDesignation,
+  );
 
   /**
    * @swagger
@@ -210,7 +273,7 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *   get:
    *     summary: Get all team member designations
    *     tags: [TeamMemberDesignations]
-   *     parameters: 
+   *     parameters:
    *       - in: query
    *         name: page
    *         schema: { type: number , default: 1}
@@ -226,13 +289,38 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       - in: query
    *         name: sortOrder
    *         schema: { type: string }
-   *     responses:  
+   *     responses:
    *       200:
    *         description: OK
    * */
-  router.get('/designation', validateRequestQuery(teamMemberDesignationQuerySchema), controller.getAllForDesignation);
+  router.get(
+    "/designation",
+    validateRequestQuery(teamMemberDesignationQuerySchema),
+    controller.getAllForDesignation,
+  );
 
-  /** 
+  /**
+   * @swagger
+   * /api/team-members/designation/{id}:
+   *   get:
+   *     summary: Get a team member designation by ID
+   *     tags: [TeamMemberDesignations]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema: { type: string, format: uuid }
+   *     responses:
+   *       200:
+   *         description: OK
+   */
+  router.get(
+    "/designation/:id",
+    validateRequestParams(teamMemberDesignationIdParamSchema),
+    controller.getByIdForDesignation,
+  );
+
+  /**
    * @swagger
    * /api/team-members/designation/{id}:
    *   patch:
@@ -254,7 +342,13 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    * */
-  router.patch('/designation/:id', authenticate, validateRequestParams(teamMemberDesignationIdParamSchema), validateRequestBody(updateTeamMemberDesignationSchema), controller.updateForDesignation);
+  router.patch(
+    "/designation/:id",
+    authenticate,
+    validateRequestParams(teamMemberDesignationIdParamSchema),
+    validateRequestBody(updateTeamMemberDesignationSchema),
+    controller.updateForDesignation,
+  );
 
   /**
    * @swagger
@@ -271,7 +365,12 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.delete('/designation/:id', authenticate, validateRequestParams(teamMemberDesignationIdParamSchema), controller.deleteForDesignation);
+  router.delete(
+    "/designation/:id",
+    authenticate,
+    validateRequestParams(teamMemberDesignationIdParamSchema),
+    controller.deleteForDesignation,
+  );
 
   /**
    * @swagger
@@ -288,7 +387,11 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.get('/:id', validateRequestParams(teamMemberIdParamSchema), controller.getById);
+  router.get(
+    "/:id",
+    validateRequestParams(teamMemberIdParamSchema),
+    controller.getById,
+  );
 
   /**
    * @swagger
@@ -323,7 +426,14 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.patch('/:id', authenticate, imageUploadHandler({ fieldName: 'image', multiple: false }), validateRequestParams(teamMemberIdParamSchema), validateRequestBody(updateTeamMemberSchema), controller.update);
+  router.patch(
+    "/:id",
+    authenticate,
+    imageUploadHandler({ fieldName: "image", multiple: false, optional: true }),
+    validateRequestParams(teamMemberIdParamSchema),
+    validateRequestBody(updateTeamMemberSchema),
+    controller.update,
+  );
 
   /**
    * @swagger
@@ -340,7 +450,12 @@ const createTeamMemberRouter = (dataSource: DataSource) => {
    *       200:
    *         description: OK
    */
-  router.delete('/:id', authenticate, validateRequestParams(teamMemberIdParamSchema), controller.delete);
+  router.delete(
+    "/:id",
+    authenticate,
+    validateRequestParams(teamMemberIdParamSchema),
+    controller.delete,
+  );
   return router;
 };
 
