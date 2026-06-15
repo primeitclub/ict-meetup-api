@@ -21,14 +21,14 @@ export class FaqController extends BaseController {
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.CREATE,
-        "Faq created successfully",
-        result.id,
+        `${result.length} faq(s) created successfully`,
+        req.body.versionId,
         AuditLogScope.FAQ,
         req.ip,
         userId
       );
       return responseHandler(res)(
-        'Faq created successfully',
+        'Faqs created successfully',
         result,
         201
       );
@@ -42,6 +42,19 @@ export class FaqController extends BaseController {
       const result = await this.service.findAll(req.query);
       return responseHandler(res)(
         'Faqs fetched successfully',
+        result,
+        200
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAllGrouped = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.service.findAllGroupedByVersion();
+      return responseHandler(res)(
+        'Faqs grouped by version fetched successfully',
         result,
         200
       );
@@ -66,22 +79,19 @@ export class FaqController extends BaseController {
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any).user?.id || 'system';
-      const result = await this.service.update(
-        req.params.id,
-        req.body,
-        userId
-      );
+      const { versionId, faqs } = req.body;
+      const result = await this.service.syncByVersion(versionId, faqs, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.UPDATE,
-        "Faq updated successfully",
-        result.id,
+        `${result.length} faq(s) updated successfully`,
+        versionId,
         AuditLogScope.FAQ,
         req.ip,
         userId
       );
       return responseHandler(res)(
-        'Faq updated successfully',
+        'Faqs updated successfully',
         result,
         200
       );
@@ -90,22 +100,4 @@ export class FaqController extends BaseController {
     }
   };
 
-  delete = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId = (req as any).user?.id || 'system';
-      await this.service.delete(req.params.id, userId);
-      await this.createAuditLog(
-        AuditLogType.INFO,
-        AuditLogActionType.DELETE,
-        "Faq deleted successfully",
-        req.params.id,
-        AuditLogScope.FAQ,
-        req.ip,
-        userId
-      );
-      return responseHandler(res)('Faq deleted successfully', null, 200);
-    } catch (error) {
-      next(error);
-    }
-  };
 }

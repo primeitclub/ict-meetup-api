@@ -6,7 +6,6 @@ import { CategoryService } from '../../category/services/category.service';
 import { DesignationService } from '../../designation/services/designation.service';
 import { AuditLogActionType, AuditLogScope, AuditLogType } from '../../../shared/constants/audit-log.constants';
 import { BaseController } from '../../../shared/base/base.controller';
-import { FlagshipEventVersionService } from '../../flagship-event/services/flagship-event.service';
 import { removeFile } from '../../../shared/utils/helpers/imageUpload.helper';
 import { CategoryType } from '../../category/entities/category.entity';
 
@@ -14,7 +13,6 @@ export class TeamMemberController extends BaseController {
   private service: TeamMemberService;
   private serviceForCategory: CategoryService;
   private serviceForDesignation: DesignationService;
-  private flagshipEventVersion: FlagshipEventVersionService;
   protected moduleName = 'TeamMemberService';
 
   constructor(dataSource: DataSource) {
@@ -22,7 +20,6 @@ export class TeamMemberController extends BaseController {
     this.service = new TeamMemberService(dataSource);
     this.serviceForCategory = new CategoryService(dataSource);
     this.serviceForDesignation = new DesignationService(dataSource);
-    this.flagshipEventVersion = new FlagshipEventVersionService(dataSource)
   }
 
   create = async (req: Request, res: Response, next: NextFunction) => {
@@ -220,19 +217,28 @@ export class TeamMemberController extends BaseController {
     }
   };
 
+  getByIdForCategory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.serviceForCategory.findById(req.params.id);
+      return responseHandler(res)(
+        'Category fetched successfully',
+        result,
+        200
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
   createForDesignation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId || 'system';
-      const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-      if (!isVersionExist) {
-        return responseHandler(res)('Version not found', null, 404);
-      }
       const result = await this.serviceForDesignation.create(req.body, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.CREATE,
         `Designation ${result.id} created successfully`,
-        req.body.versionId,
+        null,
         AuditLogScope.TEAM_MEMBERS,
         req.ip,
         userId
@@ -250,10 +256,6 @@ export class TeamMemberController extends BaseController {
   updateForDesignation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId || 'system';
-      const isVersionExist = await this.flagshipEventVersion.findById(req.body.versionId);
-      if (!isVersionExist) {
-        return responseHandler(res)('Version not found', null, 404);
-      }
       const result = await this.serviceForDesignation.update(
         req.params.id,
         req.body,
@@ -263,7 +265,7 @@ export class TeamMemberController extends BaseController {
         AuditLogType.INFO,
         AuditLogActionType.UPDATE,
         `Designation ${req.params.id} updated successfully`,
-        req.body.versionId,
+        null,
         AuditLogScope.TEAM_MEMBERS,
         req.ip,
         userId
@@ -281,17 +283,12 @@ export class TeamMemberController extends BaseController {
   deleteForDesignation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId || 'system';
-      const { versionId } = req.query as any;
-      const isVersionExist = await this.flagshipEventVersion.findById(versionId);
-      if (!isVersionExist) {
-        return responseHandler(res)('Version not found', null, 404);
-      }
       await this.serviceForDesignation.delete(req.params.id, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
         AuditLogActionType.DELETE,
         `Designation ${req.params.id} deleted successfully`,
-        versionId,
+        null,
         AuditLogScope.TEAM_MEMBERS,
         req.ip,
         userId
@@ -310,6 +307,19 @@ export class TeamMemberController extends BaseController {
       }
       return responseHandler(res)(
         'Designations fetched successfully',
+        result,
+        200
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getByIdForDesignation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.serviceForDesignation.findOne(req.params.id);
+      return responseHandler(res)(
+        'Designation fetched successfully',
         result,
         200
       );

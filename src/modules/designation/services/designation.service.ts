@@ -59,9 +59,8 @@ export class DesignationService {
                               throw new AppError('Designation already exists', 400);
                         }
                   }
-                  const { versionId, ...updateData } = data;
                   const payload = {
-                        ...updateData,
+                        ...data,
                         modifiedById: userId
                   }
                   const designation = await this.designationRepository.update(id, payload);

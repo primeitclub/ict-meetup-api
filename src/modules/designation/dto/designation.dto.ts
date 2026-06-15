@@ -1,5 +1,4 @@
 export class DesignationDto {
-      versionId: string;
       name: string;
 }
 

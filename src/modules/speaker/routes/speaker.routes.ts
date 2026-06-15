@@ -148,7 +148,7 @@ const createSpeakerRouter = (dataSource: DataSource) => {
        *       404:
        *         description: Speaker not found
        */
-      router.delete('/:id', authenticate, validateRequestQuery(deleteSpeakerQuerySchema), controller.delete);
+      router.delete('/:id', authenticate, controller.delete);
 
       return router;
 }

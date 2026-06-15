@@ -36,10 +36,11 @@ export const galleryVersionParamSchema = z.object({
 });
 
 
-export const galleryIdParamSchema = z.object({
-  id: z.string().uuid(),
+// Used by the per-image delete route: /:version_id/images/:image_id
+export const galleryImageParamSchema = z.object({
+  version_id: z.string().uuid(),
+  image_id: z.string().uuid(),
 });
 
 export type CreateGalleryDto = z.infer<typeof createGallerySchema>;
 export type BulkUpdateGalleryDto = z.infer<typeof bulkUpdateGallerySchema>['data'];
-

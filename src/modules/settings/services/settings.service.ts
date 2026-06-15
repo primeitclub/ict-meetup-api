@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { AppError } from '../../../shared/utils/error.utils';
 import logger from '../../../shared/utils/logger.utils';
 import { Settings } from '../entities/settings.entity';
@@ -86,6 +86,13 @@ export class SettingsService {
         totalPages: Math.ceil(total / Number(limit)),
       }
     };
+  }
+
+  async findByVersion(versionId: string): Promise<Settings | null> {
+    return this.settingsRepository.findOne({
+      where: { versionId },
+      relations: ['flagshipEventVersion'],
+    });
   }
 
   async findById(id: string): Promise<Settings> {
@@ -177,6 +184,25 @@ export class SettingsService {
     settings.modifiedById = userId;
 
     return await this.settingsRepository.save(settings);
+  }
+
+  // Delete the settings row belonging to a version (cascade on version delete),
+  // cleaning up the QR code asset. Pass `manager` to run inside the
+  // version-delete transaction.
+  async deleteByVersion(versionId: string, manager?: EntityManager): Promise<void> {
+    const repo = manager ? manager.getRepository(Settings) : this.settingsRepository;
+    const rows = await repo.find({ where: { versionId } });
+    if (!rows.length) return;
+
+    logger.warn(`Deleting settings for version ${versionId}`, {
+      module: 'SettingsService',
+    });
+
+    for (const row of rows) {
+      await this.deleteFiles(row.qrCodeLocalPath, row.qrCodePath);
+    }
+
+    await repo.remove(rows);
   }
 
   private async deleteFiles(localPath?: string, publicId?: string): Promise<void> {

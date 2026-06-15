@@ -7,6 +7,7 @@ export const createSpeakerSchema = z.object({
       company: z.string().trim().optional(),
       versionId: z.uuid(),
       imagePath: z.string().min(1,'Image path is required'),
+      imageUrl: z.string().optional(),
       displayOrder: z.preprocess(
             (val) => (val === "" || val === undefined || val === null ? undefined : val),
             z.coerce.number().int().min(1, 'Display order must be positive').optional().default(0)

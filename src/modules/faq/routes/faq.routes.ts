@@ -19,7 +19,7 @@ const createFaqRouter = (dataSource: DataSource) => {
    * @swagger
    * /api/faqs:
    *   post:
-   *     summary: Create a new faq
+   *     summary: Create faqs for a version (bulk)
    *     tags: [FAQs]
    *     requestBody:
    *       required: true
@@ -27,11 +27,18 @@ const createFaqRouter = (dataSource: DataSource) => {
    *         application/json:
    *           schema:
    *             type: object
-   *             required: [versionId, title]
+   *             required: [versionId, faqs]
    *             properties:
    *               versionId: { type: string, format: uuid }
-   *               title: { type: string, minLength: 1, maxLength: 255 }
-   *               description: { type: string }
+   *               faqs:
+   *                 type: array
+   *                 minItems: 1
+   *                 items:
+   *                   type: object
+   *                   required: [title, description]
+   *                   properties:
+   *                     title: { type: string, minLength: 1, maxLength: 255 }
+   *                     description: { type: string, minLength: 1, maxLength: 1000 }
    *     responses:
    *       201:
    *         description: Created
@@ -56,6 +63,18 @@ const createFaqRouter = (dataSource: DataSource) => {
 
   /**
    * @swagger
+   * /api/faqs/grouped:
+   *   get:
+   *     summary: Get all faqs grouped by version
+   *     tags: [FAQs]
+   *     responses:
+   *       200:
+   *         description: OK
+   */
+  router.get('/grouped', controller.getAllGrouped);
+
+  /**
+   * @swagger
    * /api/faqs/{id}:
    *   get:
    *     summary: Get faq by ID
@@ -73,46 +92,33 @@ const createFaqRouter = (dataSource: DataSource) => {
 
   /**
    * @swagger
-   * /api/faqs/{id}:
+   * /api/faqs:
    *   put:
-   *     summary: Update a faq
+   *     summary: Sync faqs for a version (update existing, add new, remove omitted)
    *     tags: [FAQs]
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema: { type: string, format: uuid }
    *     requestBody:
+   *       required: true
    *       content:
    *         application/json:
    *           schema:
    *             type: object
+   *             required: [versionId, faqs]
    *             properties:
    *               versionId: { type: string, format: uuid }
-   *               title: { type: string, minLength: 1, maxLength: 255 }
-   *               description: { type: string }
+   *               faqs:
+   *                 type: array
+   *                 items:
+   *                   type: object
+   *                   required: [title, description]
+   *                   properties:
+   *                     id: { type: string, format: uuid, description: "Omit for new faqs" }
+   *                     title: { type: string, minLength: 1, maxLength: 255 }
+   *                     description: { type: string, minLength: 1, maxLength: 1000 }
    *     responses:
    *       200:
    *         description: OK
    */
-  router.put('/:id', authenticate, validateRequestBody(updateFaqSchema), controller.update);
-
-  /**
-   * @swagger
-   * /api/faqs/{id}:
-   *   delete:
-   *     summary: Delete a faq
-   *     tags: [FAQs]
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema: { type: string, format: uuid }
-   *     responses:
-   *       200:
-   *         description: OK
-   */
-  router.delete('/:id', authenticate, controller.delete);
+  router.put('/', authenticate, validateRequestBody(updateFaqSchema), controller.update);
 
   return router;
 };

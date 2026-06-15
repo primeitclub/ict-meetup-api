@@ -50,6 +50,53 @@ export class SettingsController extends BaseController {
     }
   };
 
+  getContacts = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { versionId } = req.query as { versionId: string };
+      const settings = await this.service.findByVersion(versionId);
+      if (!settings) {
+        return responseHandler(res)('No settings found for this version', null, 404);
+      }
+      return responseHandler(res)('Contact settings fetched successfully', {
+        email: settings.email,
+        phoneNumber: settings.phoneNumber,
+        teamName: settings.teamName,
+      }, 200);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getSocialMedia = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { versionId } = req.query as { versionId: string };
+      const settings = await this.service.findByVersion(versionId);
+      if (!settings) {
+        return responseHandler(res)('No settings found for this version', null, 404);
+      }
+      return responseHandler(res)('Social media settings fetched successfully', {
+        socialMediaLinks: settings.socialMediaLinks,
+      }, 200);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getPayments = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { versionId } = req.query as { versionId: string };
+      const settings = await this.service.findByVersion(versionId);
+      if (!settings) {
+        return responseHandler(res)('No settings found for this version', null, 404);
+      }
+      return responseHandler(res)('Payment settings fetched successfully', {
+        qrCodeUrl: settings.qrCodeUrl,
+      }, 200);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.service.findById(req.params.id);
