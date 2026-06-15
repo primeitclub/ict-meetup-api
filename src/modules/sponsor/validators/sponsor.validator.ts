@@ -3,10 +3,10 @@ import { paginationShape } from '../../../shared/validators/pagination.validator
 
 export const baseSponsorSchema = z.object({
       name: z.string().trim().min(1).max(150),
-      link: z.string().max(255).optional().nullable(),
+      link: z.string().max(2048).optional().nullable(),
       categoryId: z.uuid(),
       versionId: z.uuid(),
-      imagePath: z.string().min(1).max(255),
+      imagePath: z.string().min(1).max(2048),
       imageUrl: z.string().optional(),
       displayOrder: z.preprocess(
             (val) => (typeof val === 'string' ? Number(val) : val),
