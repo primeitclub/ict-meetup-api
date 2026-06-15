@@ -88,6 +88,13 @@ export class SettingsService {
     };
   }
 
+  async findByVersion(versionId: string): Promise<Settings | null> {
+    return this.settingsRepository.findOne({
+      where: { versionId },
+      relations: ['flagshipEventVersion'],
+    });
+  }
+
   async findById(id: string): Promise<Settings> {
     const settings = await this.settingsRepository.findOne({
       where: { id },

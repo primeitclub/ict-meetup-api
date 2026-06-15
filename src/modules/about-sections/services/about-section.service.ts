@@ -30,10 +30,6 @@ export class AboutSectionService {
       throw new AppError('Flagship event version not found', 404);
     }
 
-    if (versionExists.status !== EventVersionStatus.DRAFT) {
-      throw new AppError('Can only create about sections for a flagship event version that is in "draft" status', 400);
-    }
-
     const existing = await this.aboutSectionRepository.findOne({
       where: { versionId: data.versionId },
     });

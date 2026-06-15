@@ -43,7 +43,6 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
        */
       router.post(
             '/',
-            authenticate,
             imageUploadHandler({ fieldName: 'image', multiple: false }),
             (req, _res, next) => {
                   if (req.body.imagePath) {

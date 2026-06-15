@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { DataSource } from 'typeorm';
+import { z } from 'zod';
 import { SettingsController } from '../controllers/settings.controller';
 import { validateRequestBody, validateRequestQuery, validateRequestParams } from '../../../shared/validators/request.validator';
 import {
@@ -10,6 +11,8 @@ import {
 } from '../validators/settings.validator';
 import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
 import { imageUploadHandler } from '../../../shared/utils/helpers/imageUpload.helper';
+
+const versionIdQuerySchema = z.object({ versionId: z.string().uuid() });
 
 const createSettingsRouter = (dataSource: DataSource) => {
   const router = Router();
@@ -60,6 +63,57 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *         description: OK
   */
   router.get('/', validateRequestQuery(settingsQuerySchema), controller.getAll);
+
+  /**
+  * @swagger
+  * /api/settings/contacts:
+  *   get:
+  *     summary: Get contact info (email, phone, teamName) for a version
+  *     tags: [Settings]
+  *     parameters:
+  *       - in: query
+  *         name: versionId
+  *         required: true
+  *         schema: { type: string, format: uuid }
+  *     responses:
+  *       200:
+  *         description: OK
+  */
+  router.get('/contacts', validateRequestQuery(versionIdQuerySchema), controller.getContacts);
+
+  /**
+  * @swagger
+  * /api/settings/social-media:
+  *   get:
+  *     summary: Get social media links for a version
+  *     tags: [Settings]
+  *     parameters:
+  *       - in: query
+  *         name: versionId
+  *         required: true
+  *         schema: { type: string, format: uuid }
+  *     responses:
+  *       200:
+  *         description: OK
+  */
+  router.get('/social-media', validateRequestQuery(versionIdQuerySchema), controller.getSocialMedia);
+
+  /**
+  * @swagger
+  * /api/settings/payments:
+  *   get:
+  *     summary: Get payment QR code URL for a version
+  *     tags: [Settings]
+  *     parameters:
+  *       - in: query
+  *         name: versionId
+  *         required: true
+  *         schema: { type: string, format: uuid }
+  *     responses:
+  *       200:
+  *         description: OK
+  */
+  router.get('/payments', validateRequestQuery(versionIdQuerySchema), controller.getPayments);
 
   /**
   * @swagger

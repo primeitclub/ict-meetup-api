@@ -31,7 +31,7 @@ const baseFlagshipEventVersionSchema = z.object({
       z.enum(["true", "false"]).transform((v) => v === "true"),
     ])
     .default(false),
-  logo: z.string().min(1, "Logo is required"),
+  logo: z.string().optional(),
 });
 
 export const flagshipEventVersionSchema = baseFlagshipEventVersionSchema.refine(

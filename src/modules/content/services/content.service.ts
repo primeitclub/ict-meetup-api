@@ -101,6 +101,8 @@ export class ContentService {
         slug: version.slug,
         name: version.version_name,
         isCurrent,
+        startDate: version.start_date ?? null,
+        endDate: version.end_date ?? null,
       },
       sections: {
         hero: hero.items?.[0] ?? null,

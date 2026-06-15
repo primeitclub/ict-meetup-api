@@ -27,10 +27,6 @@ export class FaqService {
       throw new AppError('Flagship event version not found', 404);
     }
 
-    if (versionExists.status !== EventVersionStatus.DRAFT) {
-      throw new AppError('Can only create faqs for a flagship event version that is in "draft" status', 400);
-    }
-
     const newFaqs = data.faqs.map((item) =>
       this.faqRepository.create({
         versionId: data.versionId,
