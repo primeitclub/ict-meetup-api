@@ -34,15 +34,15 @@ export class FlagshipEventVersionService {
       );
     }
 
-    // Use client-provided values if present, fallback to defaults
+    // is_current is derived from status only — never accepted directly from the client
     const newVersion = this.versionRepository.create({
       ...data,
       status: data.status ?? EventVersionStatus.DRAFT,
-      is_current: data.is_current ?? false,
+      is_current: false,
       createdById: userId,
     });
 
-    // Handle activation if status is ACTIVE
+    // Handle activation if status is ACTIVE (sets is_current = true and clears others)
     if (newVersion.status === EventVersionStatus.ACTIVE) {
       await this.handleStatusTransition(newVersion, EventVersionStatus.ACTIVE);
     }
@@ -115,12 +115,16 @@ export class FlagshipEventVersionService {
       module: "FlagshipEventVersionService",
     });
 
+    // Strip is_current from the incoming data — it must only be set via
+    // handleStatusTransition to guarantee the single-current invariant.
+    const { is_current: _ignored, ...safeData } = data as Partial<FlagshipEventVersion> & { is_current?: boolean };
+
     // Handle status transition if status changes
-    if (data.status && data.status !== version.status) {
-      await this.handleStatusTransition(version, data.status);
+    if (safeData.status && safeData.status !== version.status) {
+      await this.handleStatusTransition(version, safeData.status);
     }
 
-    Object.assign(version, data);
+    Object.assign(version, safeData);
     version.modifiedById = userId;
 
     const updatedVersion = await this.versionRepository.save(version);
@@ -137,15 +141,18 @@ export class FlagshipEventVersionService {
     newStatus: EventVersionStatus,
   ) {
     if (newStatus === EventVersionStatus.ACTIVE) {
-      const currentActive = await this.findCurrent();
-      if (currentActive && currentActive.id !== version.id) {
-        currentActive.status = EventVersionStatus.ARCHIVED;
-        currentActive.is_current = false;
-        await this.versionRepository.save(currentActive);
-        logger.info(`Archived previously active version: ${currentActive.id}`, {
-          module: "FlagshipEventVersionService",
-        });
-      }
+      // Clear ALL versions that currently have is_current = true (handles duplicates too)
+      await this.versionRepository
+        .createQueryBuilder()
+        .update(FlagshipEventVersion)
+        .set({ is_current: false, status: EventVersionStatus.ARCHIVED })
+        .where("is_current = :val AND id != :id", { val: true, id: version.id ?? "" })
+        .execute();
+
+      logger.info(`Cleared previously active version(s) before activating ${version.id ?? "(new)"}`, {
+        module: "FlagshipEventVersionService",
+      });
+
       version.status = EventVersionStatus.ACTIVE;
       version.is_current = true;
     } else if (
@@ -172,7 +179,7 @@ export class FlagshipEventVersionService {
       throw new AppError("Archived versions cannot be deleted", 400);
     }
 
-    logger.warn(`Deleting flagship event version: ${id}`, {
+    logger.warn(`Deleting flagship event version: ${id} (by user: ${userId})`, {
       module: "FlagshipEventVersionService",
     });
 

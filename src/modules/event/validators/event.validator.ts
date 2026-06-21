@@ -19,7 +19,7 @@ export const baseEventSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)"),
   categoryId: z.string(),
   versionId: z.string(),
-  speakerId: z.string().optional(),
+  speakerId: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
   totalSeats: z.coerce.number().min(1).max(100),
   feeType: z.enum([FeeType.FREE, FeeType.PAID]),
   fee: z.string().optional().nullable(),
