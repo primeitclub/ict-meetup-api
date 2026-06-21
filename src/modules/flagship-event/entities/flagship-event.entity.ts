@@ -64,4 +64,10 @@ export class FlagshipEventVersion extends BaseEntity {
     nullable: true,
   })
   logo: string;
+
+  @Column({
+    type: "varchar",
+    nullable: true,
+  })
+  logoPath: string;
 }
