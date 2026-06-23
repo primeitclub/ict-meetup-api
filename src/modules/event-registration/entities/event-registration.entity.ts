@@ -32,8 +32,8 @@ export class EventRegistration extends BaseEntity {
       @Column({ type: "int", nullable: true })
       year: number | null;
 
-      @Column({ type: "varchar", length: 150 })
-      attachedPaymentScreenshot: string;
+      @Column({ type: "varchar", length: 150, nullable: true })
+      attachedPaymentScreenshot: string | null;
 
       @Column({ type: "varchar", length: 150 })
       eventId: string;

@@ -60,7 +60,7 @@ export class EventRegistrationService {
                   skip,
                   take: Number(limit),
                   relations: ['event', 'version'],
-                  select: {
+            select: {
                         id: true,
                         versionId: true,
                         eventId: true,
@@ -73,6 +73,7 @@ export class EventRegistrationService {
                         year: true,
                         attachedPaymentScreenshot: true,
                         status: true,
+                        createdAt: true,
                         event: {
                               id: true,
                               versionId: true,
@@ -94,34 +95,6 @@ export class EventRegistrationService {
             const eventRegistration = await this.eventRegistrationRepository.findOne({
                   where: { id },
                   relations: ['event', 'version'],
-                  select: {
-                        id: true,
-                        versionId: true,
-                        eventId: true,
-                        username: true,
-                        email: true,
-                        contactNumber: true,
-                        isStudent: true,
-                        educationLevel: true,
-                        faculty: true,
-                        year: true,
-                        attachedPaymentScreenshot: true,
-                        status: true,
-                        event: {
-                              id: true,
-                              versionId: true,
-                              title: true,
-                              date: true,
-                              location: true,
-                              fee: true,
-                              feeType: true,
-                        },
-                        version: {
-                              id: true,
-                              version_name: true,
-                              status: true,
-                        },
-                  }
             });
             if (!eventRegistration) {
                   throw new AppError("Event registration not found", 404);
