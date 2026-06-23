@@ -101,6 +101,8 @@ export class ContentService {
         slug: version.slug,
         name: version.version_name,
         isCurrent,
+        logo: version.logo ?? null,
+        logoPath: version.logoPath ?? null,
         startDate: version.start_date ?? null,
         endDate: version.end_date ?? null,
       },
