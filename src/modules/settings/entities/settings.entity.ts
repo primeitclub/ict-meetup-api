@@ -38,4 +38,13 @@ export class Settings extends BaseEntity {
 
   @Column({ name: 'qr_code_local_path', type: 'text', nullable: true })
   qrCodeLocalPath: string;
+
+  @Column({ name: 'club_email', type: 'varchar', length: 255, nullable: true })
+  clubEmail: string;
+
+  @Column({ name: 'club_phone_number', type: 'varchar', length: 20, nullable: true })
+  clubPhoneNumber: string;
+
+  @Column({ name: 'contact_departments', type: 'json', nullable: true })
+  contactDepartments: { department: string; contacts: { name: string; phone: string }[] }[];
 }

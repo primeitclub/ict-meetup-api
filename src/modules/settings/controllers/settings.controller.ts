@@ -61,6 +61,9 @@ export class SettingsController extends BaseController {
         email: settings.email,
         phoneNumber: settings.phoneNumber,
         teamName: settings.teamName,
+        clubEmail: settings.clubEmail,
+        clubPhoneNumber: settings.clubPhoneNumber,
+        contactDepartments: settings.contactDepartments,
       }, 200);
     } catch (error) {
       next(error);

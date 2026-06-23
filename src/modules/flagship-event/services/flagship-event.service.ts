@@ -85,7 +85,15 @@ export class FlagshipEventVersionService {
   }
 
   async findBySlug(slug: string) {
-    const version = await this.versionRepository.findOne({ where: { slug } });
+    let version = await this.versionRepository.findOne({ where: { slug } });
+    if (!version) {
+      // Fallback: search for slug ending with -slug or suffix (e.g. ict-meetup-v7 or ictmeetupv7 matches v7)
+      version = await this.versionRepository.createQueryBuilder("version")
+        .where("version.slug = :slug", { slug })
+        .orWhere("version.slug LIKE :likeSlug", { likeSlug: `%-${slug}` })
+        .orWhere("version.slug LIKE :likeSuffix", { likeSuffix: `%${slug}` })
+        .getOne();
+    }
     if (!version) throw new AppError("Flagship event version not found", 404);
     return version;
   }

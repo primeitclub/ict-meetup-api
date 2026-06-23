@@ -13,6 +13,16 @@ const socialMediaLinkSchema = z.object({
   link: z.string().url(),
 });
 
+const contactPersonSchema = z.object({
+  name: z.string(),
+  phone: z.string(),
+});
+
+const contactDepartmentSchema = z.object({
+  department: z.string(),
+  contacts: z.array(contactPersonSchema),
+});
+
 export const createSettingsSchema = z.object({
   versionId: z.uuid(),
   socialMediaLinks: z.preprocess(
@@ -31,6 +41,21 @@ export const createSettingsSchema = z.object({
   email: z.string().email().optional(),
   phoneNumber: z.string().trim().max(20).optional(),
   teamName: z.string().trim().max(255).optional(),
+  clubEmail: z.string().email().optional(),
+  clubPhoneNumber: z.string().trim().max(20).optional(),
+  contactDepartments: z.preprocess(
+    (val) => {
+      if (typeof val === 'string') {
+        try {
+          return JSON.parse(val);
+        } catch {
+          return val;
+        }
+      }
+      return val;
+    },
+    z.array(contactDepartmentSchema).optional()
+  ),
   qrCodeUrl: z.string().trim().optional(),
   qrCodePath: z.string().trim().optional(),
   qrCodeLocalPath: z.string().trim().optional(),

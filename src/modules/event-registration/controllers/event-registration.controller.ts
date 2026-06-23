@@ -17,7 +17,7 @@ export class EventRegistrationController extends BaseController {
 
       create = async (req: Request, res: Response, next: NextFunction) => {
             try {
-                  const userId = req.user!.userId || 'system';
+                  const userId = req.user?.userId || 'system';
                   const result = await this.eventRegistrationService.create(req.body);
                   await this.createAuditLog(
                         AuditLogType.INFO,
@@ -72,7 +72,7 @@ export class EventRegistrationController extends BaseController {
 
       updateStatus = async (req: Request, res: Response, next: NextFunction) => {
             try {
-                  const userId = req.user!.userId || 'system';
+                  const userId = req.user?.userId || 'system';
                   const result = await this.eventRegistrationService.updateStatus(
                         req.params.id,
                         req.body.status,
@@ -98,7 +98,7 @@ export class EventRegistrationController extends BaseController {
 
       delete = async (req: Request, res: Response, next: NextFunction) => {
             try {
-                  const userId = req.user!.userId || 'system';
+                  const userId = req.user?.userId || 'system';
                   const versionId = req.query.versionId as string;
                   await this.eventRegistrationService.delete(req.params.id, versionId, userId);
                   await this.createAuditLog(

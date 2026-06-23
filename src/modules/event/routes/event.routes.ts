@@ -169,6 +169,25 @@ const createEventRouter = (dataSource: DataSource) => {
       /**
        * @swagger
        * /api/events/category/{id}:
+       *   get:
+       *     summary: Get event category by ID
+       *     tags: [EventCategories]
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *     responses:
+       *       200:
+       *         description: Event category details
+       *       404:
+       *         description: Category not found
+       */
+      router.get('/category/:id', eventController.getCategoryById);
+
+      /**
+       * @swagger
+       * /api/events/category/{id}:
        *   patch:
        *     summary: Update an existing event category
        *     tags: [EventCategories]
