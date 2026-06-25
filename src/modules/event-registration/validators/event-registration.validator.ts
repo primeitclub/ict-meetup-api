@@ -9,7 +9,7 @@ const createEventRegistrationBaseSchema = z.object({
       educationLevel: z.string().trim().min(3).max(150).optional(),
       faculty: z.string().trim().min(3).max(150).optional(),
       year: z.coerce.number().optional(),
-      attachedPaymentScreenshot: z.string().trim().min(3),
+      attachedPaymentScreenshot: z.string().trim().min(3).optional(),
       eventId: z.string().trim().min(3).max(150),
       versionId: z.string().trim().min(3).max(150),
       status: z.enum(EventRegistrationStatus).default(EventRegistrationStatus.PENDING),

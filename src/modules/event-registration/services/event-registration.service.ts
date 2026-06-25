@@ -32,13 +32,19 @@ export class EventRegistrationService {
             if (eventRegistration) {
                   throw new AppError("You have already registered for this event", 400);
             }
+            if (eventExists.feeType === 'paid' && !data.attachedPaymentScreenshot) {
+                  throw new AppError("Payment screenshot is required for paid events", 400);
+            }
+            if (eventExists.feeType === 'free') {
+                  data.attachedPaymentScreenshot = 'free';
+            }
             if (!data.isStudent) {
                   (data as any).faculty = null;
                   (data as any).year = null;
                   (data as any).educationLevel = null;
             }
-            const savedEventRegistration = await this.eventRegistrationRepository.save(data);
-            return savedEventRegistration;
+            const savedEventRegistration = await this.eventRegistrationRepository.save(data as any);
+            return savedEventRegistration as EventRegistration;
       }
 
 
@@ -54,7 +60,7 @@ export class EventRegistrationService {
                   skip,
                   take: Number(limit),
                   relations: ['event', 'version'],
-                  select: {
+            select: {
                         id: true,
                         versionId: true,
                         eventId: true,
@@ -67,6 +73,7 @@ export class EventRegistrationService {
                         year: true,
                         attachedPaymentScreenshot: true,
                         status: true,
+                        createdAt: true,
                         event: {
                               id: true,
                               versionId: true,
@@ -85,7 +92,10 @@ export class EventRegistrationService {
             return { items, meta: { total, page, limit, totalPages: Math.ceil(total / Number(limit)) } };
       }
       async findById(id: string) {
-            const eventRegistration = await this.eventRegistrationRepository.findOne({ where: { id }, relations: ['event', 'version'], select: { event: { id: true, versionId: true, title: true }, version: { id: true, version_name: true, status: true } } });
+            const eventRegistration = await this.eventRegistrationRepository.findOne({
+                  where: { id },
+                  relations: ['event', 'version'],
+            });
             if (!eventRegistration) {
                   throw new AppError("Event registration not found", 404);
             }

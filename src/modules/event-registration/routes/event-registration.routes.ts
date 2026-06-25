@@ -43,10 +43,12 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
        */
       router.post(
             '/',
-            imageUploadHandler({ fieldName: 'image', multiple: false }),
+            imageUploadHandler({ fieldName: 'image', multiple: false, optional: true }),
             (req, _res, next) => {
-                  if (req.body.imagePath) {
-                        req.body.attachedPaymentScreenshot = req.body.imagePath;
+                  if (req.body.imageUrl) {
+                        req.body.attachedPaymentScreenshot = req.body.imageUrl;
+                  } else if (req.body.imageLocalUrl) {
+                        req.body.attachedPaymentScreenshot = req.body.imageLocalUrl;
                   }
                   next();
             },

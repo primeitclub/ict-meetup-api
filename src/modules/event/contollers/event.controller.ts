@@ -169,6 +169,15 @@ export class EventController extends BaseController {
             }
       }
 
+      getCategoryById = async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                  const result = await this.serviceForCategory.findById(req.params.id);
+                  return responseHandler(res)('Event category fetched successfully', result, 200);
+            } catch (error) {
+                  next(error);
+            }
+      }
+
       getAllForCategory = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const result = await this.serviceForCategory.findAll(req.query, CategoryType.EVENT);

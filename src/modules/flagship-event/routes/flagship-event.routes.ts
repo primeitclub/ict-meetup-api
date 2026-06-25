@@ -107,18 +107,6 @@ const createVersionRouter = (dataSource: DataSource) => {
        * /api/flagship-event/versions/{id}:
        *   get:
        *     summary: Get version by ID
-       *     tags: [FlagshipEventVersions]
-       *     parameters:
-       *       - in: path
-       *         name: id
-       *         required: true
-       *         schema: { type: string, format: uuid }
-       *     responses:
-       *       200:
-       *         description: OK
-       */
-      versionRouter.get("/:id", controller.getById);
-
       /**
        * @swagger
        * /api/flagship-event/versions/slug/{slug}:
@@ -135,6 +123,24 @@ const createVersionRouter = (dataSource: DataSource) => {
        *         description: OK
        */
       versionRouter.get("/slug/:slug", controller.getBySlug);
+
+      /**
+       * @swagger
+       * /api/flagship-event/versions/{id}:
+       *   get:
+       *     summary: Get version by ID
+       *     tags: [FlagshipEventVersions]
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         required: true
+       *         schema: { type: string, format: uuid }
+       *     responses:
+       *       200:
+       *         description: OK
+       */
+      versionRouter.get("/:id", controller.getById);
+
 
       /**
        * @swagger

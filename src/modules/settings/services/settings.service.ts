@@ -136,8 +136,13 @@ export class SettingsService {
       await this.deleteFiles(settings.qrCodeLocalPath, settings.qrCodePath);
     }
 
+    // Filter out undefined properties from data so they don't overwrite existing settings
+    const cleanData = Object.fromEntries(
+      Object.entries(data).filter(([_, v]) => v !== undefined)
+    );
+
     const payload = {
-      ...data,
+      ...cleanData,
       qrCodeUrl: data.uploadedImages?.cloudUrl || data.qrCodeUrl || settings.qrCodeUrl,
       qrCodePath: data.uploadedImages?.publicId || data.qrCodePath || settings.qrCodePath,
       qrCodeLocalPath: data.uploadedImages?.localPath || data.qrCodeLocalPath || settings.qrCodeLocalPath,
