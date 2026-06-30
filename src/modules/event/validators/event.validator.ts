@@ -34,6 +34,9 @@ export const baseEventSchema = z.object({
     (val) => (typeof val === "string" ? Number(val) : val),
     z.number().int().min(1),
   ),
+  isHighlighted: z
+    .preprocess((v) => v === "true" || v === true, z.boolean())
+    .optional(),
 });
 
 export const createEventSchema = baseEventSchema.superRefine((data, ctx) => {
