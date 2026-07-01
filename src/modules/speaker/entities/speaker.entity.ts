@@ -27,6 +27,9 @@ export class Speaker extends BaseEntity {
       flagshipEvent: FlagshipEventVersion;
 
 
+      @Column({ type: 'text', nullable: true })
+      description: string;
+
       @Column({ name: 'display_order', type: 'int', default: 0 })
       displayOrder: number;
 

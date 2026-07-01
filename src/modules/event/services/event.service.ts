@@ -119,6 +119,8 @@ export class EventService {
                         flagshipEvent: {
                               id: true,
                               version_name: true,
+                              version_number: true,
+                              is_current: true,
                               status: true,
                         },
                         category: {
@@ -183,6 +185,8 @@ export class EventService {
                               id: true,
                               name: true,
                               designation: true,
+                              company: true,
+                              description: true,
                               imagePath: true,
                               imageUrl: true,
                               socialLinks: true,
