@@ -59,7 +59,7 @@ export class Event extends BaseEntity {
       flagshipEvent: FlagshipEventVersion;
 
       @Column({ name: 'speaker_id', type: 'varchar', length: 36, nullable: true })
-      speakerId: string;
+      speakerId: string | null;
 
       @ManyToOne(() => Speaker, { onDelete: 'RESTRICT' })
       @JoinColumn({ name: 'speaker_id' })

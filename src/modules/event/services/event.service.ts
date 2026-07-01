@@ -171,6 +171,7 @@ export class EventService {
                         createdAt: true,
                         updatedAt: true,
                         displayOrder: true,
+                        isHighlighted: true,
                         flagshipEvent: {
                               id: true,
                               version_name: true,
@@ -204,6 +205,10 @@ export class EventService {
             if (!event) {
                   throw new AppError('Event not found', 404);
             }
+
+            const resolvedVersionId = data.versionId ?? event.versionId;
+            const resolvedCategoryId = data.categoryId ?? event.categoryId;
+
             if (data.versionId) {
                   const versionExists = await this.versionRepository
                         .findOne({ where: { id: data.versionId } });
@@ -211,7 +216,7 @@ export class EventService {
                         throw new AppError('Flagship event version not found', 404);
                   }
                   if (versionExists.status === EventVersionStatus.ARCHIVED) {
-                        throw new AppError('Cannot update team members for an archived flagship event version', 400);
+                        throw new AppError('Cannot update events for an archived flagship event version', 400);
                   }
             }
             if (data.categoryId) {
@@ -225,38 +230,49 @@ export class EventService {
                   }
             }
             if (data.speakerId) {
-                  const speaker = await this.speakerRepository.findOne({ where: { id: data.speakerId, versionId: data.versionId || event.versionId } });
+                  const speaker = await this.speakerRepository.findOne({ where: { id: data.speakerId, versionId: resolvedVersionId } });
                   if (!speaker) {
                         throw new AppError("Speaker not found in this version", 404);
                   }
             }
-
             if (data.displayOrder) {
-                  const targetCategoryId = data.categoryId || event.categoryId;
                   const existingOrder = await this.eventRepository.findOne({
-                        where: {
-                              categoryId: targetCategoryId,
-                              displayOrder: data.displayOrder
-                        }
+                        where: { categoryId: resolvedCategoryId, displayOrder: data.displayOrder }
                   });
-
-                  // If found another event with same order
                   if (existingOrder && existingOrder.id !== id) {
                         throw new AppError(`Display order ${data.displayOrder} is already taken in this category`, 400);
                   }
             }
 
-            const updatedEvent = await this.eventRepository.save({
-                  ...event,
-                  ...data,
-                  versionId: data.versionId || event.versionId,
-                  categoryId: data.categoryId || event.categoryId,
-                  speakerId: data.speakerId || event.speakerId,
-                  fee: data.fee === null ? "" : (data.fee === undefined ? event.fee : data.fee),
+            // Use update() instead of save() to avoid TypeORM merging loaded relation
+            // objects (flagshipEvent, category, speaker) back over the FK columns we
+            // just changed — that was silently reverting versionId/categoryId.
+            await this.eventRepository.update(id, {
+                  ...(data.title !== undefined && { title: data.title }),
+                  ...(data.subtitle !== undefined && { subtitle: data.subtitle }),
+                  ...(data.description !== undefined && { description: data.description }),
+                  ...(data.startTime !== undefined && { startTime: data.startTime }),
+                  ...(data.endTime !== undefined && { endTime: data.endTime }),
+                  ...(data.date !== undefined && { date: data.date }),
+                  versionId: resolvedVersionId,
+                  categoryId: resolvedCategoryId,
+                  // speakerId undefined means the form sent "" which Zod converted to undefined
+                  // (the form always submits this field). null clears it in the DB.
+                  speakerId: data.speakerId || null,
+                  ...(data.totalSeats !== undefined && { totalSeats: data.totalSeats }),
+                  ...(data.feeType !== undefined && { feeType: data.feeType }),
+                  ...(data.fee !== undefined && { fee: data.fee === null ? "" : data.fee }),
+                  ...(data.location !== undefined && { location: data.location }),
+                  ...(data.status !== undefined && { status: data.status }),
+                  ...(data.registrationDeadline !== undefined && { registrationDeadline: data.registrationDeadline }),
+                  ...(data.displayOrder !== undefined && { displayOrder: data.displayOrder }),
+                  ...(data.isHighlighted !== undefined && { isHighlighted: data.isHighlighted }),
+                  ...(data.imagePath !== undefined && { imagePath: data.imagePath }),
+                  ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
                   modifiedById: userId,
             });
 
-            return updatedEvent;
+            return await this.findById(id);
       }
 
       async findByHighlighted(query: any) {
