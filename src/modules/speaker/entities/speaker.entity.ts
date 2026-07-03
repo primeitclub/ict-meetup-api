@@ -11,7 +11,7 @@ export class Speaker extends BaseEntity {
       designation: string;
 
       @Column({ type: 'varchar', length: 150, nullable: true })
-      company: string;
+      company: string | null;
 
       @Column({ name: 'version_id', type: 'varchar', length: 36 })
       versionId: string;
@@ -20,7 +20,7 @@ export class Speaker extends BaseEntity {
       imagePath: string;
 
       @Column({ name: 'image_url', type: 'varchar', nullable: true })
-      imageUrl: string;
+      imageUrl: string | null;
 
       @ManyToOne(() => FlagshipEventVersion, { onDelete: 'RESTRICT' })
       @JoinColumn({ name: 'version_id' })
@@ -28,7 +28,7 @@ export class Speaker extends BaseEntity {
 
 
       @Column({ type: 'text', nullable: true })
-      description: string;
+      description: string | null;
 
       @Column({ name: 'display_order', type: 'int', default: 0 })
       displayOrder: number;

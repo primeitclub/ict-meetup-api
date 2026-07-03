@@ -23,4 +23,11 @@ export class Faq extends BaseEntity {
 
   @Column({ type: 'text', nullable: true })
   description: string;
+
+  // Explicit display order within a version, set from the array index the
+  // admin submits. Lower sorts first. Not derived from createdAt/updatedAt,
+  // which change independently and previously caused list order to drift.
+  @Index()
+  @Column({ name: 'order', type: 'int', nullable: false, default: 0 })
+  order: number;
 }

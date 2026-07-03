@@ -145,55 +145,70 @@ export class EventService {
       }
 
       async findById(id: string) {
-            const event = await this.eventRepository.findOne({
-                  where: { id },
-                  relations: ['flagshipEvent', 'category', 'speaker'],
-                  select: {
+            const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+            const selectFields = {
+                  id: true,
+                  versionId: true,
+                  categoryId: true,
+                  speakerId: true,
+                  trackingId: true,
+                  title: true,
+                  subtitle: true,
+                  description: true,
+                  imagePath: true,
+                  imageUrl: true,
+                  startTime: true,
+                  endTime: true,
+                  date: true,
+                  totalSeats: true,
+                  feeType: true,
+                  fee: true,
+                  location: true,
+                  status: true,
+                  registrationDeadline: true,
+                  createdAt: true,
+                  updatedAt: true,
+                  displayOrder: true,
+                  isHighlighted: true,
+                  flagshipEvent: {
                         id: true,
-                        versionId: true,
-                        categoryId: true,
-                        speakerId: true,
-                        trackingId: true,
-                        title: true,
-                        subtitle: true,
+                        version_name: true,
+                        status: true,
+                  },
+                  category: {
+                        id: true,
+                        name: true,
+                        type: true,
+                  },
+                  speaker: {
+                        id: true,
+                        name: true,
+                        designation: true,
+                        company: true,
                         description: true,
                         imagePath: true,
                         imageUrl: true,
-                        startTime: true,
-                        endTime: true,
-                        date: true,
-                        totalSeats: true,
-                        feeType: true,
-                        fee: true,
-                        location: true,
-                        status: true,
-                        registrationDeadline: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        displayOrder: true,
-                        isHighlighted: true,
-                        flagshipEvent: {
-                              id: true,
-                              version_name: true,
-                              status: true,
-                        },
-                        category: {
-                              id: true,
-                              name: true,
-                              type: true,
-                        },
-                        speaker: {
-                              id: true,
-                              name: true,
-                              designation: true,
-                              company: true,
-                              description: true,
-                              imagePath: true,
-                              imageUrl: true,
-                              socialLinks: true,
-                        },
+                        socialLinks: true,
                   },
-            });
+            };
+
+            let event;
+            if (isUuid) {
+                  event = await this.eventRepository.findOne({
+                        where: { id },
+                        relations: ['flagshipEvent', 'category', 'speaker'],
+                        select: selectFields as any,
+                  });
+            } else {
+                  // Fallback: slug lookup
+                  const allEvents = await this.eventRepository.find({
+                        relations: ['flagshipEvent', 'category', 'speaker'],
+                        select: selectFields as any,
+                  });
+                  const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                  event = allEvents.find(e => slugify(e.title) === id);
+            }
+
             if (!event) {
                   throw new AppError("Event not found", 404);
             }

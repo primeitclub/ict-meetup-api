@@ -27,11 +27,12 @@ export class FaqService {
       throw new AppError('Flagship event version not found', 404);
     }
 
-    const newFaqs = data.faqs.map((item) =>
+    const newFaqs = data.faqs.map((item, index) =>
       this.faqRepository.create({
         versionId: data.versionId,
         title: item.title,
         description: item.description,
+        order: index,
         createdById: userId,
       })
     );
@@ -51,7 +52,7 @@ export class FaqService {
 
     const [items, total] = await this.faqRepository.findAndCount({
       where,
-      order: { createdAt: 'DESC' },
+      order: { order: 'ASC', createdAt: 'ASC' },
       skip,
       take: Number(limit),
     });
@@ -76,7 +77,7 @@ export class FaqService {
 
     const faqs = await this.faqRepository.find({
       relations: ['flagshipEventVersion'],
-      order: { createdAt: 'DESC' },
+      order: { order: 'ASC', createdAt: 'ASC' },
     });
 
     const groups = new Map<string, any>();
@@ -95,6 +96,7 @@ export class FaqService {
         id: faq.id,
         title: faq.title,
         description: faq.description,
+        order: faq.order,
         createdAt: faq.createdAt,
         updatedAt: faq.updatedAt,
       });
@@ -161,12 +163,15 @@ export class FaqService {
         await repo.remove(toDelete);
       }
 
-      // Update existing + create new.
-      const toSave = faqs.map((item) => {
+      // Update existing + create new. `order` is always set from the item's
+      // position in the submitted array — this is the single source of truth
+      // for display order, independent of createdAt/updatedAt.
+      const toSave = faqs.map((item, index) => {
         if (item.id) {
           const current = existingById.get(item.id)!;
           current.title = item.title;
           current.description = item.description;
+          current.order = index;
           current.modifiedById = userId;
           return current;
         }
@@ -174,6 +179,7 @@ export class FaqService {
           versionId,
           title: item.title,
           description: item.description,
+          order: index,
           createdById: userId,
         });
       });
