@@ -9,8 +9,8 @@ export const baseSponsorSchema = z.object({
       imagePath: z.string().min(1).max(2048),
       imageUrl: z.string().optional(),
       displayOrder: z.preprocess(
-            (val) => (typeof val === 'string' ? Number(val) : val),
-            z.number().int().min(0).max(100).default(0)
+            (val) => (typeof val === 'string' && val.trim() === '' ? undefined : typeof val === 'string' ? Number(val) : val),
+            z.number().int().min(1, 'Display order must be at least 1').max(100).optional()
       ),
 });
 

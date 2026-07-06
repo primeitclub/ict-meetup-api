@@ -21,7 +21,7 @@ export class SpeakerService {
             if (!versionExists) {
                   throw new AppError('Version not found', 404);
             }
-            if (data.displayOrder) {
+            if (data.displayOrder !== undefined && data.displayOrder !== null) {
                   const existingOrder = await this.speakerRepository.findOne({
                         where: { versionId: data.versionId, displayOrder: data.displayOrder }
                   });
@@ -90,9 +90,10 @@ id: true,
                   where: { id },
                   relations: ['flagshipEvent'],
                   select: {
-id: true,
+                        id: true,
                         name: true,
                         designation: true,
+                        description: true,
                         company: true,
                         versionId: true,
                         imagePath: true,
@@ -120,7 +121,7 @@ id: true,
                   throw new AppError('Speaker not found', 404);
             }
 
-            if (data.displayOrder) {
+            if (data.displayOrder !== undefined && data.displayOrder !== null) {
                   const targetVersionId = data.versionId || speaker.versionId;
                   const existingOrder = await this.speakerRepository.findOne({
                         where: {
@@ -134,15 +135,18 @@ id: true,
                   }
             }
 
-            Object.assign(speaker, data);
+            const cleanData = Object.fromEntries(
+                  Object.entries(data).filter(([, v]) => v !== undefined)
+            );
+            Object.assign(speaker, cleanData);
             speaker.modifiedById = userId;
             return await this.speakerRepository.save(speaker);
       }
 
       async delete(id: string, versionId: string, userId: string) {
-            const speaker = await this.speakerRepository.findOne({ where: { id, versionId } });
+            const speaker = await this.speakerRepository.findOne({ where: { id } });
             if (!speaker) {
-                  throw new AppError('Speaker not found in this version', 404);
+                  throw new AppError('Speaker not found', 404);
             }
             await removeFile(speaker.imagePath);
             await this.speakerRepository.remove(speaker);

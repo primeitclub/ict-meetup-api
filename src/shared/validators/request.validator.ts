@@ -1,6 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import { ValidationError } from "../utils/error.utils";
+const zodMessage = (error: z.ZodError): string => {
+      const issue = error.issues[0];
+      if (!issue) return 'Validation failed';
+      const field = issue.path.length > 0 ? issue.path.join('.') : null;
+      return field ? `${field}: ${issue.message}` : issue.message;
+};
+
 export const validateRequestBody = (schema: z.ZodSchema) => {
       return (req: Request, _: Response, next: NextFunction) => {
             try {
@@ -8,9 +15,8 @@ export const validateRequestBody = (schema: z.ZodSchema) => {
                   req.body = validatedData;
                   next();
             } catch (error) {
-                  console.log(error);
                   if (error instanceof z.ZodError) {
-                        throw new ValidationError('Invalid request body', JSON.parse(JSON.stringify(error.issues)));
+                        throw new ValidationError(zodMessage(error), JSON.parse(JSON.stringify(error.issues)));
                   }
                   next(error);
             }
@@ -24,7 +30,7 @@ export const validateRequestParams = (schema: z.ZodSchema) => {
                   next();
             } catch (error) {
                   if (error instanceof z.ZodError) {
-                        throw new ValidationError('Invalid request params', JSON.parse(JSON.stringify(error.issues)));
+                        throw new ValidationError(zodMessage(error), JSON.parse(JSON.stringify(error.issues)));
                   }
                   next(error);
             }
@@ -38,7 +44,7 @@ export const validateRequestQuery = (schema: z.ZodSchema) => {
                   next();
             } catch (error) {
                   if (error instanceof z.ZodError) {
-                        throw new ValidationError('Invalid request query', JSON.parse(JSON.stringify(error.issues)));
+                        throw new ValidationError(zodMessage(error), JSON.parse(JSON.stringify(error.issues)));
                   }
                   next(error);
             }

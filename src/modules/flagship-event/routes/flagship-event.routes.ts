@@ -104,11 +104,6 @@ const createVersionRouter = (dataSource: DataSource) => {
 
       /**
        * @swagger
-       * /api/flagship-event/versions/{id}:
-       *   get:
-       *     summary: Get version by ID
-      /**
-       * @swagger
        * /api/flagship-event/versions/slug/{slug}:
        *   get:
        *     summary: Get version by slug
