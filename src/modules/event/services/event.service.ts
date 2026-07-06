@@ -84,16 +84,18 @@ export class EventService {
       }
 
       async findAll(query: any) {
-            const { versionId, categoryId, ...rest } = query;
+            const { versionId, categoryId, status, ...rest } = query;
             const where: any = {};
             if (versionId) where.versionId = versionId;
             if (categoryId) where.categoryId = categoryId;
+            if (status) where.status = status;
             const { page = 1, limit = 10 } = rest;
-            const skip = (Number(page) - 1) * Number(limit);
+            const parsedLimit = Math.min(Number(limit) || 10, 100);
+            const skip = (Number(page) - 1) * parsedLimit;
             const [items, total] = await this.eventRepository.findAndCount({
                   where,
                   skip,
-                  take: Number(limit),
+                  take: parsedLimit,
                   relations: ['flagshipEvent', 'category', 'speaker'],
                   select: {
                         id: true,
@@ -139,7 +141,7 @@ export class EventService {
                         displayOrder: 'ASC',
                   }
             });
-            return { items, meta: { total, page, limit, totalPages: Math.ceil(total / Number(limit)) } };
+            return { items, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
       }
 
       async findById(id: string) {
@@ -278,11 +280,12 @@ export class EventService {
             if (categoryId) where.categoryId = categoryId;
             where.isHighlighted = true;
             const { page = 1, limit = 10 } = rest;
-            const skip = (Number(page) - 1) * Number(limit);
+            const parsedLimit = Math.min(Number(limit) || 10, 100);
+            const skip = (Number(page) - 1) * parsedLimit;
             const [items, total] = await this.eventRepository.findAndCount({
                   where,
                   skip,
-                  take: Number(limit),
+                  take: parsedLimit,
                   relations: ['flagshipEvent', 'category', 'speaker'],
                   select: {
                         id: true,
@@ -330,7 +333,7 @@ export class EventService {
                         displayOrder: 'ASC',
                   }
             });
-            return { items, meta: { total, page, limit, totalPages: Math.ceil(total / Number(limit)) } };
+            return { items, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
       }
 
       async delete(id: string, versionId: string) {

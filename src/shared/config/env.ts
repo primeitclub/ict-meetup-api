@@ -18,6 +18,9 @@ const envSchema = z.object({
       CLOUDINARY_API_SECRET: z.string().default('3M9cgR50m7y69ygWO8vHR2KLhX0'),
       CRON_REVOKED_TOKENS_SCHEDULE: z.string().default('0 0 * * *'),
       ALLOWED_ORIGINS: z.string().default('http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176'),
+      MAIL_USER: z.string().default(''),
+      MAIL_PASSWORD: z.string().default(''),
+      MAIL_FROM: z.string().default(''),
 });
 
 export const envConfig = envSchema.parse(process.env);

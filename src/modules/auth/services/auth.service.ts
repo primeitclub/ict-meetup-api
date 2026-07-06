@@ -23,12 +23,13 @@ export class AuthService {
 
       public async login(data: LoginDto) {
             const user = await this.userRepository.findOne({ where: { email: data.email }, select: ['id', 'email', 'password', 'role'] });
-            if (!user) {
-                  throw new AppError('User not found', 404);
-            }
-            const isPasswordValid = await bcrypt.compare(data.password, user.password);
-            if (!isPasswordValid) {
-                  throw new AppError('Invalid password', 401);
+
+            // Always run bcrypt regardless of whether the user exists — prevents timing-based email enumeration
+            const DUMMY_HASH = '$2b$10$invalidhashfortimingprotection000000000000000000000000';
+            const isPasswordValid = await bcrypt.compare(data.password, user?.password ?? DUMMY_HASH);
+
+            if (!user || !isPasswordValid) {
+                  throw new AppError('Invalid email or password', 401);
             }
             const payload: TokenPayload = {
                   userId: user.id,
@@ -36,8 +37,6 @@ export class AuthService {
                   role: user.role,
             };
             const tokens = await this.generateTokens(payload);
-            console.log(tokens);
-            console.log(user)
             await this.accessTokenRepository.save({
                   userId: user.id,
                   token: tokens.accessToken,

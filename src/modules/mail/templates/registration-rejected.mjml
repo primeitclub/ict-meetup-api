@@ -1,0 +1,88 @@
+<mjml>
+  <mj-head>
+    <mj-title>Registration Update — ICT Meetup</mj-title>
+    <mj-preview>An update regarding your registration for {{eventTitle}}.</mj-preview>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text font-size="15px" line-height="1.7" color="#333333" />
+    </mj-attributes>
+    <mj-style>
+      .badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 20px;
+        background-color: #fee2e2;
+        color: #991b1b;
+        font-weight: bold;
+        font-size: 13px;
+      }
+    </mj-style>
+  </mj-head>
+
+  <mj-body background-color="#f4f4f4">
+
+    <!-- Header with logo -->
+    <mj-section background-color="#1a1a2e" padding="28px 40px" border-radius="8px 8px 0 0">
+      <mj-column>
+        {{logoSection}}
+        <mj-text align="center" color="#ffffff" font-size="20px" font-weight="bold" letter-spacing="1px" padding-top="8px">
+          {{heroTitle}}
+        </mj-text>
+        {{heroDescriptionSection}}
+      </mj-column>
+    </mj-section>
+
+    <!-- Body -->
+    <mj-section background-color="#ffffff" padding="40px 40px 24px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold" color="#1a1a2e">
+          Registration Update
+        </mj-text>
+
+        <mj-text>
+          Hi <strong>{{username}}</strong>,
+        </mj-text>
+
+        <mj-text>
+          Unfortunately, we were unable to confirm your registration for <strong>{{eventTitle}}</strong>.
+        </mj-text>
+
+        <!-- Status box -->
+        <mj-text padding="0">
+          <div style="background:#fff5f5;border-left:4px solid #ef4444;padding:16px 20px;border-radius:4px;margin:16px 0;">
+            <p style="margin:0 0 8px;"><strong>Status:</strong> &nbsp;<span class="badge">❌ Not Confirmed</span></p>
+            {{rejectionReasonBlock}}
+            <p style="margin:0;">If you believe this is a mistake or need further clarification, please contact us.</p>
+          </div>
+        </mj-text>
+
+        <mj-text>
+          We hope to see you at future events.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Team Section -->
+    <mj-section background-color="#fff5f5" padding="20px 40px">
+      <mj-column>
+        <mj-text font-size="14px" color="#1a1a2e" font-weight="bold" padding-bottom="2px">
+          {{teamName}}
+        </mj-text>
+        <mj-text font-size="12px" color="#6b7280" padding-top="0" padding-bottom="0">
+          {{versionName}}
+        </mj-text>
+        {{clubContactBlock}}
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section padding="20px 40px">
+      <mj-column>
+        <mj-text align="center" font-size="12px" color="#9ca3af">
+          &copy; {{year}} ICT Meetup &mdash; PrimeIT Club
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+  </mj-body>
+</mjml>

@@ -60,13 +60,14 @@ export class AboutSectionService {
 
     const { versionId, page = 1, limit = 10 } = query;
     const where = versionId ? { versionId } : {};
-    const skip = (Number(page) - 1) * Number(limit);
+    const parsedLimit = Math.min(Number(limit) || 10, 100);
+    const skip = (Number(page) - 1) * parsedLimit;
 
     const [items, total] = await this.aboutSectionRepository.findAndCount({
       where,
       order: { createdAt: 'DESC' },
       skip,
-      take: Number(limit),
+      take: parsedLimit,
       relations: ['flagshipEventVersion'],
     });
 
@@ -75,8 +76,8 @@ export class AboutSectionService {
       meta: {
         total,
         page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit)),
+        limit: parsedLimit,
+        totalPages: Math.ceil(total / parsedLimit),
       }
     };
   }

@@ -41,7 +41,9 @@ export const createEventRegistrationSchema = createEventRegistrationBaseSchema.s
       }
 });
 
-export const updateEventRegistrationSchema = createEventRegistrationBaseSchema.partial();
+export const updateEventRegistrationSchema = createEventRegistrationBaseSchema.partial().extend({
+      rejectionReason: z.string().trim().max(500).optional(),
+});
 
 
 export const eventRegistrationQuerySchema = z.object({

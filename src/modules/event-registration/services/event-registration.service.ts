@@ -5,15 +5,38 @@ import { Event, EventStatus } from "../../event/entities/event.entity";
 import { CreateEventRegistrationDto } from "../validators/event-registration.validator";
 import { AppError } from "../../../shared/utils/error.utils";
 import { removeFile } from "../../../shared/utils/helpers/imageUpload.helper";
+import { mailService, ClubInfo } from "../../mail/mail.service";
+import { Settings } from "../../settings/entities/settings.entity";
+import { HeroSection } from "../../hero-sections/entities/hero-section.entity";
 
 export class EventRegistrationService {
       private eventRegistrationRepository: Repository<EventRegistration>;
       private flagshipEventVersionRepository: Repository<FlagshipEventVersion>;
       private eventRepository: Repository<Event>;
+      private settingsRepository: Repository<Settings>;
+      private heroSectionRepository: Repository<HeroSection>;
       constructor(dataSources: DataSource) {
             this.eventRegistrationRepository = dataSources.getRepository(EventRegistration);
             this.flagshipEventVersionRepository = dataSources.getRepository(FlagshipEventVersion);
             this.eventRepository = dataSources.getRepository(Event);
+            this.settingsRepository = dataSources.getRepository(Settings);
+            this.heroSectionRepository = dataSources.getRepository(HeroSection);
+      }
+
+      private async getClubInfo(versionId: string, version: FlagshipEventVersion): Promise<ClubInfo> {
+            const [settings, hero] = await Promise.all([
+                  this.settingsRepository.findOne({ where: { versionId } }),
+                  this.heroSectionRepository.findOne({ where: { flagshipEventVersionId: versionId } }),
+            ]);
+            return {
+                  teamName: settings?.teamName ?? "ICT Meetup Team",
+                  versionName: version?.version_name ?? "ICT Meetup",
+                  logoUrl: version?.logo ?? null,
+                  heroTitle: hero?.heading ?? null,
+                  heroDescription: hero?.paragraph ?? null,
+                  clubEmail: settings?.clubEmail ?? settings?.email ?? null,
+                  clubPhoneNumber: settings?.clubPhoneNumber ?? settings?.phoneNumber ?? null,
+            };
       }
 
       async create(data: CreateEventRegistrationDto) {
@@ -44,6 +67,11 @@ export class EventRegistrationService {
                   (data as any).educationLevel = null;
             }
             const savedEventRegistration = await this.eventRegistrationRepository.save(data as any);
+
+            this.getClubInfo(data.versionId, versionExists)
+                  .then((club) => mailService.sendRegistrationReceived({ to: data.email, username: data.username, eventTitle: eventExists.title, club }))
+                  .catch((err) => console.error("[MailService] getClubInfo failed:", err));
+
             return savedEventRegistration as EventRegistration;
       }
 
@@ -54,11 +82,12 @@ export class EventRegistrationService {
             if (versionId) where.versionId = versionId;
             if (eventId) where.eventId = eventId;
             const { page = 1, limit = 10 } = rest;
-            const skip = (Number(page) - 1) * Number(limit);
+            const parsedLimit = Math.min(Number(limit) || 10, 100);
+            const skip = (Number(page) - 1) * parsedLimit;
             const [items, total] = await this.eventRegistrationRepository.findAndCount({
                   where,
                   skip,
-                  take: Number(limit),
+                  take: parsedLimit,
                   relations: ['event', 'version'],
             select: {
                         id: true,
@@ -89,7 +118,7 @@ export class EventRegistrationService {
                         id: 'ASC',
                   }
             });
-            return { items, meta: { total, page, limit, totalPages: Math.ceil(total / Number(limit)) } };
+            return { items, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
       }
       async findById(id: string) {
             const eventRegistration = await this.eventRegistrationRepository.findOne({
@@ -101,13 +130,29 @@ export class EventRegistrationService {
             }
             return eventRegistration;
       }
-      async updateStatus(id: string, status: EventRegistrationStatus) {
-            const eventRegistration = await this.eventRegistrationRepository.findOne({ where: { id } });
+      async updateStatus(id: string, status: EventRegistrationStatus, rejectionReason?: string) {
+            const eventRegistration = await this.eventRegistrationRepository.findOne({
+                  where: { id },
+                  relations: ['event', 'version'],
+            });
             if (!eventRegistration) {
                   throw new AppError("Event registration not found", 404);
             }
             eventRegistration.status = status;
             const updatedEventRegistration = await this.eventRegistrationRepository.save(eventRegistration);
+
+            const eventTitle = eventRegistration.event?.title ?? 'the event';
+
+            this.getClubInfo(eventRegistration.versionId, eventRegistration.version)
+                  .then((club) => {
+                        if (status === EventRegistrationStatus.APPROVED) {
+                              mailService.sendRegistrationApproved({ to: eventRegistration.email, username: eventRegistration.username, eventTitle, club });
+                        } else if (status === EventRegistrationStatus.REJECTED) {
+                              mailService.sendRegistrationRejected({ to: eventRegistration.email, username: eventRegistration.username, eventTitle, club, rejectionReason });
+                        }
+                  })
+                  .catch((err) => console.error("[MailService] getClubInfo failed:", err));
+
             return updatedEventRegistration;
       }
       async delete(id: string, versionId: string, userId: string) {

@@ -75,16 +75,15 @@ export class AuthController extends BaseController {
       refreshToken = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const refreshToken = req.cookies.refresh_token;
-                  const expiry = req.query?.expiry || req.body?.expiry;
 
                   if (!refreshToken) {
                         throw new AppError('Refresh token not found', 401);
                   }
                   const ipAddress = req.ip || 'unknown';
                   const userAgent = req.headers['user-agent'] || 'unknown';
-                  const result = await this.authService.refreshToken(refreshToken, ipAddress, userAgent, expiry);
+                  const result = await this.authService.refreshToken(refreshToken, ipAddress, userAgent);
                   const accessTokenCookie = setCookie('access_token', result.accessToken, { maxAge: parseExpiryToMs(envConfig.JWT_ACCESS_EXPIRY) });
-                  const refreshTokenCookie = setCookie('refresh_token', result.refreshToken, { maxAge: parseExpiryToMs(expiry || envConfig.JWT_REFRESH_EXPIRY) });
+                  const refreshTokenCookie = setCookie('refresh_token', result.refreshToken, { maxAge: parseExpiryToMs(envConfig.JWT_REFRESH_EXPIRY) });
                   res.cookie(accessTokenCookie.name, accessTokenCookie.value, accessTokenCookie.options);
                   res.cookie(refreshTokenCookie.name, refreshTokenCookie.value, refreshTokenCookie.options);
                   await this.createAuditLog(

@@ -83,8 +83,6 @@ export class ContentService {
         this.eventService.findAll({ versionId, limit: ALL }),
       ]);
 
-    console.log({ sponsors });
-
     // FAQ is exposed for the current edition only — past editions omit it.
     const faqItems = isCurrent
       ? (await this.faqService.findAll({ versionId, limit: ALL })).items
