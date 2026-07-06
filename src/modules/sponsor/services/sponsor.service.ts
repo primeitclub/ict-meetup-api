@@ -154,7 +154,7 @@ export class SponsorService {
                   }
             }
 
-            if (data.displayOrder) {
+            if (data.displayOrder !== undefined && data.displayOrder !== null) {
                   const targetCategoryId = data.categoryId || sponsor.categoryId;
                   const existingOrder = await this.sponsorRepository.findOne({
                         where: {
