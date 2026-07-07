@@ -104,21 +104,29 @@ export class AboutSectionService {
       module: 'AboutSectionService',
     });
 
-    const versionId = data.versionId || aboutSection.versionId;
-    const versionExists = await this.dataSource
-      .getRepository(FlagshipEventVersion)
-      .findOne({ where: { id: versionId } });
+    // Only validate the target version when it is being changed to a different one.
+    if (data.versionId && data.versionId !== aboutSection.versionId) {
+      const versionExists = await this.dataSource
+        .getRepository(FlagshipEventVersion)
+        .findOne({ where: { id: data.versionId } });
 
-    if (!versionExists) {
-      throw new AppError('Flagship event version not found', 404);
+      if (!versionExists) {
+        throw new AppError('Flagship event version not found', 404);
+      }
+      if (versionExists.status === EventVersionStatus.ARCHIVED) {
+        throw new AppError('Cannot move about section to an archived flagship event version', 400);
+      }
     }
 
-    if (versionExists.status === EventVersionStatus.ARCHIVED) {
-      throw new AppError('Cannot update about sections for an archived flagship event version', 400);
-    }
+    // Strip empty-string version to avoid overwriting with blank FK.
+    const { versionId, ...rest } = data;
+    const safeData = {
+      ...rest,
+      ...(versionId ? { versionId } : {}),
+    };
 
     const payload = {
-      ...data,
+      ...safeData,
       modifiedById: userId
     };
 

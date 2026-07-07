@@ -5,13 +5,13 @@ import path from "path";
 import { envConfig } from "../../shared/config/env";
 
 export interface ClubInfo {
-      teamName: string;
       versionName: string;
       logoUrl?: string | null;
       heroTitle?: string | null;
       heroDescription?: string | null;
       clubEmail?: string | null;
       clubPhoneNumber?: string | null;
+      socialMediaLinks?: { platform: string; link: string }[] | null;
 }
 
 interface RegistrationReceivedOptions {
@@ -29,25 +29,27 @@ interface RegistrationStatusOptions {
       rejectionReason?: string;
 }
 
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+const PLATFORM_META: Record<string, { color: string; label: string }> = {
+      linkedin:  { color: "#0A66C2", label: "in" },
+      facebook:  { color: "#1877F2", label: "fb" },
+      instagram: { color: "#E4405F", label: "ig" },
+      twitter:   { color: "#1DA1F2", label: "tw" },
+      x:         { color: "#000000", label: "X"  },
+      youtube:   { color: "#FF0000", label: "yt" },
+      tiktok:    { color: "#010101", label: "tt" },
+      discord:   { color: "#5865F2", label: "dc" },
+      telegram:  { color: "#2CA5E0", label: "tg" },
+      whatsapp:  { color: "#25D366", label: "wa" },
+      github:    { color: "#181717", label: "gh" },
+};
 
-function buildClubContactBlock(club: ClubInfo): string {
-      const lines: string[] = [];
-      if (club.clubEmail) {
-            lines.push(`<a href="mailto:${escapeHtml(club.clubEmail)}" style="color:#4f6ef7;text-decoration:none;">${escapeHtml(club.clubEmail)}</a>`);
-      }
-      if (club.clubPhoneNumber) {
-            lines.push(`<span>${escapeHtml(club.clubPhoneNumber)}</span>`);
-      }
-      if (!lines.length) return "";
-      return `<mj-text font-size="13px" color="#555555" padding-top="4px">${lines.join(" &nbsp;·&nbsp; ")}</mj-text>`;
+function escapeHtml(str: string): string {
+      return str
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
 }
 
 function buildLogoSection(logoUrl: string | null | undefined): string {
@@ -60,6 +62,30 @@ function buildHeroDescriptionSection(description: string | null | undefined): st
       return `<mj-text align="center" color="#94a3b8" font-size="13px" padding-top="4px">${escapeHtml(description)}</mj-text>`;
 }
 
+function buildClubContactBlock(club: ClubInfo): string {
+      const lines: string[] = [];
+      if (club.clubEmail) {
+            lines.push(`<a href="mailto:${escapeHtml(club.clubEmail)}" style="color:#3b82f6;text-decoration:none;">${escapeHtml(club.clubEmail)}</a>`);
+      }
+      if (club.clubPhoneNumber) {
+            lines.push(`<span>${escapeHtml(club.clubPhoneNumber)}</span>`);
+      }
+      if (!lines.length) return "";
+      return `<mj-text font-size="13px" color="#64748b" padding-top="2px">${lines.join(" &nbsp;&middot;&nbsp; ")}</mj-text>`;
+}
+
+function buildSocialLinksBlock(links?: { platform: string; link: string }[] | null): string {
+      if (!links?.length) return "";
+      const icons = links
+            .map(({ platform, link }) => {
+                  const key = platform.toLowerCase().trim().replace(/\s+/g, "");
+                  const meta = PLATFORM_META[key] ?? { color: "#475569", label: platform.slice(0, 2).toLowerCase() };
+                  return `<a href="${escapeHtml(link)}" target="_blank" style="display:inline-block;width:30px;height:30px;background:${meta.color};border-radius:50%;text-align:center;line-height:30px;color:#ffffff;font-size:11px;font-weight:bold;text-decoration:none;margin:0 5px;font-family:Arial,sans-serif;">${escapeHtml(meta.label)}</a>`;
+            })
+            .join("");
+      return `<mj-text align="center" padding="0 0 8px">${icons}</mj-text>`;
+}
+
 class MailService {
       private transporter = nodemailer.createTransport({
             service: "gmail",
@@ -69,7 +95,6 @@ class MailService {
             },
       });
 
-      // Simple in-memory queue — prevents SMTP flooding under load
       private queue: (() => Promise<void>)[] = [];
       private processing = false;
 
@@ -113,13 +138,12 @@ class MailService {
                   const html = await this.compileTemplate("registration-received", {
                         username,
                         eventTitle,
-                        teamName: club.teamName,
                         versionName: club.versionName,
                         logoSection: buildLogoSection(club.logoUrl),
                         heroTitle: club.heroTitle ?? club.versionName,
                         heroDescriptionSection: buildHeroDescriptionSection(club.heroDescription),
                         clubContactBlock: buildClubContactBlock(club),
-                        year: new Date().getFullYear().toString(),
+                        socialLinksBlock: buildSocialLinksBlock(club.socialMediaLinks),
                   });
                   await this.transporter.sendMail({
                         from: `"ICT Meetup" <${envConfig.MAIL_FROM}>`,
@@ -135,13 +159,12 @@ class MailService {
                   const html = await this.compileTemplate("registration-approved", {
                         username,
                         eventTitle,
-                        teamName: club.teamName,
                         versionName: club.versionName,
                         logoSection: buildLogoSection(club.logoUrl),
                         heroTitle: club.heroTitle ?? club.versionName,
                         heroDescriptionSection: buildHeroDescriptionSection(club.heroDescription),
                         clubContactBlock: buildClubContactBlock(club),
-                        year: new Date().getFullYear().toString(),
+                        socialLinksBlock: buildSocialLinksBlock(club.socialMediaLinks),
                   });
                   await this.transporter.sendMail({
                         from: `"ICT Meetup" <${envConfig.MAIL_FROM}>`,
@@ -155,19 +178,18 @@ class MailService {
       sendRegistrationRejected({ to, username, eventTitle, club, rejectionReason }: RegistrationStatusOptions): void {
             this.enqueue(async () => {
                   const rejectionReasonBlock = rejectionReason
-                        ? `<strong>Reason:</strong> ${escapeHtml(rejectionReason)}<br/>`
+                        ? `<mj-text padding="0"><div style="background:#fef2f2;border-left:3px solid #ef4444;padding:14px 18px;border-radius:3px;margin:8px 0 0;font-size:14px;color:#7f1d1d;"><strong>Reason:</strong> ${escapeHtml(rejectionReason)}</div></mj-text>`
                         : "";
                   const html = await this.compileTemplate("registration-rejected", {
                         username,
                         eventTitle,
                         rejectionReasonBlock,
-                        teamName: club.teamName,
                         versionName: club.versionName,
                         logoSection: buildLogoSection(club.logoUrl),
                         heroTitle: club.heroTitle ?? club.versionName,
                         heroDescriptionSection: buildHeroDescriptionSection(club.heroDescription),
                         clubContactBlock: buildClubContactBlock(club),
-                        year: new Date().getFullYear().toString(),
+                        socialLinksBlock: buildSocialLinksBlock(club.socialMediaLinks),
                   });
                   await this.transporter.sendMail({
                         from: `"ICT Meetup" <${envConfig.MAIL_FROM}>`,

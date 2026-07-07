@@ -29,13 +29,13 @@ export class EventRegistrationService {
                   this.heroSectionRepository.findOne({ where: { flagshipEventVersionId: versionId } }),
             ]);
             return {
-                  teamName: settings?.teamName ?? "ICT Meetup Team",
                   versionName: version?.version_name ?? "ICT Meetup",
                   logoUrl: version?.logo ?? null,
                   heroTitle: hero?.heading ?? null,
                   heroDescription: hero?.paragraph ?? null,
                   clubEmail: settings?.clubEmail ?? settings?.email ?? null,
                   clubPhoneNumber: settings?.clubPhoneNumber ?? settings?.phoneNumber ?? null,
+                  socialMediaLinks: settings?.socialMediaLinks ?? null,
             };
       }
 
@@ -66,7 +66,10 @@ export class EventRegistrationService {
                   (data as any).year = null;
                   (data as any).educationLevel = null;
             }
-            const savedEventRegistration = await this.eventRegistrationRepository.save(data as any);
+            const savedEventRegistration = await this.eventRegistrationRepository.save({
+                  ...data,
+                  status: EventRegistrationStatus.PENDING,
+} as any);
 
             this.getClubInfo(data.versionId, versionExists)
                   .then((club) => mailService.sendRegistrationReceived({ to: data.email, username: data.username, eventTitle: eventExists.title, club }))

@@ -102,23 +102,29 @@ export class HeroSectionService {
       module: 'HeroSectionService',
     });
 
-    const versionId = data.flagshipEventVersionId || heroSection.flagshipEventVersionId;
-    const versionExists = await this.dataSource
-      .getRepository(FlagshipEventVersion)
-      .findOne({ where: { id: versionId } });
+    // Only validate the target version when it is being changed to a different one.
+    if (data.flagshipEventVersionId && data.flagshipEventVersionId !== heroSection.flagshipEventVersionId) {
+      const versionExists = await this.dataSource
+        .getRepository(FlagshipEventVersion)
+        .findOne({ where: { id: data.flagshipEventVersionId } });
 
-    if (!versionExists) {
-      throw new AppError('Flagship event version not found', 404);
+      if (!versionExists) {
+        throw new AppError('Flagship event version not found', 404);
+      }
+      if (versionExists.status === EventVersionStatus.ARCHIVED) {
+        throw new AppError('Cannot move hero section to an archived flagship event version', 400);
+      }
     }
 
-    if (versionExists.status === EventVersionStatus.ARCHIVED) {
-      throw new AppError('Cannot update hero sections for an archived flagship event version', 400);
-    }
-
-    const oldState = { ...heroSection };
+    // Strip empty-string version to avoid overwriting with blank FK.
+    const { flagshipEventVersionId, ...rest } = data;
+    const safeData = {
+      ...rest,
+      ...(flagshipEventVersionId ? { flagshipEventVersionId } : {}),
+    };
 
     const payload = {
-      ...data,
+      ...safeData,
       modifiedById: userId
     };
 
