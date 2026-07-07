@@ -114,6 +114,21 @@ export class HeroSectionService {
       if (versionExists.status === EventVersionStatus.ARCHIVED) {
         throw new AppError('Cannot move hero section to an archived flagship event version', 400);
       }
+
+      const duplicate = await this.heroSectionRepository.findOne({
+        where: { flagshipEventVersionId: data.flagshipEventVersionId },
+      });
+      if (duplicate) {
+        throw new AppError(
+          `Hero section already exists for this flagship event version`,
+          400
+        );
+      }
+
+      // Keep the loaded relation in sync with the new FK — TypeORM writes the
+      // join column from this relation on save, so a stale relation here would
+      // silently overwrite the flagshipEventVersionId we're about to assign below.
+      heroSection.flagshipEventVersion = versionExists;
     }
 
     // Strip empty-string version to avoid overwriting with blank FK.

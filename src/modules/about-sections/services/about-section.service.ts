@@ -116,6 +116,21 @@ export class AboutSectionService {
       if (versionExists.status === EventVersionStatus.ARCHIVED) {
         throw new AppError('Cannot move about section to an archived flagship event version', 400);
       }
+
+      const duplicate = await this.aboutSectionRepository.findOne({
+        where: { versionId: data.versionId },
+      });
+      if (duplicate) {
+        throw new AppError(
+          `About section already exists for this flagship event version`,
+          400
+        );
+      }
+
+      // Keep the loaded relation in sync with the new FK — TypeORM writes the
+      // join column from this relation on save, so a stale relation here would
+      // silently overwrite the versionId we're about to assign below.
+      aboutSection.flagshipEventVersion = versionExists;
     }
 
     // Strip empty-string version to avoid overwriting with blank FK.

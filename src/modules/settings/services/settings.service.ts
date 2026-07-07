@@ -130,6 +130,23 @@ export class SettingsService {
       throw new AppError('Cannot update settings for an archived flagship event version', 400);
     }
 
+    if (data.versionId && data.versionId !== settings.versionId) {
+      const duplicate = await this.settingsRepository.findOne({
+        where: { versionId: data.versionId },
+      });
+      if (duplicate) {
+        throw new AppError(
+          `Settings already exist for this flagship event version`,
+          400
+        );
+      }
+    }
+
+    // Keep the loaded relation in sync with the new FK — TypeORM writes the
+    // join column from this relation on save, so a stale relation here would
+    // silently overwrite the versionId we're about to assign below.
+    settings.flagshipEventVersion = versionExists;
+
     // Handle QR code lifecycle on update
     const newQrCodePath = data.uploadedImages?.publicId;
     if (newQrCodePath && settings.qrCodePath && newQrCodePath !== settings.qrCodePath) {
