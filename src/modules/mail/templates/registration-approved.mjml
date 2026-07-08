@@ -48,6 +48,18 @@
       </mj-column>
     </mj-section>
 
+    <!-- Tracking ID -->
+    <mj-section background-color="#ffffff" padding="0 40px 32px">
+      <mj-column background-color="#f1f5f9" border-radius="6px" padding="14px 18px">
+        <mj-text font-size="12px" color="#64748b" padding-bottom="2px">
+          Tracking ID
+        </mj-text>
+        <mj-text font-size="16px" font-weight="bold" color="#0f172a" padding="0">
+          {{trackingId}}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
     <!-- Contact section -->
     <mj-section background-color="#f8fafc" padding="20px 40px">
       <mj-column>

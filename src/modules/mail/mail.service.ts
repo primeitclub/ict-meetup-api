@@ -18,6 +18,7 @@ interface RegistrationReceivedOptions {
       to: string;
       username: string;
       eventTitle: string;
+      trackingId: string;
       club: ClubInfo;
 }
 
@@ -25,6 +26,7 @@ interface RegistrationStatusOptions {
       to: string;
       username: string;
       eventTitle: string;
+      trackingId: string;
       club: ClubInfo;
       rejectionReason?: string;
 }
@@ -133,11 +135,12 @@ class MailService {
             return html;
       }
 
-      sendRegistrationReceived({ to, username, eventTitle, club }: RegistrationReceivedOptions): void {
+      sendRegistrationReceived({ to, username, eventTitle, trackingId, club }: RegistrationReceivedOptions): void {
             this.enqueue(async () => {
                   const html = await this.compileTemplate("registration-received", {
                         username,
                         eventTitle,
+                        trackingId,
                         versionName: club.versionName,
                         logoSection: buildLogoSection(club.logoUrl),
                         heroTitle: club.heroTitle ?? club.versionName,
@@ -154,11 +157,12 @@ class MailService {
             });
       }
 
-      sendRegistrationApproved({ to, username, eventTitle, club }: RegistrationStatusOptions): void {
+      sendRegistrationApproved({ to, username, eventTitle, trackingId, club }: RegistrationStatusOptions): void {
             this.enqueue(async () => {
                   const html = await this.compileTemplate("registration-approved", {
                         username,
                         eventTitle,
+                        trackingId,
                         versionName: club.versionName,
                         logoSection: buildLogoSection(club.logoUrl),
                         heroTitle: club.heroTitle ?? club.versionName,

@@ -8,6 +8,7 @@ import { removeFile } from "../../../shared/utils/helpers/imageUpload.helper";
 import { mailService, ClubInfo } from "../../mail/mail.service";
 import { Settings } from "../../settings/entities/settings.entity";
 import { HeroSection } from "../../hero-sections/entities/hero-section.entity";
+import { randomUUID } from "crypto";
 
 export class EventRegistrationService {
       private eventRegistrationRepository: Repository<EventRegistration>;
@@ -66,13 +67,17 @@ export class EventRegistrationService {
                   (data as any).year = null;
                   (data as any).educationLevel = null;
             }
+            const versionLabel = Number(versionExists.version_number).toString();
+            const trackingId = `ICT-Meetup-${versionLabel}-${randomUUID().slice(0, 8)}`;
+
             const savedEventRegistration = await this.eventRegistrationRepository.save({
                   ...data,
+                  trackingId,
                   status: EventRegistrationStatus.PENDING,
 } as any);
 
             this.getClubInfo(data.versionId, versionExists)
-                  .then((club) => mailService.sendRegistrationReceived({ to: data.email, username: data.username, eventTitle: eventExists.title, club }))
+                  .then((club) => mailService.sendRegistrationReceived({ to: data.email, username: data.username, eventTitle: eventExists.title, trackingId, club }))
                   .catch((err) => console.error("[MailService] getClubInfo failed:", err));
 
             return savedEventRegistration as EventRegistration;
@@ -94,6 +99,7 @@ export class EventRegistrationService {
                   relations: ['event', 'version'],
             select: {
                         id: true,
+                        trackingId: true,
                         versionId: true,
                         eventId: true,
                         username: true,
@@ -118,7 +124,7 @@ export class EventRegistrationService {
                         },
                   },
                   order: {
-                        id: 'ASC',
+                        createdAt: 'DESC',
                   }
             });
             return { items, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
@@ -141,6 +147,19 @@ export class EventRegistrationService {
             if (!eventRegistration) {
                   throw new AppError("Event registration not found", 404);
             }
+
+            if (status === EventRegistrationStatus.APPROVED && eventRegistration.status !== EventRegistrationStatus.APPROVED) {
+                  const totalSeats = eventRegistration.event?.totalSeats;
+                  if (totalSeats !== undefined) {
+                        const approvedCount = await this.eventRegistrationRepository.count({
+                              where: { eventId: eventRegistration.eventId, status: EventRegistrationStatus.APPROVED },
+                        });
+                        if (approvedCount >= totalSeats) {
+                              throw new AppError("No seats available for this event", 400);
+                        }
+                  }
+            }
+
             eventRegistration.status = status;
             const updatedEventRegistration = await this.eventRegistrationRepository.save(eventRegistration);
 
@@ -149,9 +168,9 @@ export class EventRegistrationService {
             this.getClubInfo(eventRegistration.versionId, eventRegistration.version)
                   .then((club) => {
                         if (status === EventRegistrationStatus.APPROVED) {
-                              mailService.sendRegistrationApproved({ to: eventRegistration.email, username: eventRegistration.username, eventTitle, club });
+                              mailService.sendRegistrationApproved({ to: eventRegistration.email, username: eventRegistration.username, eventTitle, trackingId: eventRegistration.trackingId, club });
                         } else if (status === EventRegistrationStatus.REJECTED) {
-                              mailService.sendRegistrationRejected({ to: eventRegistration.email, username: eventRegistration.username, eventTitle, club, rejectionReason });
+                              mailService.sendRegistrationRejected({ to: eventRegistration.email, username: eventRegistration.username, eventTitle, trackingId: eventRegistration.trackingId, club, rejectionReason });
                         }
                   })
                   .catch((err) => console.error("[MailService] getClubInfo failed:", err));

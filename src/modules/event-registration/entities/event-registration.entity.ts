@@ -12,6 +12,9 @@ export enum EventRegistrationStatus {
 @Entity({ name: "event_registration" })
 export class EventRegistration extends BaseEntity {
       @Column({ type: "varchar", length: 150 })
+      trackingId: string;
+
+      @Column({ type: "varchar", length: 150 })
       username: string;
 
       @Column({ type: "varchar", length: 150 })

@@ -6,19 +6,38 @@ import { Category, CategoryType } from "../../category/entities/category.entity"
 import { removeFile } from "../../../shared/utils/helpers/imageUpload.helper";
 import { Speaker } from "../../speaker/entities/speaker.entity";
 import { EventVersionStatus, FlagshipEventVersion } from "../../flagship-event/entities/flagship-event.entity";
-import { randomInt, randomUUID } from "crypto";
+import { EventRegistration, EventRegistrationStatus } from "../../event-registration/entities/event-registration.entity";
 
 export class EventService {
       private eventRepository: Repository<EventEntity>;
       private categoryRepository: Repository<Category>;
       private speakerRepository: Repository<Speaker>;
       private versionRepository: Repository<FlagshipEventVersion>;
+      private eventRegistrationRepository: Repository<EventRegistration>;
 
       constructor(dataSource: DataSource) {
             this.eventRepository = dataSource.getRepository(EventEntity);
             this.categoryRepository = dataSource.getRepository(Category);
             this.speakerRepository = dataSource.getRepository(Speaker);
             this.versionRepository = dataSource.getRepository(FlagshipEventVersion);
+            this.eventRegistrationRepository = dataSource.getRepository(EventRegistration);
+      }
+
+      /** Maps eventId -> count of approved registrations for that event. */
+      private async getApprovedCounts(eventIds: string[]): Promise<Record<string, number>> {
+            if (!eventIds.length) return {};
+            const rows = await this.eventRegistrationRepository
+                  .createQueryBuilder('registration')
+                  .select('registration.eventId', 'eventId')
+                  .addSelect('COUNT(*)', 'count')
+                  .where('registration.eventId IN (:...eventIds)', { eventIds })
+                  .andWhere('registration.status = :status', { status: EventRegistrationStatus.APPROVED })
+                  .groupBy('registration.eventId')
+                  .getRawMany<{ eventId: string; count: string }>();
+            return rows.reduce((acc, row) => {
+                  acc[row.eventId] = Number(row.count);
+                  return acc;
+            }, {} as Record<string, number>);
       }
 
       async create(event: CreateEventDto, userId: string): Promise<EventEntity> {
@@ -53,10 +72,7 @@ export class EventService {
                   throw new AppError(`Display order ${rest.displayOrder} is already taken in this category`, 400);
             }
 
-            const trackingId = `ICT-Meetup-${versionExists.version_number}-${randomUUID().slice(0, 8)}`
-
             const newEvent = this.eventRepository.create({
-                  trackingId: trackingId,
                   title: rest.title,
                   subtitle: rest.subtitle,
                   description: rest.description,
@@ -102,7 +118,6 @@ export class EventService {
                         versionId: true,
                         categoryId: true,
                         speakerId: true,
-                        trackingId: true,
                         title: true,
                         subtitle: true,
                         description: true,
@@ -143,7 +158,9 @@ export class EventService {
                         displayOrder: 'ASC',
                   }
             });
-            return { items, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
+            const approvedCounts = await this.getApprovedCounts(items.map((item) => item.id));
+            const itemsWithSeats = items.map((item) => ({ ...item, bookedSeats: approvedCounts[item.id] ?? 0 }));
+            return { items: itemsWithSeats, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
       }
 
       async findById(id: string) {
@@ -153,7 +170,6 @@ export class EventService {
                   versionId: true,
                   categoryId: true,
                   speakerId: true,
-                  trackingId: true,
                   title: true,
                   subtitle: true,
                   description: true,
@@ -214,7 +230,8 @@ export class EventService {
             if (!event) {
                   throw new AppError("Event not found", 404);
             }
-            return event;
+            const approvedCounts = await this.getApprovedCounts([event.id]);
+            return { ...event, bookedSeats: approvedCounts[event.id] ?? 0 };
       }
 
       async update(id: string, data: UpdateEventDto, userId: string) {
@@ -311,7 +328,6 @@ export class EventService {
                         versionId: true,
                         categoryId: true,
                         speakerId: true,
-                        trackingId: true,
                         title: true,
                         subtitle: true,
                         description: true,
@@ -352,7 +368,9 @@ export class EventService {
                         displayOrder: 'ASC',
                   }
             });
-            return { items, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
+            const approvedCounts = await this.getApprovedCounts(items.map((item) => item.id));
+            const itemsWithSeats = items.map((item) => ({ ...item, bookedSeats: approvedCounts[item.id] ?? 0 }));
+            return { items: itemsWithSeats, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
       }
 
       async delete(id: string, versionId: string) {
