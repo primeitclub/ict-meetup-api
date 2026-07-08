@@ -76,6 +76,7 @@ export class EventRegistrationController extends BaseController {
                   const result = await this.eventRegistrationService.updateStatus(
                         req.params.id,
                         req.body.status,
+                        req.body.rejectionReason,
                   );
                   await this.createAuditLog(
                         AuditLogType.INFO,

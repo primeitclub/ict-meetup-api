@@ -59,7 +59,7 @@ export class AuditLogService {
             } = query;
 
             const pageNum = Number(page);
-            const limitNum = Number(limit);
+            const limitNum = Math.min(Number(limit) || 10, 100);
             const skip = (pageNum - 1) * limitNum;
 
             const queryBuilder = this.auditLogRepository.createQueryBuilder('auditLog');

@@ -6,6 +6,7 @@ export function parseExpiryToSeconds(expiry: string) {
       const unit = expiry.replace(/[0-9]/g, '');
 
       switch (unit) {
+            case 's': return value;              // seconds
             case 'm': return value * 60;        // minutes
             case 'h': return value * 60 * 60;   // hours
             case 'd': return value * 24 * 60 * 60; // days
@@ -31,6 +32,10 @@ export function clearCookie(name: string) {
             value: '',
             options: {
                   maxAge: 0,
+                  httpOnly: true,
+                  secure: envConfig.NODE_ENV === 'prod' || envConfig.NODE_ENV === 'dev',
+                  sameSite: 'strict' as const,
+                  path: '/',
             },
       };
 }

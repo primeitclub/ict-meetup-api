@@ -27,12 +27,17 @@ import createEventRegistrationRouter from "./modules/event-registration/routes/e
 import createGalleryRouter from "./modules/gallery/routes/gallery.routes";
 import createSettingsRouter from "./modules/settings/routes/settings.routes";
 import createContentRouter from "./modules/content/routes/content.routes";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 
 const app = express();
 
-app.use(express.json());
+app.set("trust proxy", 1);
+app.use(helmet());
+
+app.use(express.json({ limit: "50kb" }));
 const allowedOrigins = envConfig.ALLOWED_ORIGINS.split(",").map((o) => o.trim());
 
 app.use(
@@ -44,11 +49,12 @@ app.use(
 
 app.use(cookieParser());
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-app.use("/api-docs.json", (req: Request, res: Response) => {
-  res.json(swaggerSpec);
-});
+if (envConfig.NODE_ENV !== "prod") {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use("/api-docs.json", (req: Request, res: Response) => {
+    res.json(swaggerSpec);
+  });
+}
 
 app.use(errorHandler);
 
@@ -56,6 +62,20 @@ connectDatabase
   .initialize()
   .then(() => {
     console.log("Database connected successfully.");
+
+    // Rate limiters — only applied in prod
+    if (envConfig.NODE_ENV === 'prod') {
+      const authLoginLimiter = rateLimit({ windowMs: 60_000, max: 5, standardHeaders: true, legacyHeaders: false });
+      const authRefreshLimiter = rateLimit({ windowMs: 60_000, max: 10, standardHeaders: true, legacyHeaders: false });
+      const registrationLimiter = rateLimit({ windowMs: 5 * 60_000, max: 3, standardHeaders: true, legacyHeaders: false });
+      const publicReadLimiter = rateLimit({ windowMs: 60_000, max: 60, standardHeaders: true, legacyHeaders: false });
+
+      app.use("/api/auth/login", authLoginLimiter);
+      app.use("/api/auth/refresh-token", authRefreshLimiter);
+      app.use("/api/event-registrations", registrationLimiter);
+      app.use("/api/content", publicReadLimiter);
+      app.use("/api/events", publicReadLimiter);
+    }
 
     // Register routes AFTER DB is initialized — safe to create repositories
     app.use("/api/auth", createAuthRouter(connectDatabase));

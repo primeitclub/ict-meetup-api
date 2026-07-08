@@ -79,8 +79,9 @@ export class TeamMemberService {
     });
     const { versionId, categoryId, ...rest } = query;
     const { page = 1, limit = 10 } = rest;
-    const skip = (Number(page) - 1) * Number(limit);
-    
+    const parsedLimit = Math.min(Number(limit) || 10, 100);
+    const skip = (Number(page) - 1) * parsedLimit;
+
     const queryBuilder = this.teamMemberRepository.createQueryBuilder('teamMember');
     queryBuilder
       .leftJoinAndSelect('teamMember.category', 'category')
@@ -111,7 +112,7 @@ export class TeamMemberService {
       .addOrderBy('teamMember.displayOrder', 'ASC')
       .addOrderBy('teamMember.createdAt', 'DESC')
       .skip(skip)
-      .take(Number(limit));
+      .take(parsedLimit);
 
     const [items, total] = await queryBuilder.getManyAndCount();
 
@@ -120,8 +121,8 @@ export class TeamMemberService {
       meta: {
         total,
         page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit)),
+        limit: parsedLimit,
+        totalPages: Math.ceil(total / parsedLimit),
       }
     };
   }

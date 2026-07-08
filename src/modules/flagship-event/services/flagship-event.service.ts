@@ -59,12 +59,13 @@ export class FlagshipEventVersionService {
     });
 
     const { page = 1, limit = 10 } = query;
-    const skip = (Number(page) - 1) * Number(limit);
+    const parsedLimit = Math.min(Number(limit) || 10, 100);
+    const skip = (Number(page) - 1) * parsedLimit;
 
     const [items, total] = await this.versionRepository.findAndCount({
       order: { version_number: "DESC" },
       skip,
-      take: Number(limit),
+      take: parsedLimit,
     });
 
     return {
@@ -72,8 +73,8 @@ export class FlagshipEventVersionService {
       meta: {
         total,
         page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit)),
+        limit: parsedLimit,
+        totalPages: Math.ceil(total / parsedLimit),
       },
     };
   }
@@ -85,15 +86,7 @@ export class FlagshipEventVersionService {
   }
 
   async findBySlug(slug: string) {
-    let version = await this.versionRepository.findOne({ where: { slug } });
-    if (!version) {
-      // Fallback: search for slug ending with -slug or suffix (e.g. ict-meetup-v7 or ictmeetupv7 matches v7)
-      version = await this.versionRepository.createQueryBuilder("version")
-        .where("version.slug = :slug", { slug })
-        .orWhere("version.slug LIKE :likeSlug", { likeSlug: `%-${slug}` })
-        .orWhere("version.slug LIKE :likeSuffix", { likeSuffix: `%${slug}` })
-        .getOne();
-    }
+    const version = await this.versionRepository.findOne({ where: { slug } });
     if (!version) throw new AppError("Flagship event version not found", 404);
     return version;
   }

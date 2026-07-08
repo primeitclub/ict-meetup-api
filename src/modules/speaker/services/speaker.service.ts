@@ -41,7 +41,8 @@ export class SpeakerService {
             if (versionId) where.versionId = versionId;
 
             const { page = 1, limit = 10 } = rest;
-            const skip = (Number(page) - 1) * Number(limit);
+            const parsedLimit = Math.min(Number(limit) || 10, 100);
+            const skip = (Number(page) - 1) * parsedLimit;
 
             const [items, total] = await this.speakerRepository.findAndCount({
                   where,
@@ -71,7 +72,7 @@ id: true,
                         createdAt: 'DESC',
                   },
                   skip,
-                  take: Number(limit),
+                  take: parsedLimit,
             });
 
             return {
@@ -79,8 +80,8 @@ id: true,
                   meta: {
                         total,
                         page: Number(page),
-                        limit: Number(limit),
-                        totalPages: Math.ceil(total / Number(limit)),
+                        limit: parsedLimit,
+                        totalPages: Math.ceil(total / parsedLimit),
                   }
             };
       }

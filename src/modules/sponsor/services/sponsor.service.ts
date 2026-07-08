@@ -49,21 +49,22 @@ export class SponsorService {
 
       async findAll(query: any) {
             const { versionId, categoryId, page = 1, limit = 10 } = query;
-            
+
             const where: any = {};
-            
+
             if (versionId) where.versionId = versionId;
             if (categoryId) where.categoryId = categoryId;
-            
+
             // Add category type filter for sponsors
             where.category = { type: CategoryType.SPONSOR };
 
-            const skip = (Number(page) - 1) * Number(limit);
+            const parsedLimit = Math.min(Number(limit) || 10, 100);
+            const skip = (Number(page) - 1) * parsedLimit;
 
             const [items, total] = await this.sponsorRepository.findAndCount({
                   where,
                   skip,
-                  take: Number(limit),
+                  take: parsedLimit,
                   relations: ['category', 'flagshipEvent'],
                   select: {
                         id: true,
@@ -94,14 +95,14 @@ export class SponsorService {
                   },
             });
 
-            return { 
-                  items, 
-                  meta: { 
-                        total, 
-                        page: Number(page), 
-                        limit: Number(limit), 
-                        totalPages: Math.ceil(total / Number(limit)) 
-                  } 
+            return {
+                  items,
+                  meta: {
+                        total,
+                        page: Number(page),
+                        limit: parsedLimit,
+                        totalPages: Math.ceil(total / parsedLimit),
+                  }
             };
       }
 

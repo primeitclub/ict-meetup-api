@@ -12,7 +12,6 @@ const createEventRegistrationBaseSchema = z.object({
       attachedPaymentScreenshot: z.string().trim().min(3).optional(),
       eventId: z.string().trim().min(3).max(150),
       versionId: z.string().trim().min(3).max(150),
-      status: z.enum(EventRegistrationStatus).default(EventRegistrationStatus.PENDING),
 });
 
 export const createEventRegistrationSchema = createEventRegistrationBaseSchema.superRefine((data, ctx) => {
@@ -41,7 +40,9 @@ export const createEventRegistrationSchema = createEventRegistrationBaseSchema.s
       }
 });
 
-export const updateEventRegistrationSchema = createEventRegistrationBaseSchema.partial();
+export const updateEventRegistrationSchema = createEventRegistrationBaseSchema.partial().extend({
+      rejectionReason: z.string().trim().max(500).optional(),
+});
 
 
 export const eventRegistrationQuerySchema = z.object({

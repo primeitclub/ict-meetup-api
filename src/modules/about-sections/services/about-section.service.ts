@@ -60,13 +60,14 @@ export class AboutSectionService {
 
     const { versionId, page = 1, limit = 10 } = query;
     const where = versionId ? { versionId } : {};
-    const skip = (Number(page) - 1) * Number(limit);
+    const parsedLimit = Math.min(Number(limit) || 10, 100);
+    const skip = (Number(page) - 1) * parsedLimit;
 
     const [items, total] = await this.aboutSectionRepository.findAndCount({
       where,
       order: { createdAt: 'DESC' },
       skip,
-      take: Number(limit),
+      take: parsedLimit,
       relations: ['flagshipEventVersion'],
     });
 
@@ -75,8 +76,8 @@ export class AboutSectionService {
       meta: {
         total,
         page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit)),
+        limit: parsedLimit,
+        totalPages: Math.ceil(total / parsedLimit),
       }
     };
   }
@@ -103,21 +104,44 @@ export class AboutSectionService {
       module: 'AboutSectionService',
     });
 
-    const versionId = data.versionId || aboutSection.versionId;
-    const versionExists = await this.dataSource
-      .getRepository(FlagshipEventVersion)
-      .findOne({ where: { id: versionId } });
+    // Only validate the target version when it is being changed to a different one.
+    if (data.versionId && data.versionId !== aboutSection.versionId) {
+      const versionExists = await this.dataSource
+        .getRepository(FlagshipEventVersion)
+        .findOne({ where: { id: data.versionId } });
 
-    if (!versionExists) {
-      throw new AppError('Flagship event version not found', 404);
+      if (!versionExists) {
+        throw new AppError('Flagship event version not found', 404);
+      }
+      if (versionExists.status === EventVersionStatus.ARCHIVED) {
+        throw new AppError('Cannot move about section to an archived flagship event version', 400);
+      }
+
+      const duplicate = await this.aboutSectionRepository.findOne({
+        where: { versionId: data.versionId },
+      });
+      if (duplicate) {
+        throw new AppError(
+          `About section already exists for this flagship event version`,
+          400
+        );
+      }
+
+      // Keep the loaded relation in sync with the new FK — TypeORM writes the
+      // join column from this relation on save, so a stale relation here would
+      // silently overwrite the versionId we're about to assign below.
+      aboutSection.flagshipEventVersion = versionExists;
     }
 
-    if (versionExists.status === EventVersionStatus.ARCHIVED) {
-      throw new AppError('Cannot update about sections for an archived flagship event version', 400);
-    }
+    // Strip empty-string version to avoid overwriting with blank FK.
+    const { versionId, ...rest } = data;
+    const safeData = {
+      ...rest,
+      ...(versionId ? { versionId } : {}),
+    };
 
     const payload = {
-      ...data,
+      ...safeData,
       modifiedById: userId
     };
 

@@ -97,15 +97,8 @@ const createAuthRouter = (dataSource: DataSource) => {
        * @swagger
        * /api/auth/refresh-token:
        *   post:
-       *     summary: Refresh a token (Supports optional expiry in path, query, or body for testing)
+       *     summary: Refresh access token using the refresh cookie
        *     tags: [Auth]
-       *     parameters:
-       *       - in: query
-       *         name: expiry
-       *         schema:
-       *           type: string
-       *         required: false
-       *         description: The custom expiry time for the new refresh token (e.g., '10s', '1m', '1h')
        *     responses:
        *       200:
        *         description: Refresh token successful
