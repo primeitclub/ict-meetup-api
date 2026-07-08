@@ -72,6 +72,25 @@ No migration script backfills data from any existing version's `Settings`
 row into `SiteSettings` — it's created empty and populated manually via the
 admin UI after deploy.
 
+**Risk — data loss on deploy:** dropping these columns permanently destroys
+whatever `clubEmail`/`clubPhoneNumber`/`socialMediaLinks`/`qrCodeUrl` is
+currently saved on any version's `Settings` row. In particular, any
+existing QR code image is orphaned in Cloudinary — its `qrCodePath`
+(the deletion pointer) is dropped along with the column, so nothing will
+ever clean that asset up automatically. Before deploying, note down the
+current club email/phone, social links, and re-download the current QR
+code image if one exists, so they can be manually re-entered via the new
+singleton form.
+
+**Deployment note:** locally, `NODE_ENV=local` sets `synchronize: true`, so
+these entity changes apply automatically on server restart — no manual
+migration needed to test this locally. For `dev`/`prod`, `synchronize` is
+off and a real migration is required: run
+`pnpm typeorm:generate-migration --name=NonVersionedSiteSettings` after the
+entity changes are in place, review the generated SQL (it should contain a
+`CREATE TABLE site_settings` and an `ALTER TABLE settings DROP COLUMN ...`
+for each removed field), and run it before/during deploy.
+
 ## Backend API
 
 New module `site-settings` (mirrors the existing `settings` module's
@@ -93,7 +112,9 @@ Register `SiteSettings` in `db.config.ts`'s entity list and mount
 router.
 
 `AuditLogScope` gains a `SITE_SETTINGS` member for the audit log calls on
-`PUT`/QR-delete.
+`PUT`/QR-delete. `swagger.utils.ts`'s static `tags` array gains a
+`SiteSettings` entry alongside the existing `Setting` tag, so the new
+routes' `@swagger` JSDoc groups correctly in `/api-docs`.
 
 ### Changes to the existing `settings` module
 
@@ -109,8 +130,11 @@ router.
   the QR lifecycle handling in `update`) since QR code no longer lives on
   this entity.
 
-### Mail service integration
+### Registration email integration
 
+`mail.service.ts` itself needs **no changes** — its `ClubInfo` interface is
+already decoupled from the `Settings` entity; it just renders whatever
+object it's handed. Only the assembly of that object changes:
 `EventRegistrationService.getClubInfo` (`event-registration.service.ts:27-41`)
 currently reads `settings.clubEmail ?? settings.email` etc. from the
 per-version `Settings` row. It changes to read directly from the new
@@ -159,10 +183,18 @@ still built on `useSettingsForVersion`/`useSaveSettings` against
 
 `types/settings.ts` splits into two types: `Settings` (now just
 `versionId`, `email`, `phoneNumber`, `contactDepartments`,
-`flagshipEventVersion`) and a new `SiteSettings` (`clubEmail`,
-`clubPhoneNumber`, `socialMediaLinks`, `qrCodeUrl`). New `API_ROUTES`
+`flagshipEventVersion`, and it keeps the `ContactPerson`/
+`ContactDepartment` types since those belong to Contact Management) and a
+new `SiteSettings` (`clubEmail`, `clubPhoneNumber`, `socialMediaLinks`,
+`qrCodeUrl`, taking over the existing `SocialMediaLink`/`SOCIAL_PLATFORMS`
+exports since those belong to the Social Media tab). New `API_ROUTES`
 entries: `siteSettings` (`/site-settings`) and `siteSettingsQrCode`
-(`/site-settings/qrcode`).
+(`/site-settings/qrcode`) — note the QR delete route needs no `${id}`
+placeholder (unlike the old `settingQrCode: "/settings/${id}/qrcode"`)
+since there's only ever one row.
+
+`SettingsVersionBar.tsx` is not deleted — it's still used by
+`ContactManagement.tsx`. Only `PaymentSetup.tsx` stops importing it.
 
 ## Public frontend (`ict-frontend`)
 
@@ -182,6 +214,14 @@ shared hook (e.g. `useSiteSettings()`) wrapping
 `useApiQuery("siteSettings")` so these five files don't each duplicate the
 fetch.
 
+All five currently gate their versioned settings queries on
+`enabled: !!versionId` (`Footer.tsx`, `ContactUs.tsx`, `Sponsors.tsx`,
+`PaymentSuccess.tsx`, `Payment.tsx`) because the old endpoints required a
+`versionId` query param. The new `siteSettings` query has no version
+dependency, so it should be enabled unconditionally (fetch on mount) —
+don't copy the old `enabled` guard onto it, or club info will wait on
+version resolution for no reason.
+
 ## Consequence: historical versions
 
 Archived versions (v5, v6, v7) will show the same global club email/phone,
@@ -192,6 +232,10 @@ something that should have varied per edition in the first place.
 
 ## Verification plan
 
+0. Before touching any code: record the current club email/phone, social
+   links, and download the current QR code image (if any exist on any
+   version today), so they can be manually re-entered after the columns
+   are dropped.
 1. Backend: start `pnpm dev`, confirm `GET`/`PUT /api/site-settings` and
    `DELETE /api/site-settings/qrcode` work; confirm
    `GET /api/settings/contacts` no longer returns `clubEmail`/
@@ -205,3 +249,6 @@ something that should have varied per edition in the first place.
 4. Mail: submit a test registration and confirm the confirmation email's
    club contact block still populates correctly from the new global
    source.
+5. Re-enter the club email/phone, social links, and re-upload the QR code
+   (from step 0) into the new Club Details/Social Media/Payment Setup
+   forms, and confirm they appear correctly across the public site.
