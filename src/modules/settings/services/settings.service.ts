@@ -4,9 +4,6 @@ import logger from '../../../shared/utils/logger.utils';
 import { Settings } from '../entities/settings.entity';
 import { CreateSettingsDto, UpdateSettingsDto } from '../validators/settings.validator';
 import { FlagshipEventVersion, EventVersionStatus } from '../../flagship-event/entities/flagship-event.entity';
-import fs from 'fs';
-import path from 'path';
-import cloudinary from '../../../shared/config/cloudinary.config';
 
 export class SettingsService {
   private settingsRepository: Repository<Settings>;
@@ -17,7 +14,7 @@ export class SettingsService {
     this.settingsRepository = dataSource.getRepository(Settings);
   }
 
-  async create(data: CreateSettingsDto & { uploadedImages?: any }, userId: string): Promise<Settings> {
+  async create(data: CreateSettingsDto, userId: string): Promise<Settings> {
     logger.info(`Creating new settings`, {
       module: 'SettingsService',
     });
@@ -47,9 +44,6 @@ export class SettingsService {
 
     const payload = {
       ...data,
-      qrCodeUrl: data.uploadedImages?.cloudUrl || data.qrCodeUrl,
-      qrCodePath: data.uploadedImages?.publicId || data.qrCodePath,
-      qrCodeLocalPath: data.uploadedImages?.localPath || data.qrCodeLocalPath,
       createdById: userId
     };
 
@@ -108,7 +102,7 @@ export class SettingsService {
 
   async update(
     id: string,
-    data: UpdateSettingsDto & { uploadedImages?: any },
+    data: UpdateSettingsDto,
     userId: string
   ): Promise<Settings> {
     const settings = await this.findById(id);
@@ -147,26 +141,12 @@ export class SettingsService {
     // silently overwrite the versionId we're about to assign below.
     settings.flagshipEventVersion = versionExists;
 
-    // Handle QR code lifecycle on update
-    const newQrCodePath = data.uploadedImages?.publicId;
-    if (newQrCodePath && settings.qrCodePath && newQrCodePath !== settings.qrCodePath) {
-      await this.deleteFiles(settings.qrCodeLocalPath, settings.qrCodePath);
-    }
-
     // Filter out undefined properties from data so they don't overwrite existing settings
     const cleanData = Object.fromEntries(
       Object.entries(data).filter(([_, v]) => v !== undefined)
     );
 
-    const payload = {
-      ...cleanData,
-      qrCodeUrl: data.uploadedImages?.cloudUrl || data.qrCodeUrl || settings.qrCodeUrl,
-      qrCodePath: data.uploadedImages?.publicId || data.qrCodePath || settings.qrCodePath,
-      qrCodeLocalPath: data.uploadedImages?.localPath || data.qrCodeLocalPath || settings.qrCodeLocalPath,
-      modifiedById: userId
-    };
-
-    Object.assign(settings, payload);
+    Object.assign(settings, cleanData, { modifiedById: userId });
     const updatedSettings = await this.settingsRepository.save(settings);
 
     return updatedSettings;
@@ -183,34 +163,13 @@ export class SettingsService {
       throw new AppError('Can only delete settings for a flagship event version that is in "draft" status', 400);
     }
 
-    // Clean up assets before deletion
-    await this.deleteFiles(settings.qrCodeLocalPath, settings.qrCodePath);
-
     await this.settingsRepository.remove(settings);
 
     return;
   }
 
-  async removeQrCode(id: string, userId: string): Promise<Settings> {
-    const settings = await this.findById(id);
-
-    logger.warn(`Removing QR code from settings: ${id}`, {
-      module: 'SettingsService',
-    });
-
-    await this.deleteFiles(settings.qrCodeLocalPath, settings.qrCodePath);
-
-    settings.qrCodeUrl = null as any;
-    settings.qrCodePath = null as any;
-    settings.qrCodeLocalPath = null as any;
-    settings.modifiedById = userId;
-
-    return await this.settingsRepository.save(settings);
-  }
-
-  // Delete the settings row belonging to a version (cascade on version delete),
-  // cleaning up the QR code asset. Pass `manager` to run inside the
-  // version-delete transaction.
+  // Delete the settings row belonging to a version (cascade on version delete).
+  // Pass `manager` to run inside the version-delete transaction.
   async deleteByVersion(versionId: string, manager?: EntityManager): Promise<void> {
     const repo = manager ? manager.getRepository(Settings) : this.settingsRepository;
     const rows = await repo.find({ where: { versionId } });
@@ -220,38 +179,6 @@ export class SettingsService {
       module: 'SettingsService',
     });
 
-    for (const row of rows) {
-      await this.deleteFiles(row.qrCodeLocalPath, row.qrCodePath);
-    }
-
     await repo.remove(rows);
-  }
-
-  private async deleteFiles(localPath?: string, publicId?: string): Promise<void> {
-    try {
-      if (publicId) {
-        await cloudinary.uploader.destroy(publicId);
-        logger.info(`Deleted from Cloudinary: ${publicId}`, {
-          module: 'SettingsService',
-        });
-      }
-
-      if (localPath) {
-        const fullPath = path.isAbsolute(localPath)
-          ? localPath
-          : path.join(process.cwd(), localPath);
-
-        if (fs.existsSync(fullPath)) {
-          fs.unlinkSync(fullPath);
-          logger.info(`Deleted from local disk: ${fullPath}`, {
-            module: 'SettingsService',
-          });
-        }
-      }
-    } catch (error) {
-      logger.error(`Failed to delete associated files: ${error instanceof Error ? error.message : String(error)}`, {
-        module: 'SettingsService',
-      });
-    }
   }
 }
