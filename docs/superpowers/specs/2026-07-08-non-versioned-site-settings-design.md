@@ -116,6 +116,41 @@ router.
 `SiteSettings` entry alongside the existing `Setting` tag, so the new
 routes' `@swagger` JSDoc groups correctly in `/api-docs`.
 
+**Blocker found — `imageUploadHandler` requires a version:**
+`shared/utils/helpers/imageUpload.helper.ts`'s multer `storage.destination`
+(lines 51-78) computes the upload folder from a `versionId` pulled off
+`req.body`/`req.query`/`req.params`, and throws
+`AppError("Version ID or version_name is required", 400)` if none is
+found — unless the resolved `moduleName` (derived from `req.baseUrl`) is
+the special-cased `"flagship-event"`, which uses a fixed `"flagship-main"`
+folder name instead. Since `PUT /api/site-settings` requests will never
+carry a `versionId`, QR code uploads would fail this check immediately.
+
+Fix: add `"site-settings"` as a second special-cased module in that same
+`if (!versionId)` branch, using a fixed folder name (e.g. `"site-settings"`)
+the same way `"flagship-event"` does:
+
+```ts
+if (!versionId) {
+  if (req.body.version_name) {
+    versionName = req.body.version_name;
+  } else if (moduleName === "flagship-event") {
+    versionName = "flagship-main";
+  } else if (moduleName === "site-settings") {
+    versionName = "site-settings";
+  } else {
+    return cb(new AppError("Version ID or version_name is required", 400), "");
+  }
+} else {
+  ...
+}
+```
+
+This means the QR image ends up stored under
+`public/assets/site-settings/site-settings/<file>` and Cloudinary folder
+`assets/site-settings/site-settings` — harmless, just a fixed path instead
+of a per-version one.
+
 ### Changes to the existing `settings` module
 
 - `SettingsController.getSocialMedia` and `getPayments` are deleted
