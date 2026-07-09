@@ -6,7 +6,7 @@ import { CreateEventRegistrationDto } from "../validators/event-registration.val
 import { AppError } from "../../../shared/utils/error.utils";
 import { removeFile } from "../../../shared/utils/helpers/imageUpload.helper";
 import { mailService, ClubInfo } from "../../mail/mail.service";
-import { Settings } from "../../settings/entities/settings.entity";
+import { SiteSettingsService } from "../../site-settings/services/site-settings.service";
 import { HeroSection } from "../../hero-sections/entities/hero-section.entity";
 import { randomUUID } from "crypto";
 
@@ -14,19 +14,19 @@ export class EventRegistrationService {
       private eventRegistrationRepository: Repository<EventRegistration>;
       private flagshipEventVersionRepository: Repository<FlagshipEventVersion>;
       private eventRepository: Repository<Event>;
-      private settingsRepository: Repository<Settings>;
+      private siteSettingsService: SiteSettingsService;
       private heroSectionRepository: Repository<HeroSection>;
       constructor(dataSources: DataSource) {
             this.eventRegistrationRepository = dataSources.getRepository(EventRegistration);
             this.flagshipEventVersionRepository = dataSources.getRepository(FlagshipEventVersion);
             this.eventRepository = dataSources.getRepository(Event);
-            this.settingsRepository = dataSources.getRepository(Settings);
+            this.siteSettingsService = new SiteSettingsService(dataSources);
             this.heroSectionRepository = dataSources.getRepository(HeroSection);
       }
 
       private async getClubInfo(versionId: string, version: FlagshipEventVersion): Promise<ClubInfo> {
-            const [settings, hero] = await Promise.all([
-                  this.settingsRepository.findOne({ where: { versionId } }),
+            const [siteSettings, hero] = await Promise.all([
+                  this.siteSettingsService.get(),
                   this.heroSectionRepository.findOne({ where: { flagshipEventVersionId: versionId } }),
             ]);
             return {
@@ -34,9 +34,9 @@ export class EventRegistrationService {
                   logoUrl: version?.logo ?? null,
                   heroTitle: hero?.heading ?? null,
                   heroDescription: hero?.paragraph ?? null,
-                  clubEmail: settings?.clubEmail ?? settings?.email ?? null,
-                  clubPhoneNumber: settings?.clubPhoneNumber ?? settings?.phoneNumber ?? null,
-                  socialMediaLinks: settings?.socialMediaLinks ?? null,
+                  clubEmail: siteSettings?.clubEmail ?? null,
+                  clubPhoneNumber: siteSettings?.clubPhoneNumber ?? null,
+                  socialMediaLinks: siteSettings?.socialMediaLinks ?? null,
             };
       }
 
