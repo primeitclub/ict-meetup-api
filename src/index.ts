@@ -2,6 +2,7 @@ import "reflect-metadata";
 import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
+import path from "path";
 import connectDatabase from "./shared/config/typeorm/db.config";
 import { envConfig } from "./shared/config/env";
 import createSeedRouter from "./modules/seed/seed.routes";
@@ -36,9 +37,12 @@ dotenv.config();
 const app = express();
 
 app.set("trust proxy", 1);
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow images to be loaded from other origins
+}));
 
 app.use(express.json({ limit: "50kb" }));
+
 const allowedOrigins = envConfig.ALLOWED_ORIGINS.split(",").map((o) => o.trim());
 
 app.use(
@@ -47,6 +51,9 @@ app.use(
     credentials: true,
   }),
 );
+
+// Serve local assets publicly — must be after CORS & helmet config
+app.use("/public/assets", express.static(path.join(process.cwd(), "public", "assets")));
 
 app.use(cookieParser());
 

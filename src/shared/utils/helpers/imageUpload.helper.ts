@@ -11,6 +11,7 @@ import {
 } from "../../constants/upload.constants";
 import { handleMulterError } from "./multerError.helper";
 import { AppError } from "../error.utils";
+import { envConfig } from "../../config/env";
 import { FlagshipEventVersionService } from "../../../modules/flagship-event/services/flagship-event.service";
 import connectDatabase from "../../config/typeorm/db.config";
 
@@ -181,15 +182,11 @@ export const imageUploadHandler =
 
             uploadedImages.push({
               localPath: file.path,
-              localUrl: `/public/assets/${version}/${moduleName}/${file.filename}`,
+              localUrl: `${envConfig.BASE_URL}/public/assets/${version}/${moduleName}/${file.filename}`,
               cloudUrl: cloudResult.secure_url,
               publicId: cloudResult.public_id,
             });
           }
-
-          const finalImageUrl = options.multiple
-            ? uploadedImages.map((image) => image.cloudUrl)
-            : uploadedImages[0].cloudUrl;
 
           const finalLocalUrl = options.multiple
             ? uploadedImages.map((image) => image.localUrl)
@@ -202,11 +199,13 @@ export const imageUploadHandler =
           req.body.imagePath = options.multiple
             ? uploadedImages.map((image) => image.localPath)
             : uploadedImages[0].localPath;
-          req.body.imageUrl = finalImageUrl;
+
+          // Switch to using the local API URL for serving images
+          req.body.imageUrl = finalLocalUrl;
           req.body.imageLocalUrl = finalLocalUrl;
 
           // Also set the specific fieldName for validation/controller compatibility
-          req.body[options.fieldName] = finalImageUrl;
+          req.body[options.fieldName] = finalLocalUrl;
 
           next();
         } catch (uploadError) {
