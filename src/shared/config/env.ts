@@ -2,7 +2,8 @@ import z from "zod";
 import dotenv from "dotenv";
 dotenv.config();
 const envSchema = z.object({
-      PORT: z.coerce.number().default(3000),
+      PORT: z.coerce.number().default(4000),
+      BASE_URL: z.string().default('http://localhost:4000'),
       DB_HOST: z.string().default('localhost'),
       DB_PORT: z.coerce.number().default(3306),
       DB_USERNAME: z.string().default('root'),
