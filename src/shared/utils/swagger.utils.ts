@@ -69,6 +69,10 @@ const options: swaggerJSDoc.Options = {
                   {
                         name: "Setting",
                         description:"API for managing settings "
+                  },
+                  {
+                        name: "SiteSettings",
+                        description: "API for managing global, non-versioned club settings (club contact, social links, payment QR code)"
                   }
 ],
       },

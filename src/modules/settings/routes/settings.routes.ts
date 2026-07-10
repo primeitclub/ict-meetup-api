@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { DataSource } from 'typeorm';
-import { z } from 'zod';
 import { SettingsController } from '../controllers/settings.controller';
 import { validateRequestBody, validateRequestQuery, validateRequestParams } from '../../../shared/validators/request.validator';
 import {
@@ -10,7 +9,7 @@ import {
   settingsIdParamSchema,
 } from '../validators/settings.validator';
 import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
-import { imageUploadHandler } from '../../../shared/utils/helpers/imageUpload.helper';
+import { z } from 'zod';
 
 const versionIdQuerySchema = z.object({ versionId: z.string().uuid() });
 
@@ -28,7 +27,7 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *     requestBody:
   *       required: true
   *       content:
-  *         multipart/form-data:
+  *         application/json:
   *           schema:
   *             type: object
   *             required: [versionId]
@@ -36,17 +35,12 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *               versionId: { type: string, format: uuid }
   *               email: { type: string }
   *               phoneNumber: { type: string }
-  *               teamName: { type: string }
-  *               socialMediaLinks: { type: string, description: "JSON stringified array of {platform, link}" }
-  *               qrCode:
-  *                 type: string
-  *                 format: binary
-  *                 description: QR code image
+  *               contactDepartments: { type: string, description: "JSON stringified array of {department, contacts}" }
   *     responses:
   *       201:
   *         description: Created
   */
-  router.post('/', authenticate, imageUploadHandler({ fieldName: 'qrCode', multiple: false, optional: true }), validateRequestBody(createSettingsSchema), controller.create);
+  router.post('/', authenticate, validateRequestBody(createSettingsSchema), controller.create);
 
   /**
   * @swagger
@@ -68,7 +62,7 @@ const createSettingsRouter = (dataSource: DataSource) => {
   * @swagger
   * /api/settings/contacts:
   *   get:
-  *     summary: Get contact info (email, phone, teamName) for a version
+  *     summary: Get contact info (email, phone, department contacts) for a version
   *     tags: [Settings]
   *     parameters:
   *       - in: query
@@ -80,40 +74,6 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *         description: OK
   */
   router.get('/contacts', validateRequestQuery(versionIdQuerySchema), controller.getContacts);
-
-  /**
-  * @swagger
-  * /api/settings/social-media:
-  *   get:
-  *     summary: Get social media links for a version
-  *     tags: [Settings]
-  *     parameters:
-  *       - in: query
-  *         name: versionId
-  *         required: true
-  *         schema: { type: string, format: uuid }
-  *     responses:
-  *       200:
-  *         description: OK
-  */
-  router.get('/social-media', validateRequestQuery(versionIdQuerySchema), controller.getSocialMedia);
-
-  /**
-  * @swagger
-  * /api/settings/payments:
-  *   get:
-  *     summary: Get payment QR code URL for a version
-  *     tags: [Settings]
-  *     parameters:
-  *       - in: query
-  *         name: versionId
-  *         required: true
-  *         schema: { type: string, format: uuid }
-  *     responses:
-  *       200:
-  *         description: OK
-  */
-  router.get('/payments', validateRequestQuery(versionIdQuerySchema), controller.getPayments);
 
   /**
   * @swagger
@@ -145,24 +105,19 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *         schema: { type: string, format: uuid }
   *     requestBody:
   *       content:
-  *         multipart/form-data:
+  *         application/json:
   *           schema:
   *             type: object
   *             properties:
   *               versionId: { type: string, format: uuid }
   *               email: { type: string }
   *               phoneNumber: { type: string }
-  *               teamName: { type: string }
-  *               socialMediaLinks: { type: string, description: "JSON stringified array of {platform, link}" }
-  *               qrCode:
-  *                 type: string
-  *                 format: binary
-  *                 description: QR code image
+  *               contactDepartments: { type: string, description: "JSON stringified array of {department, contacts}" }
   *     responses:
   *       200:
   *         description: OK
   */
-  router.put('/:id', authenticate, imageUploadHandler({ fieldName: 'qrCode', multiple: false, optional: true }), validateRequestParams(settingsIdParamSchema), validateRequestBody(updateSettingsSchema), controller.update);
+  router.put('/:id', authenticate, validateRequestParams(settingsIdParamSchema), validateRequestBody(updateSettingsSchema), controller.update);
 
   /**
   * @swagger
@@ -180,23 +135,6 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *         description: OK
   */
   router.delete('/:id', authenticate, validateRequestParams(settingsIdParamSchema), controller.delete);
-
-  /**
-  * @swagger
-  * /api/settings/{id}/qrcode:
-  *   delete:
-  *     summary: Remove only the QR code from settings
-  *     tags: [Settings]
-  *     parameters:
-  *       - in: path
-  *         name: id
-  *         required: true
-  *         schema: { type: string, format: uuid }
-  *     responses:
-  *       200:
-  *         description: OK
-  */
-  router.delete('/:id/qrcode', authenticate, validateRequestParams(settingsIdParamSchema), controller.removeQrCode);
 
   return router;
 };

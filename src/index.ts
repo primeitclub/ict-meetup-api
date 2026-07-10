@@ -27,6 +27,7 @@ import createSponsorRouter from "./modules/sponsor/routes/sponsor.routes";
 import createEventRegistrationRouter from "./modules/event-registration/routes/event-registration.routes";
 import createGalleryRouter from "./modules/gallery/routes/gallery.routes";
 import createSettingsRouter from "./modules/settings/routes/settings.routes";
+import createSiteSettingsRouter from "./modules/site-settings/routes/site-settings.routes";
 import createContentRouter from "./modules/content/routes/content.routes";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -107,6 +108,7 @@ connectDatabase
     );
     app.use("/api/gallery", createGalleryRouter(connectDatabase));
     app.use("/api/settings", createSettingsRouter(connectDatabase));
+    app.use("/api/site-settings", createSiteSettingsRouter(connectDatabase));
     app.use("/api/content", createContentRouter(connectDatabase));
 
     app.use(errorHandler);

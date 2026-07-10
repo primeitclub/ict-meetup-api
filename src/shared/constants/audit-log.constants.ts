@@ -27,6 +27,7 @@ export enum AuditLogScope {
   TEAM_MEMBERS = 'team_members',
   VERSION_SETTINGS = 'version_settings',
   SETTINGS = 'settings',
+  SITE_SETTINGS = 'site_settings',
   USERS = 'users',
   FAQ = 'faq',
 }
