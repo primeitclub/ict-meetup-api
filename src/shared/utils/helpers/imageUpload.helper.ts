@@ -66,6 +66,9 @@ const storage = multer.diskStorage({
         } else if (moduleName === "flagship-event") {
           // Special case: Flagship event logo can be uploaded even if name/id isn't in body yet
           versionName = "flagship-main";
+        } else if (moduleName === "site-settings") {
+          // Site settings is a global singleton with no version at all.
+          versionName = "site-settings";
         } else {
           return cb(new AppError("Version ID or version_name is required", 400), "");
         }

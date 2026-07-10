@@ -60,40 +60,7 @@ export class SettingsController extends BaseController {
       return responseHandler(res)('Contact settings fetched successfully', {
         email: settings.email,
         phoneNumber: settings.phoneNumber,
-        teamName: settings.teamName,
-        clubEmail: settings.clubEmail,
-        clubPhoneNumber: settings.clubPhoneNumber,
         contactDepartments: settings.contactDepartments,
-      }, 200);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  getSocialMedia = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { versionId } = req.query as { versionId: string };
-      const settings = await this.service.findByVersion(versionId);
-      if (!settings) {
-        return responseHandler(res)('No settings found for this version', null, 404);
-      }
-      return responseHandler(res)('Social media settings fetched successfully', {
-        socialMediaLinks: settings.socialMediaLinks,
-      }, 200);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  getPayments = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { versionId } = req.query as { versionId: string };
-      const settings = await this.service.findByVersion(versionId);
-      if (!settings) {
-        return responseHandler(res)('No settings found for this version', null, 404);
-      }
-      return responseHandler(res)('Payment settings fetched successfully', {
-        qrCodeUrl: settings.qrCodeUrl,
       }, 200);
     } catch (error) {
       next(error);
@@ -155,25 +122,6 @@ export class SettingsController extends BaseController {
         userId
       );
       return responseHandler(res)('Settings deleted successfully', null, 200);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  removeQrCode = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId = req.user!.userId;
-      const result = await this.service.removeQrCode(req.params.id, userId);
-      await this.createAuditLog(
-        AuditLogType.INFO,
-        AuditLogActionType.DELETE,
-        "QR code removed successfully",
-        result.versionId,
-        AuditLogScope.SETTINGS,
-        req.ip,
-        userId
-      );
-      return responseHandler(res)('QR code removed successfully', result, 200);
     } catch (error) {
       next(error);
     }
