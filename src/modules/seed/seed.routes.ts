@@ -26,7 +26,7 @@ const createSeedRouter = (dataSource: DataSource) => {
        *       200:
        *         description: OK
        */
-      seedRouter.post('/init', blockInProd, authenticate, seedController.seedStaticUsers);
+      seedRouter.post('/init', blockInProd,seedController.seedStaticUsers);
       seedRouter.post('/create', blockInProd, authenticate, seedController.seedCustomUser);
 
       return seedRouter;
