@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { DataSource } from 'typeorm';
+import multer from 'multer';
 import { SettingsController } from '../controllers/settings.controller';
 import { validateRequestBody, validateRequestQuery, validateRequestParams } from '../../../shared/validators/request.validator';
 import {
@@ -17,6 +18,8 @@ const createSettingsRouter = (dataSource: DataSource) => {
   const router = Router();
   const controller = new SettingsController(dataSource);
   const authenticate = createAuthenticate(dataSource);
+  // Parse multipart/form-data fields (no file uploads on this route)
+  const parseFormData = multer().none();
 
   /**
   * @swagger
@@ -40,7 +43,7 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *       201:
   *         description: Created
   */
-  router.post('/', authenticate, validateRequestBody(createSettingsSchema), controller.create);
+  router.post('/', authenticate, parseFormData, validateRequestBody(createSettingsSchema), controller.create);
 
   /**
   * @swagger
@@ -117,7 +120,7 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *       200:
   *         description: OK
   */
-  router.put('/:id', authenticate, validateRequestParams(settingsIdParamSchema), validateRequestBody(updateSettingsSchema), controller.update);
+  router.put('/:id', authenticate, parseFormData, validateRequestParams(settingsIdParamSchema), validateRequestBody(updateSettingsSchema), controller.update);
 
   /**
   * @swagger

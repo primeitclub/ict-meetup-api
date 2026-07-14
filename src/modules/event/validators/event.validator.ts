@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EventStatus, FeeType } from "../entities/event.entity";
+import { EventStatus, FeeType, EventType } from "../entities/event.entity";
 import { paginationShape } from "../../../shared/validators/pagination.validator";
 
 export const baseEventSchema = z.object({
@@ -37,6 +37,11 @@ export const baseEventSchema = z.object({
   isHighlighted: z
     .preprocess((v) => v === "true" || v === true, z.boolean())
     .optional(),
+  eventType: z.enum([EventType.SINGLE, EventType.GROUP]).optional().default(EventType.SINGLE),
+  maxParticipants: z.preprocess(
+    (val) => (val === "" || val === undefined || val === null ? undefined : Number(val)),
+    z.number().int().min(1).max(20).optional()
+  ),
 });
 
 export const createEventSchema = baseEventSchema.superRefine((data, ctx) => {
@@ -87,6 +92,23 @@ export const createEventSchema = baseEventSchema.superRefine((data, ctx) => {
         code: z.ZodIssueCode.custom,
         message: "Registration deadline must be before the event date",
         path: ["registrationDeadline"],
+      });
+    }
+  }
+
+  // 4. Group Event Validation
+  if (data.eventType === EventType.GROUP) {
+    if (data.maxParticipants === undefined || data.maxParticipants === null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Maximum participants limit is required for group events",
+        path: ["maxParticipants"],
+      });
+    } else if (data.maxParticipants < 1 || data.maxParticipants > 20) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Maximum participants must be between 1 and 20",
+        path: ["maxParticipants"],
       });
     }
   }
@@ -143,6 +165,23 @@ export const updateEventSchema = baseEventSchema
           code: z.ZodIssueCode.custom,
           message: "Registration deadline must be before the event date",
           path: ["registrationDeadline"],
+        });
+      }
+    }
+
+    // 4. Group Event Validation
+    if (data.eventType === EventType.GROUP) {
+      if (data.maxParticipants === undefined || data.maxParticipants === null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Maximum participants limit is required for group events",
+          path: ["maxParticipants"],
+        });
+      } else if (data.maxParticipants < 1 || data.maxParticipants > 20) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Maximum participants must be between 1 and 20",
+          path: ["maxParticipants"],
         });
       }
     }

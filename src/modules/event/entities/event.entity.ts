@@ -15,8 +15,19 @@ export enum EventStatus {
       ARCHIVED = "archived",
 }
 
+export enum EventType {
+      SINGLE = "SINGLE",
+      GROUP = "GROUP",
+}
+
 @Entity({ name: 'events' })
 export class Event extends BaseEntity {
+      @Column({ name: 'event_type', type: "enum", enum: EventType, default: EventType.SINGLE })
+      eventType: EventType;
+
+      @Column({ name: 'max_participants', type: 'int', nullable: true })
+      maxParticipants: number | null;
+
       @Column({ type: 'varchar', length: 150 })
       title: string;
 
