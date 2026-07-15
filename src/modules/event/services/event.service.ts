@@ -173,6 +173,9 @@ export class EventService {
                         },
                   },
                   order: {
+                        category: {
+                              displayOrder: 'ASC',
+                        },
                         displayOrder: 'ASC',
                   }
             });
@@ -405,6 +408,9 @@ export class EventService {
                         },
                   },
                   order: {
+                        category: {
+                              displayOrder: 'ASC',
+                        },
                         displayOrder: 'ASC',
                   }
             });
