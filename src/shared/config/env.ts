@@ -22,6 +22,7 @@ const envSchema = z.object({
       MAIL_USER: z.string().default('primecreativehub2025@gmail.com'),
       MAIL_PASSWORD: z.string().default('acfg ptax rhby wzos'),
       MAIL_FROM: z.string().default('primecreativehub2025@gmail.com'),
+      STATIC_ASSETS_MAX_AGE: z.string().default('1y'),
 });
 
 export const envConfig = envSchema.parse(process.env);
