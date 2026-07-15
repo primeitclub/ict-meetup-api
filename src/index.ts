@@ -53,7 +53,14 @@ app.use(
 );
 
 // Serve local assets publicly — must be after CORS & helmet config
-app.use("/public/assets", express.static(path.join(process.cwd(), "public", "assets")));
+// Filenames are timestamp+uuid based and never reused, so cache aggressively.
+app.use(
+  "/public/assets",
+  express.static(path.join(process.cwd(), "public", "assets"), {
+    maxAge: envConfig.STATIC_ASSETS_MAX_AGE,
+    immutable: true,
+  }),
+);
 
 app.use(cookieParser());
 
