@@ -28,7 +28,7 @@ export const createAuthenticate = (dataSource: DataSource) =>
                         throw new AppError('Unauthorized - Token revoked', 401);
                   }
 
-                  (req as Request & { user: TokenPayload }).user = decoded;
+                  req.user = decoded;
                   next();
             } catch (error) {
                   next(error);

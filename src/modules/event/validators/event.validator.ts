@@ -19,7 +19,13 @@ export const baseEventSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)"),
   categoryId: z.string(),
   versionId: z.string(),
-  speakerId: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
+  // Multipart sends a single value as a bare string and multiple as an array, so
+  // normalise both to string[]. Absent/"" means "no speakers", not "leave unchanged".
+  speakerIds: z.preprocess((v) => {
+    if (v === "" || v === undefined || v === null) return [];
+    if (typeof v === "string") return [v];
+    return v;
+  }, z.array(z.string().min(1)).default([])),
   totalSeats: z.coerce.number().min(1).max(100),
   feeType: z.enum([FeeType.FREE, FeeType.PAID]),
   fee: z.string().optional().nullable(),
@@ -41,6 +47,24 @@ export const baseEventSchema = z.object({
   maxParticipants: z.preprocess(
     (val) => (val === "" || val === undefined || val === null ? undefined : Number(val)),
     z.number().int().min(1).max(20).optional()
+  ),
+  // Optional external registration URL (e.g. a Google Form). When set it takes
+  // precedence over the in-app registration flow. "" means "clear it" — the
+  // admin form always sends this field so it can be unset.
+  registerLink: z.preprocess(
+    (val) => (typeof val === "string" && val.trim() === "" ? null : val),
+    z
+      .string()
+      .trim()
+      .max(500, "Register link must be at most 500 characters")
+      // Restricted to http(s) so the stored value can never be a
+      // javascript:/data: URI, which the client turns into a redirect.
+      .regex(
+        /^https?:\/\/.+/i,
+        "Register link must start with http:// or https://",
+      )
+      .nullable()
+      .optional(),
   ),
 });
 

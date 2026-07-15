@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, JoinColumn } from "typeorm";
+import { Column, Entity, ManyToOne, JoinColumn, ManyToMany, JoinTable } from "typeorm";
 import { BaseEntity } from "../../../shared/config/typeorm/base-entity";
 import { Category } from "../../category/entities/category.entity";
 import { FlagshipEventVersion } from "../../flagship-event/entities/flagship-event.entity";
@@ -43,6 +43,13 @@ export class Event extends BaseEntity {
       @Column({ name: 'image_url', type: 'varchar', nullable: true })
       imageUrl: string;
 
+      /**
+       * External registration URL (e.g. a Google Form). When set, it takes
+       * precedence over the in-app registration flow.
+       */
+      @Column({ name: 'register_link', type: 'varchar', length: 500, nullable: true })
+      registerLink: string | null;
+
       @Column({ name: 'start_time', type: 'time', nullable: true })
       startTime: string;
 
@@ -66,12 +73,13 @@ export class Event extends BaseEntity {
       @JoinColumn({ name: 'version_id' })
       flagshipEvent: FlagshipEventVersion;
 
-      @Column({ name: 'speaker_id', type: 'varchar', length: 36, nullable: true })
-      speakerId: string | null;
-
-      @ManyToOne(() => Speaker, { onDelete: 'RESTRICT' })
-      @JoinColumn({ name: 'speaker_id' })
-      speaker: Speaker;
+      @ManyToMany(() => Speaker, { onDelete: 'RESTRICT' })
+      @JoinTable({
+            name: 'event_speakers',
+            joinColumn: { name: 'event_id', referencedColumnName: 'id' },
+            inverseJoinColumn: { name: 'speaker_id', referencedColumnName: 'id' },
+      })
+      speakers: Speaker[];
 
       @Column({ name: 'total_seats', type: 'int', default: 0 })
       totalSeats: number;
