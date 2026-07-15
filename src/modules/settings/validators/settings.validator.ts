@@ -30,9 +30,6 @@ const contactDepartmentSchema = z.object({
 
 export const createSettingsSchema = z.object({
   versionId: z.uuid(),
-  email: z.string().trim().email().optional().or(z.literal('')),
-  // The admin form always sends this field, so blank must stay acceptable.
-  phoneNumber: phoneSchema.optional().or(z.literal('')),
   contactDepartments: z.preprocess(
     (val) => {
       if (typeof val === 'string') {
