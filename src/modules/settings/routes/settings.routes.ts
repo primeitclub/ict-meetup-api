@@ -36,8 +36,6 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *             required: [versionId]
   *             properties:
   *               versionId: { type: string, format: uuid }
-  *               email: { type: string }
-  *               phoneNumber: { type: string }
   *               contactDepartments: { type: string, description: "JSON stringified array of {department, contacts}" }
   *     responses:
   *       201:
@@ -113,8 +111,6 @@ const createSettingsRouter = (dataSource: DataSource) => {
   *             type: object
   *             properties:
   *               versionId: { type: string, format: uuid }
-  *               email: { type: string }
-  *               phoneNumber: { type: string }
   *               contactDepartments: { type: string, description: "JSON stringified array of {department, contacts}" }
   *     responses:
   *       200:
