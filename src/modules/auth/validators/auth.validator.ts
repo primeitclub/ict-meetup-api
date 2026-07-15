@@ -1,0 +1,10 @@
+import { z } from "zod";
+export const loginSchema = z.object({
+      email: z.email({ message: "Invalid email address" }).trim().min(1).max(255),
+      password: z.string().trim().min(1).max(255),
+      ipAddress: z.string().trim().min(1).max(255).optional().default('unknown'),
+      userAgent: z.string().trim().min(1).max(255).optional().default('unknown'),
+});
+
+export type LoginSchema = z.infer<typeof loginSchema>;
+export type LoginDto = LoginSchema;

@@ -21,9 +21,16 @@ out/
 *.js
 *.js.map
 *.d.ts
+dist.zip
 
 # ==================== Uploads / Media ====================
 uploads/
-public/uploads/
+public/assets/
 storage/
 media/
+
+# ==================== TypeORM Migrations ====================
+src/shared/config/typeorm/migrations/
+
+# ==================== Logs ====================
+logs/

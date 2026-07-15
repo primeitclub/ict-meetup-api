@@ -1,4 +1,5 @@
 import swaggerJSDoc from "swagger-jsdoc";
+import { envConfig } from "../config/env";
 
 const options: swaggerJSDoc.Options = {
       definition: {
@@ -8,10 +9,74 @@ const options: swaggerJSDoc.Options = {
                   version: "1.0.0",
                   description: 'API Documentation for ICT Meetup App',
             },
+            tags: [
+                  {
+                        name: "Auth",
+                        description: "API for managing authentication",
+                  },
+                  {
+                        name: "FlagshipEventVersions",
+                        description: "API for managing flagship event versions",
+                  },
+                  {
+                        name: "TeamMembers",
+                        description: "API for managing team members",
+                  },
+                  {
+                        name: "TeamMemberCategories",
+                        description: "API for managing team member categories",
+                  },
+                  {
+                        name: "TeamMemberDesignations",
+                        description: "API for managing team member designations",
+                  },
+                  {
+                        name: "HeroSections",
+                        description: "API for managing hero sections",
+                  },
+                  {
+                        name: "AboutSections",
+                        description: "API for managing about sections",
+                  },
+                  {
+                        name: "FAQs",
+                        description: "API for managing FAQs",
+                  },
+                  {
+                        name: "Events",
+                        description: "API for managing events",
+                  },
+                  {
+                        name: "EventCategories",
+                        description: "API for managing event categories",
+                  },
+                  {
+                        name: "AuditLogs",
+                        description: "API for managing audit logs",
+                  },
+                  {
+                        name: "EventRegistration",
+                        description: "API for managing event registrations",
+                  },
+                  {
+                        name: "Seed",
+                        description: "Seed endpoints",
+                  },
+                  {
+                        name: "Gallery",
+                         description: "API for managing galleries"
+                  },
+                  {
+                        name: "Setting",
+                        description:"API for managing settings "
+                  },
+                  {
+                        name: "SiteSettings",
+                        description: "API for managing global, non-versioned club settings (club contact, social links, payment QR code)"
+                  }
+],
       },
-      tags: [
-      ],
-      apis: [process.cwd() + "/src/modules/**/*.routes.ts"],
+      apis: ["./src/modules/**/*.routes.ts", "./modules/**/*.routes.js"],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

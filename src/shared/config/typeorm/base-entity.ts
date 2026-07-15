@@ -14,7 +14,7 @@ export class BaseEntity {
       id: string;
 
       @CreateDateColumn({
-            type: 'timestamp without time zone',
+            type: 'datetime',
             nullable: true,
             default: null,
       })
@@ -22,7 +22,7 @@ export class BaseEntity {
       createdAt?: Date;
 
       @UpdateDateColumn({
-            type: 'timestamp without time zone',
+            type: 'datetime',
             nullable: true,
             default: null,
       })
@@ -30,16 +30,18 @@ export class BaseEntity {
       updatedAt?: Date;
 
       @Column({
-            type: 'uuid',
+            type: 'varchar',
+            length: 36,
             nullable: true,
             default: null,
       })
       createdById?: string;
 
       @Column({
-            type: 'uuid',
+            type: 'varchar',
+            length: 36,
             nullable: true,
             default: null,
       })
-      modifiedBy?: string;
+      modifiedById?: string;
 }
