@@ -12,6 +12,26 @@ const createEventRegistrationBaseSchema = z.object({
       attachedPaymentScreenshot: z.string().trim().min(3).optional(),
       eventId: z.string().trim().min(3).max(150),
       versionId: z.string().trim().min(3).max(150),
+      teamName: z.string().trim().min(3).max(150).optional().nullable(),
+      participants: z.preprocess(
+            (val) => {
+                  if (typeof val === "string") {
+                        try {
+                              return JSON.parse(val);
+                        } catch {
+                              return val;
+                        }
+                  }
+                  return val;
+            },
+            z.array(
+                  z.object({
+                        fullName: z.string().trim().min(1, "Full name is required"),
+                        email: z.string().trim().email("Invalid email address"),
+                        phoneNumber: z.string().trim().optional().nullable(),
+                  })
+            ).optional().nullable()
+      ),
 });
 
 export const createEventRegistrationSchema = createEventRegistrationBaseSchema.superRefine((data, ctx) => {

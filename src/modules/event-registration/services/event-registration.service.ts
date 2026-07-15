@@ -67,6 +67,26 @@ export class EventRegistrationService {
                   (data as any).year = null;
                   (data as any).educationLevel = null;
             }
+
+            // Group Event Validation
+            const { EventType } = require("../../event/entities/event.entity");
+            if (eventExists.eventType === EventType.GROUP) {
+                  if (!data.teamName || data.teamName.trim() === "") {
+                        throw new AppError("Team name is required for group events", 400);
+                  }
+                  if (!data.participants || !Array.isArray(data.participants) || data.participants.length === 0) {
+                        throw new AppError("At least one participant is required for group events", 400);
+                  }
+                  const maxAllowed = eventExists.maxParticipants ?? 20;
+                  if (data.participants.length > maxAllowed) {
+                        throw new AppError(`Number of participants exceeds the limit of ${maxAllowed} configured for this event`, 400);
+                  }
+            } else {
+                  // Ensure single events don't get populated with group details
+                  (data as any).teamName = null;
+                  (data as any).participants = null;
+            }
+
             const versionLabel = Number(versionExists.version_number).toString();
             const trackingId = `ICT-Meetup-${versionLabel}-${randomUUID().slice(0, 8)}`;
 
@@ -111,6 +131,8 @@ export class EventRegistrationService {
                         year: true,
                         attachedPaymentScreenshot: true,
                         status: true,
+                        teamName: true,
+                        participants: true,
                         createdAt: true,
                         event: {
                               id: true,

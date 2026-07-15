@@ -38,6 +38,12 @@ export class EventRegistration extends BaseEntity {
       @Column({ type: "varchar", length: 150, nullable: true })
       attachedPaymentScreenshot: string | null;
 
+      @Column({ name: "team_name", type: "varchar", length: 150, nullable: true })
+      teamName: string | null;
+
+      @Column({ type: "json", nullable: true })
+      participants: { fullName: string; email: string; phoneNumber?: string }[] | null;
+
       @Column({ type: "varchar", length: 150 })
       eventId: string;
 

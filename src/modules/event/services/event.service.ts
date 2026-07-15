@@ -1,4 +1,4 @@
-import { DataSource, Repository } from "typeorm";
+import { DataSource, In, Repository } from "typeorm";
 import { Event as EventEntity, EventStatus } from "../entities/event.entity";
 import { CreateEventDto, UpdateEventDto } from "../validators/event.validator";
 import { AppError } from "../../../shared/utils/error.utils";
@@ -40,6 +40,23 @@ export class EventService {
             }, {} as Record<string, number>);
       }
 
+      /**
+       * Resolves speaker ids to entities, enforcing that every one exists within the
+       * given version. Returns [] for an empty list — events may have no speakers.
+       */
+      private async resolveSpeakers(speakerIds: string[] | undefined, versionId: string): Promise<Speaker[]> {
+            const ids = [...new Set(speakerIds ?? [])];
+            if (!ids.length) return [];
+
+            const speakers = await this.speakerRepository.find({ where: { id: In(ids), versionId } });
+            if (speakers.length !== ids.length) {
+                  const found = new Set(speakers.map((s) => s.id));
+                  const missing = ids.filter((id) => !found.has(id));
+                  throw new AppError(`Speaker not found in this version: ${missing.join(', ')}`, 404);
+            }
+            return speakers;
+      }
+
       async create(event: CreateEventDto, userId: string): Promise<EventEntity> {
             const { versionId, categoryId, ...rest } = event;
             const versionExists = await this.versionRepository.findOne({ where: { id: versionId } });
@@ -56,12 +73,7 @@ export class EventService {
                   throw new AppError("Only categories of type 'events' can be assigned to events", 400);
             }
 
-            if (event.speakerId) {
-                  const speaker = await this.speakerRepository.findOne({ where: { id: event.speakerId, versionId } });
-                  if (!speaker) {
-                        throw new AppError("Speaker not found", 404);
-                  }
-            }
+            const speakers = await this.resolveSpeakers(event.speakerIds, versionId);
 
             // Check for unique displayOrder within category
             const existingOrder = await this.eventRepository.findOne({
@@ -88,9 +100,12 @@ export class EventService {
                   status: rest.status,
                   registrationDeadline: rest.registrationDeadline,
                   displayOrder: rest.displayOrder,
+                  eventType: event.eventType,
+                  maxParticipants: event.maxParticipants ?? null,
+                  registerLink: event.registerLink ?? null,
                   versionId,
                   categoryId,
-                  speakerId: event.speakerId,
+                  speakers,
                   createdById: userId,
             });
 
@@ -112,12 +127,11 @@ export class EventService {
                   where,
                   skip,
                   take: parsedLimit,
-                  relations: ['flagshipEvent', 'category', 'speaker'],
+                  relations: ['flagshipEvent', 'category', 'speakers'],
                   select: {
                         id: true,
                         versionId: true,
                         categoryId: true,
-                        speakerId: true,
                         title: true,
                         subtitle: true,
                         description: true,
@@ -133,6 +147,10 @@ export class EventService {
                         status: true,
                         registrationDeadline: true,
                         displayOrder: true,
+                        isHighlighted: true,
+                        eventType: true,
+                        maxParticipants: true,
+                        registerLink: true,
                         flagshipEvent: {
                               id: true,
                               version_name: true,
@@ -145,7 +163,7 @@ export class EventService {
                               name: true,
                               type: true,
                         },
-                        speaker: {
+                        speakers: {
                               id: true,
                               name: true,
                               designation: true,
@@ -169,7 +187,6 @@ export class EventService {
                   id: true,
                   versionId: true,
                   categoryId: true,
-                  speakerId: true,
                   title: true,
                   subtitle: true,
                   description: true,
@@ -188,6 +205,9 @@ export class EventService {
                   updatedAt: true,
                   displayOrder: true,
                   isHighlighted: true,
+                  eventType: true,
+                  maxParticipants: true,
+                  registerLink: true,
                   flagshipEvent: {
                         id: true,
                         version_name: true,
@@ -198,7 +218,7 @@ export class EventService {
                         name: true,
                         type: true,
                   },
-                  speaker: {
+                  speakers: {
                         id: true,
                         name: true,
                         designation: true,
@@ -214,13 +234,13 @@ export class EventService {
             if (isUuid) {
                   event = await this.eventRepository.findOne({
                         where: { id },
-                        relations: ['flagshipEvent', 'category', 'speaker'],
+                        relations: ['flagshipEvent', 'category', 'speakers'],
                         select: selectFields as any,
                   });
             } else {
                   // Fallback: slug lookup
                   const allEvents = await this.eventRepository.find({
-                        relations: ['flagshipEvent', 'category', 'speaker'],
+                        relations: ['flagshipEvent', 'category', 'speakers'],
                         select: selectFields as any,
                   });
                   const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
@@ -263,12 +283,11 @@ export class EventService {
                         throw new AppError('Only categories of type "events" can be assigned to events', 400);
                   }
             }
-            if (data.speakerId) {
-                  const speaker = await this.speakerRepository.findOne({ where: { id: data.speakerId, versionId: resolvedVersionId } });
-                  if (!speaker) {
-                        throw new AppError("Speaker not found in this version", 404);
-                  }
-            }
+            // undefined means the field was not submitted at all -> leave speakers untouched.
+            // An empty array (the form sends "" for "none selected") -> clear them.
+            const speakers = data.speakerIds === undefined
+                  ? undefined
+                  : await this.resolveSpeakers(data.speakerIds, resolvedVersionId);
             if (data.displayOrder) {
                   const existingOrder = await this.eventRepository.findOne({
                         where: { categoryId: resolvedCategoryId, displayOrder: data.displayOrder }
@@ -279,7 +298,7 @@ export class EventService {
             }
 
             // Use update() instead of save() to avoid TypeORM merging loaded relation
-            // objects (flagshipEvent, category, speaker) back over the FK columns we
+            // objects (flagshipEvent, category) back over the FK columns we
             // just changed — that was silently reverting versionId/categoryId.
             await this.eventRepository.update(id, {
                   ...(data.title !== undefined && { title: data.title }),
@@ -290,9 +309,6 @@ export class EventService {
                   ...(data.date !== undefined && { date: data.date }),
                   versionId: resolvedVersionId,
                   categoryId: resolvedCategoryId,
-                  // speakerId undefined means the form sent "" which Zod converted to undefined
-                  // (the form always submits this field). null clears it in the DB.
-                  speakerId: data.speakerId || null,
                   ...(data.totalSeats !== undefined && { totalSeats: data.totalSeats }),
                   ...(data.feeType !== undefined && { feeType: data.feeType }),
                   ...(data.fee !== undefined && { fee: data.fee === null ? "" : data.fee }),
@@ -301,10 +317,31 @@ export class EventService {
                   ...(data.registrationDeadline !== undefined && { registrationDeadline: data.registrationDeadline }),
                   ...(data.displayOrder !== undefined && { displayOrder: data.displayOrder }),
                   ...(data.isHighlighted !== undefined && { isHighlighted: data.isHighlighted }),
+                  ...(data.eventType !== undefined && { eventType: data.eventType }),
+                  ...(data.maxParticipants !== undefined && { maxParticipants: data.maxParticipants }),
+                  ...(data.registerLink !== undefined && { registerLink: data.registerLink }),
                   ...(data.imagePath !== undefined && { imagePath: data.imagePath }),
                   ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
                   modifiedById: userId,
             });
+
+            // The pivot can't be written through update() — sync it separately, replacing
+            // the whole set so removals are applied as well as additions.
+            if (speakers !== undefined) {
+                  const current = await this.eventRepository.findOne({
+                        where: { id },
+                        relations: ['speakers'],
+                        select: { id: true, speakers: { id: true } },
+                  });
+                  await this.eventRepository
+                        .createQueryBuilder()
+                        .relation(EventEntity, 'speakers')
+                        .of(id)
+                        .addAndRemove(
+                              speakers.map((s) => s.id),
+                              (current?.speakers ?? []).map((s) => s.id),
+                        );
+            }
 
             return await this.findById(id);
       }
@@ -322,12 +359,11 @@ export class EventService {
                   where,
                   skip,
                   take: parsedLimit,
-                  relations: ['flagshipEvent', 'category', 'speaker'],
+                  relations: ['flagshipEvent', 'category', 'speakers'],
                   select: {
                         id: true,
                         versionId: true,
                         categoryId: true,
-                        speakerId: true,
                         title: true,
                         subtitle: true,
                         description: true,
@@ -345,6 +381,10 @@ export class EventService {
                         createdAt: true,
                         updatedAt: true,
                         displayOrder: true,
+                        isHighlighted: true,
+                        eventType: true,
+                        maxParticipants: true,
+                        registerLink: true,
                         flagshipEvent: {
                               id: true,
                               version_name: true,
@@ -355,7 +395,7 @@ export class EventService {
                               name: true,
                               type: true,
                         },
-                        speaker: {
+                        speakers: {
                               id: true,
                               name: true,
                               designation: true,

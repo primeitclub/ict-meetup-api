@@ -33,7 +33,7 @@ const createEventRouter = (dataSource: DataSource) => {
        *               date: { type: string, format: date-time }
        *               categoryId: { type: string }
        *               versionId: { type: string }
-       *               speakerId: { type: string }
+       *               speakerIds: { type: array, items: { type: string } }
        *               totalSeats: { type: number }
        *               feeType: { type: string, enum: [free, paid] }
        *               fee: { type: string }
@@ -75,7 +75,7 @@ const createEventRouter = (dataSource: DataSource) => {
        *               date: { type: string, format: date-time }
        *               categoryId: { type: string }
        *               versionId: { type: string }
-       *               speakerId: { type: string }
+       *               speakerIds: { type: array, items: { type: string } }
        *               totalSeats: { type: number }
        *               feeType: { type: string, enum: [FREE, PAID] }
        *               fee: { type: string }
