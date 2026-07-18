@@ -88,10 +88,11 @@ export class ContentService {
       ? (await this.faqService.findAll({ versionId, limit: ALL })).items
       : undefined;
 
-    // Highlights are the published events for this edition; drafts/archived
-    // never reach the public landing page.
+    // Highlights are the published events explicitly flagged as highlighted
+    // for this edition;If none are highlighted the frontend hides the
+    // whole "Event Overview" section.
     const highlights = (events.items ?? []).filter(
-      (e: any) => e.status === EventStatus.PUBLISHED,
+      (e: any) => e.status === EventStatus.PUBLISHED && e.isHighlighted === true,
     );
 
     return {

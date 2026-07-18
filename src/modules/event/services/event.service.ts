@@ -1,5 +1,5 @@
-import { DataSource, In, Repository } from "typeorm";
-import { Event as EventEntity, EventStatus } from "../entities/event.entity";
+import { DataSource, In, Repository, SelectQueryBuilder } from "typeorm";
+import { Event as EventEntity } from "../entities/event.entity";
 import { CreateEventDto, UpdateEventDto } from "../validators/event.validator";
 import { AppError } from "../../../shared/utils/error.utils";
 import { Category, CategoryType } from "../../category/entities/category.entity";
@@ -38,6 +38,101 @@ export class EventService {
                   acc[row.eventId] = Number(row.count);
                   return acc;
             }, {} as Record<string, number>);
+      }
+
+      /**
+       * Runs the id+order query (category.displayOrder, then event.displayOrder) and
+       * the matching full-entity fetch as two steps. A single query can't do both:
+       * `speakers` is many-to-many, so joining it while paginating produces duplicate
+       * root rows / broken TypeORM pagination subqueries once relation-column
+       * ordering is involved. Ordering on just the id query avoids that entirely.
+       */
+      private async findEventsOrderedByCategory(filters: {
+            versionId?: string;
+            categoryId?: string;
+            status?: string;
+            onlyHighlighted?: boolean;
+      }, skip: number, take: number) {
+            const applyFilters = <T extends SelectQueryBuilder<EventEntity>>(qb: T): T => {
+                  if (filters.versionId) qb.andWhere('event.versionId = :versionId', { versionId: filters.versionId });
+                  if (filters.categoryId) qb.andWhere('event.categoryId = :categoryId', { categoryId: filters.categoryId });
+                  if (filters.status) qb.andWhere('event.status = :status', { status: filters.status });
+                  if (filters.onlyHighlighted) qb.andWhere('event.isHighlighted = :isHighlighted', { isHighlighted: true });
+                  return qb;
+            };
+
+            const countQb = applyFilters(this.eventRepository.createQueryBuilder('event'));
+            const total = await countQb.getCount();
+
+            const idQb = applyFilters(
+                  this.eventRepository
+                        .createQueryBuilder('event')
+                        .leftJoin('event.category', 'category')
+                        .select('event.id', 'id')
+                        .orderBy('category.displayOrder', 'ASC')
+                        .addOrderBy('event.displayOrder', 'ASC')
+                        .offset(skip)
+                        .limit(take)
+            );
+            const orderedIds = (await idQb.getRawMany<{ id: string }>()).map((row) => row.id);
+
+            if (!orderedIds.length) {
+                  return { items: [] as EventEntity[], total };
+            }
+
+            const entities = await this.eventRepository.find({
+                  where: { id: In(orderedIds) },
+                  relations: ['flagshipEvent', 'category', 'speakers'],
+                  select: {
+                        id: true,
+                        versionId: true,
+                        categoryId: true,
+                        title: true,
+                        subtitle: true,
+                        description: true,
+                        imagePath: true,
+                        imageUrl: true,
+                        startTime: true,
+                        endTime: true,
+                        date: true,
+                        totalSeats: true,
+                        feeType: true,
+                        fee: true,
+                        location: true,
+                        status: true,
+                        registrationDeadline: true,
+                        displayOrder: true,
+                        isHighlighted: true,
+                        eventType: true,
+                        maxParticipants: true,
+                        registerLink: true,
+                        flagshipEvent: {
+                              id: true,
+                              version_name: true,
+                              version_number: true,
+                              is_current: true,
+                              status: true,
+                        },
+                        category: {
+                              id: true,
+                              name: true,
+                              type: true,
+                        },
+                        speakers: {
+                              id: true,
+                              name: true,
+                              designation: true,
+                              imagePath: true,
+                              imageUrl: true,
+                              socialLinks: true,
+                        },
+                  },
+            });
+
+            const byId = new Map(entities.map((e) => [e.id, e]));
+            const items = orderedIds.map((id) => byId.get(id)).filter((e): e is EventEntity => !!e);
+
+            return { items, total };
       }
 
       /**
@@ -116,66 +211,15 @@ export class EventService {
 
       async findAll(query: any) {
             const { versionId, categoryId, status, ...rest } = query;
-            const where: any = {};
-            if (versionId) where.versionId = versionId;
-            if (categoryId) where.categoryId = categoryId;
-            if (status) where.status = status;
             const { page = 1, limit = 10 } = rest;
             const parsedLimit = Math.min(Number(limit) || 10, 100);
             const skip = (Number(page) - 1) * parsedLimit;
-            const [items, total] = await this.eventRepository.findAndCount({
-                  where,
+
+            const { items, total } = await this.findEventsOrderedByCategory(
+                  { versionId, categoryId, status },
                   skip,
-                  take: parsedLimit,
-                  relations: ['flagshipEvent', 'category', 'speakers'],
-                  select: {
-                        id: true,
-                        versionId: true,
-                        categoryId: true,
-                        title: true,
-                        subtitle: true,
-                        description: true,
-                        imagePath: true,
-                        imageUrl: true,
-                        startTime: true,
-                        endTime: true,
-                        date: true,
-                        totalSeats: true,
-                        feeType: true,
-                        fee: true,
-                        location: true,
-                        status: true,
-                        registrationDeadline: true,
-                        displayOrder: true,
-                        isHighlighted: true,
-                        eventType: true,
-                        maxParticipants: true,
-                        registerLink: true,
-                        flagshipEvent: {
-                              id: true,
-                              version_name: true,
-                              version_number: true,
-                              is_current: true,
-                              status: true,
-                        },
-                        category: {
-                              id: true,
-                              name: true,
-                              type: true,
-                        },
-                        speakers: {
-                              id: true,
-                              name: true,
-                              designation: true,
-                              imagePath: true,
-                              imageUrl: true,
-                              socialLinks: true,
-                        },
-                  },
-                  order: {
-                        displayOrder: 'ASC',
-                  }
-            });
+                  parsedLimit,
+            );
             const approvedCounts = await this.getApprovedCounts(items.map((item) => item.id));
             const itemsWithSeats = items.map((item) => ({ ...item, bookedSeats: approvedCounts[item.id] ?? 0 }));
             return { items: itemsWithSeats, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
@@ -348,66 +392,15 @@ export class EventService {
 
       async findByHighlighted(query: any) {
             const { versionId, categoryId, ...rest } = query;
-            const where: any = {};
-            if (versionId) where.versionId = versionId;
-            if (categoryId) where.categoryId = categoryId;
-            where.isHighlighted = true;
             const { page = 1, limit = 10 } = rest;
             const parsedLimit = Math.min(Number(limit) || 10, 100);
             const skip = (Number(page) - 1) * parsedLimit;
-            const [items, total] = await this.eventRepository.findAndCount({
-                  where,
+
+            const { items, total } = await this.findEventsOrderedByCategory(
+                  { versionId, categoryId, onlyHighlighted: true },
                   skip,
-                  take: parsedLimit,
-                  relations: ['flagshipEvent', 'category', 'speakers'],
-                  select: {
-                        id: true,
-                        versionId: true,
-                        categoryId: true,
-                        title: true,
-                        subtitle: true,
-                        description: true,
-                        imagePath: true,
-                        imageUrl: true,
-                        startTime: true,
-                        endTime: true,
-                        date: true,
-                        totalSeats: true,
-                        feeType: true,
-                        fee: true,
-                        location: true,
-                        status: true,
-                        registrationDeadline: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        displayOrder: true,
-                        isHighlighted: true,
-                        eventType: true,
-                        maxParticipants: true,
-                        registerLink: true,
-                        flagshipEvent: {
-                              id: true,
-                              version_name: true,
-                              status: true,
-                        },
-                        category: {
-                              id: true,
-                              name: true,
-                              type: true,
-                        },
-                        speakers: {
-                              id: true,
-                              name: true,
-                              designation: true,
-                              imagePath: true,
-                              imageUrl: true,
-                              socialLinks: true,
-                        },
-                  },
-                  order: {
-                        displayOrder: 'ASC',
-                  }
-            });
+                  parsedLimit,
+            );
             const approvedCounts = await this.getApprovedCounts(items.map((item) => item.id));
             const itemsWithSeats = items.map((item) => ({ ...item, bookedSeats: approvedCounts[item.id] ?? 0 }));
             return { items: itemsWithSeats, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };

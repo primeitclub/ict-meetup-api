@@ -58,8 +58,6 @@ export class SettingsController extends BaseController {
         return responseHandler(res)('No settings found for this version', null, 404);
       }
       return responseHandler(res)('Contact settings fetched successfully', {
-        email: settings.email,
-        phoneNumber: settings.phoneNumber,
         contactDepartments: settings.contactDepartments,
       }, 200);
     } catch (error) {

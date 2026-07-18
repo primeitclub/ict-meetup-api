@@ -18,12 +18,6 @@ export class Settings extends BaseEntity {
   @JoinColumn({ name: 'flagship_event_version_id' })
   flagshipEventVersion: FlagshipEventVersion;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  email: string;
-
-  @Column({ name: 'phone_number', type: 'varchar', length: 20, nullable: true })
-  phoneNumber: string;
-
   @Column({ name: 'contact_departments', type: 'json', nullable: true })
   contactDepartments: { department: string; contacts: { name: string; phone: string }[] }[];
 }
