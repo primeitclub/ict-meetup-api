@@ -40,6 +40,7 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
    *               contactNumber: { type: string }
    *               isStudent: { type: boolean }
    *               educationLevel: { type: string }
+   *               collegeName: { type: string }
    *               faculty: { type: string }
    *               year: { type: number }
    *               eventId: { type: string }
