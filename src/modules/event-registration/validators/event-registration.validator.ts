@@ -7,6 +7,7 @@ const createEventRegistrationBaseSchema = z.object({
       contactNumber: z.string().trim().min(10).max(15),
       isStudent: z.preprocess((val) => val === 'true' || val === true, z.boolean()),
       educationLevel: z.string().trim().min(3).max(150).optional(),
+      collegeName: z.string().trim().min(3).max(150).optional(),
       faculty: z.string().trim().min(3).max(150).optional(),
       year: z.coerce.number().optional(),
       attachedPaymentScreenshot: z.string().trim().min(3).optional(),
@@ -41,6 +42,13 @@ export const createEventRegistrationSchema = createEventRegistrationBaseSchema.s
                         code: z.ZodIssueCode.custom,
                         message: "Education level is required for students",
                         path: ["educationLevel"],
+                  });
+            }
+            if (!data.collegeName) {
+                  ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "College name is required for students",
+                        path: ["collegeName"],
                   });
             }
             if (!data.faculty) {
