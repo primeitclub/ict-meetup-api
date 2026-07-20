@@ -66,6 +66,7 @@ export class EventRegistrationService {
                   (data as any).faculty = null;
                   (data as any).year = null;
                   (data as any).educationLevel = null;
+                  (data as any).collegeName = null;
             }
 
             // Group Event Validation
@@ -127,6 +128,7 @@ export class EventRegistrationService {
                         contactNumber: true,
                         isStudent: true,
                         educationLevel: true,
+                        collegeName: true,
                         faculty: true,
                         year: true,
                         attachedPaymentScreenshot: true,
