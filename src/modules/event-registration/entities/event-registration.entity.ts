@@ -29,6 +29,9 @@ export class EventRegistration extends BaseEntity {
       @Column({ type: "varchar", length: 150, nullable: true })
       educationLevel: string | null;
 
+      @Column({ name: "college_name", type: "varchar", length: 150, nullable: true })
+      collegeName: string | null;
+
       @Column({ type: "varchar", length: 150, nullable: true })
       faculty: string | null;
 
