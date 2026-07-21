@@ -75,8 +75,12 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
    *     tags: [EventRegistration]
    *     parameters:
    *       - in: query
+   *         name: versionId
+   *         required: false
+   *         schema: { type: string }
+   *       - in: query
    *         name: eventId
-   *         required: true
+   *         required: false
    *         schema: { type: string }
    *     responses:
    *       200:

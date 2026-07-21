@@ -18,9 +18,6 @@ export class AboutSection extends BaseEntity {
   @JoinColumn({ name: 'flagship_event_version_id' })
   flagshipEventVersion: FlagshipEventVersion;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  title: string;
-
   @Column({ type: 'text', nullable: true })
   content: string;
 

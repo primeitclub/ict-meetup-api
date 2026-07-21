@@ -74,7 +74,10 @@ export const updateEventRegistrationSchema = createEventRegistrationBaseSchema.p
 
 
 export const eventRegistrationQuerySchema = z.object({
-      eventId: z.string().trim().min(3).max(150),
+      eventId: z.string().trim().min(3).max(150).optional(),
+      versionId: z.string().trim().min(3).max(150).optional(),
+      page: z.coerce.number().int().positive().optional(),
+      limit: z.coerce.number().int().positive().max(100).optional(),
 })
 
 export const eventRegistrationIdParamSchema = z.object({
