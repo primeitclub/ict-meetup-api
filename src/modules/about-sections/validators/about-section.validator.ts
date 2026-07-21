@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 export const createAboutSectionSchema = z.object({
   versionId: z.uuid(),
-  title: z.string().trim().min(1).max(255),
   content: z.string().trim().min(1).max(1000),
   imageUrl: z.string().trim().optional(),
   imagePath: z.string(),

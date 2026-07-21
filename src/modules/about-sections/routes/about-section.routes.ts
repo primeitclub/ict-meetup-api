@@ -31,7 +31,6 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *             required: [versionId]
   *             properties:
   *               versionId: { type: string, format: uuid }
-  *               title: { type: string }
   *               content: { type: string }
   *               image:
   *                 type: string
@@ -94,7 +93,6 @@ const createAboutSectionRouter = (dataSource: DataSource) => {
   *             type: object
   *             properties:
   *               versionId: { type: string, format: uuid }
-  *               title: { type: string }
   *               content: { type: string }
   *               image:
   *                 type: string
