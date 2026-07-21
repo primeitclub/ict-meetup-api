@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src",
-    "build": "tsc && mkdir -p dist/modules/mail/templates && cp src/modules/mail/templates/*.mjml dist/modules/mail/templates/",
+    "build": "tsc && shx mkdir -p dist/modules/mail/templates && shx cp \"src/modules/mail/templates/*.mjml\" dist/modules/mail/templates/",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
@@ -53,6 +53,7 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/uuid": "^10.0.0",
+    "shx": "^0.4.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
