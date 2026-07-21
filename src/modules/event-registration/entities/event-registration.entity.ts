@@ -51,14 +51,14 @@ export class EventRegistration extends BaseEntity {
       eventId: string;
 
       @ManyToOne(() => Event, { onDelete: 'RESTRICT' })
-      @JoinColumn({ name: 'event_id' })
+      @JoinColumn({ name: 'eventId' })
       event: Event;
 
       @Column({ type: "varchar", length: 150 })
       versionId: string;
 
       @ManyToOne(() => FlagshipEventVersion, { onDelete: 'RESTRICT' })
-      @JoinColumn({ name: 'version_id' })
+      @JoinColumn({ name: 'versionId' })
       version: FlagshipEventVersion;
 
       @Column({ type: "enum", enum: EventRegistrationStatus })

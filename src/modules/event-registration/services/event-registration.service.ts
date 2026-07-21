@@ -179,7 +179,7 @@ export class EventRegistrationService {
                               where: { eventId: eventRegistration.eventId, status: EventRegistrationStatus.APPROVED },
                         });
                         if (approvedCount >= totalSeats) {
-                              throw new AppError("No seats available for this event", 400);
+                              throw new AppError("Registration is full for this event", 400);
                         }
                   }
             }

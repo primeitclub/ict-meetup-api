@@ -170,9 +170,9 @@ export class EventService {
 
             const speakers = await this.resolveSpeakers(event.speakerIds, versionId);
 
-            // Check for unique displayOrder within category
+            // Check for unique displayOrder within category and version
             const existingOrder = await this.eventRepository.findOne({
-                  where: { categoryId, displayOrder: rest.displayOrder }
+                  where: { categoryId, versionId, displayOrder: rest.displayOrder }
             });
 
             if (existingOrder) {
@@ -195,6 +195,7 @@ export class EventService {
                   status: rest.status,
                   registrationDeadline: rest.registrationDeadline,
                   displayOrder: rest.displayOrder,
+                  isHighlighted: event.isHighlighted ?? false,
                   eventType: event.eventType,
                   maxParticipants: event.maxParticipants ?? null,
                   registerLink: event.registerLink ?? null,
@@ -334,7 +335,7 @@ export class EventService {
                   : await this.resolveSpeakers(data.speakerIds, resolvedVersionId);
             if (data.displayOrder) {
                   const existingOrder = await this.eventRepository.findOne({
-                        where: { categoryId: resolvedCategoryId, displayOrder: data.displayOrder }
+                        where: { categoryId: resolvedCategoryId, versionId: resolvedVersionId, displayOrder: data.displayOrder }
                   });
                   if (existingOrder && existingOrder.id !== id) {
                         throw new AppError(`Display order ${data.displayOrder} is already taken in this category`, 400);
