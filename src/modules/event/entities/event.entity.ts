@@ -51,10 +51,10 @@ export class Event extends BaseEntity {
       registerLink: string | null;
 
       @Column({ name: 'start_time', type: 'time', nullable: true })
-      startTime: string;
+      startTime: string | null;
 
       @Column({ name: 'end_time', type: 'time', nullable: true })
-      endTime: string;
+      endTime: string | null;
 
       @Column({ name: 'date', type: 'date', nullable: true })
       date: string;
@@ -81,8 +81,8 @@ export class Event extends BaseEntity {
       })
       speakers: Speaker[];
 
-      @Column({ name: 'total_seats', type: 'int', default: 0 })
-      totalSeats: number;
+      @Column({ name: 'total_seats', type: 'int', nullable: true })
+      totalSeats: number | null;
 
       @Column({ name: 'fee_type', type: "enum", enum: FeeType })
       feeType: FeeType;

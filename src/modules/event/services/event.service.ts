@@ -188,7 +188,7 @@ export class EventService {
                   startTime: rest.startTime,
                   endTime: rest.endTime,
                   date: rest.date,
-                  totalSeats: rest.totalSeats,
+                  totalSeats: rest.totalSeats ?? null,
                   feeType: rest.feeType,
                   fee: rest.fee ?? "",
                   location: rest.location,

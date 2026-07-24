@@ -8,12 +8,20 @@ export const baseEventSchema = z.object({
   description: z.string().min(1).max(10000),
   imagePath: z.string().optional(),
   imageUrl: z.string().optional(),
-  startTime: z
-    .string()
-    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)"),
-  endTime: z
-    .string()
-    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)"),
+  startTime: z.preprocess(
+    (val) => (val === "" || val === undefined || val === null ? undefined : val),
+    z
+      .string()
+      .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)")
+      .optional()
+  ),
+  endTime: z.preprocess(
+    (val) => (val === "" || val === undefined || val === null ? undefined : val),
+    z
+      .string()
+      .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)")
+      .optional()
+  ),
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)"),
@@ -26,7 +34,14 @@ export const baseEventSchema = z.object({
     if (typeof v === "string") return [v];
     return v;
   }, z.array(z.string().min(1)).default([])),
-  totalSeats: z.coerce.number().min(1).max(100),
+  // Optional — "" or null means "clear it" (unlimited seats, no capacity check on
+  // registration approval); the admin form always sends this field so it can be
+  // unset, same convention as registerLink below. A genuinely absent key (undefined)
+  // means "leave unchanged" on partial updates.
+  totalSeats: z.preprocess(
+    (val) => (val === "" || val === null ? null : val === undefined ? undefined : Number(val)),
+    z.number().int().min(1).max(100).nullable().optional()
+  ),
   feeType: z.enum([FeeType.FREE, FeeType.PAID]),
   fee: z.string().optional().nullable(),
   location: z.string().trim().min(1).max(255),

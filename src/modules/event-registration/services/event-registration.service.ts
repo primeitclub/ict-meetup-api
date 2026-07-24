@@ -174,7 +174,7 @@ export class EventRegistrationService {
 
             if (status === EventRegistrationStatus.APPROVED && eventRegistration.status !== EventRegistrationStatus.APPROVED) {
                   const totalSeats = eventRegistration.event?.totalSeats;
-                  if (totalSeats !== undefined) {
+                  if (typeof totalSeats === 'number') {
                         const approvedCount = await this.eventRegistrationRepository.count({
                               where: { eventId: eventRegistration.eventId, status: EventRegistrationStatus.APPROVED },
                         });
