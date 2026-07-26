@@ -32,6 +32,7 @@ const baseFlagshipEventVersionSchema = z.object({
     ])
     .default(false),
   logo: z.string().optional(),
+  logoPath: z.string().optional(),
 });
 
 export const flagshipEventVersionSchema = baseFlagshipEventVersionSchema.refine(

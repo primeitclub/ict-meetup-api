@@ -188,7 +188,10 @@ export const imageUploadHandler =
 
             uploadedImages.push({
               localPath: file.path,
-              localUrl: `${envConfig.BASE_URL}/public/assets/${version}/${moduleName}/${file.filename}`,
+              // version/moduleName can contain spaces (e.g. "ICT Meetup 2026") — must be
+              // percent-encoded per path segment or the URL is invalid outside a browser
+              // address bar (e.g. Gmail's image proxy 404s on the raw space).
+              localUrl: `${envConfig.BASE_URL}/public/assets/${encodeURIComponent(version)}/${encodeURIComponent(moduleName)}/${file.filename}`,
               cloudUrl: cloudResult.secure_url,
               publicId: cloudResult.public_id,
             });

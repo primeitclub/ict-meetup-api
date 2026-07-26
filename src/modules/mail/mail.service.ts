@@ -7,6 +7,7 @@ import { envConfig } from "../../shared/config/env";
 export interface ClubInfo {
       versionName: string;
       logoUrl?: string | null;
+      logoPath?: string | null;
       heroTitle?: string | null;
       heroDescription?: string | null;
       clubEmail?: string | null;
@@ -54,9 +55,28 @@ function escapeHtml(str: string): string {
             .replace(/'/g, "&#039;");
 }
 
-function buildLogoSection(logoUrl: string | null | undefined): string {
-      if (!logoUrl) return "";
-      return `<mj-text align="center" padding-bottom="0"><img src="${escapeHtml(logoUrl)}" alt="ICT Meetup Logo" style="max-height:48px;max-width:160px;object-fit:contain;display:block;margin:0 auto;" /></mj-text>`;
+const LOGO_CID = "club-logo";
+
+// Email clients (Gmail especially) fetch remote <img> URLs through their own
+// proxy servers, which can never reach a localhost/internal BASE_URL and are
+// often blocked by default even for a reachable one. Embedding the logo as a
+// cid: attachment ships the image bytes inside the email itself, so nothing
+// needs to be fetched at read-time. Falls back to the remote URL only if the
+// local file is missing (e.g. deleted from disk, or a pre-existing record
+// that never had logoPath populated).
+function resolveLogoAttachment(logoPath?: string | null): { filename: string; path: string; cid: string } | null {
+      if (!logoPath) return null;
+      const resolvedPath = path.isAbsolute(logoPath) ? logoPath : path.join(process.cwd(), logoPath);
+      if (!fs.existsSync(resolvedPath)) return null;
+      return { filename: path.basename(resolvedPath), path: resolvedPath, cid: LOGO_CID };
+}
+
+function buildLogoSection(club: ClubInfo): { html: string; attachment: { filename: string; path: string; cid: string } | null } {
+      const attachment = resolveLogoAttachment(club.logoPath);
+      const src = attachment ? `cid:${LOGO_CID}` : club.logoUrl;
+      if (!src) return { html: "", attachment: null };
+      const html = `<mj-text align="center" padding-bottom="0"><img src="${escapeHtml(src)}" alt="ICT Meetup Logo" style="max-height:48px;max-width:160px;object-fit:contain;display:block;margin:0 auto;" /></mj-text>`;
+      return { html, attachment };
 }
 
 function buildHeroDescriptionSection(description: string | null | undefined): string {
@@ -137,12 +157,13 @@ class MailService {
 
       sendRegistrationReceived({ to, username, eventTitle, trackingId, club }: RegistrationReceivedOptions): void {
             this.enqueue(async () => {
+                  const logo = buildLogoSection(club);
                   const html = await this.compileTemplate("registration-received", {
                         username,
                         eventTitle,
                         trackingId,
                         versionName: club.versionName,
-                        logoSection: buildLogoSection(club.logoUrl),
+                        logoSection: logo.html,
                         heroTitle: club.heroTitle ?? club.versionName,
                         heroDescriptionSection: buildHeroDescriptionSection(club.heroDescription),
                         clubContactBlock: buildClubContactBlock(club),
@@ -153,18 +174,20 @@ class MailService {
                         to,
                         subject: `Registration Received — ${eventTitle}`,
                         html,
+                        attachments: logo.attachment ? [logo.attachment] : [],
                   });
             });
       }
 
       sendRegistrationApproved({ to, username, eventTitle, trackingId, club }: RegistrationStatusOptions): void {
             this.enqueue(async () => {
+                  const logo = buildLogoSection(club);
                   const html = await this.compileTemplate("registration-approved", {
                         username,
                         eventTitle,
                         trackingId,
                         versionName: club.versionName,
-                        logoSection: buildLogoSection(club.logoUrl),
+                        logoSection: logo.html,
                         heroTitle: club.heroTitle ?? club.versionName,
                         heroDescriptionSection: buildHeroDescriptionSection(club.heroDescription),
                         clubContactBlock: buildClubContactBlock(club),
@@ -175,6 +198,7 @@ class MailService {
                         to,
                         subject: `Registration Confirmed — ${eventTitle}`,
                         html,
+                        attachments: logo.attachment ? [logo.attachment] : [],
                   });
             });
       }
@@ -184,12 +208,13 @@ class MailService {
                   const rejectionReasonBlock = rejectionReason
                         ? `<mj-text padding="0"><div style="background:#fef2f2;border-left:3px solid #ef4444;padding:14px 18px;border-radius:3px;margin:8px 0 0;font-size:14px;color:#7f1d1d;"><strong>Reason:</strong> ${escapeHtml(rejectionReason)}</div></mj-text>`
                         : "";
+                  const logo = buildLogoSection(club);
                   const html = await this.compileTemplate("registration-rejected", {
                         username,
                         eventTitle,
                         rejectionReasonBlock,
                         versionName: club.versionName,
-                        logoSection: buildLogoSection(club.logoUrl),
+                        logoSection: logo.html,
                         heroTitle: club.heroTitle ?? club.versionName,
                         heroDescriptionSection: buildHeroDescriptionSection(club.heroDescription),
                         clubContactBlock: buildClubContactBlock(club),
@@ -200,6 +225,7 @@ class MailService {
                         to,
                         subject: `Registration Update — ${eventTitle}`,
                         html,
+                        attachments: logo.attachment ? [logo.attachment] : [],
                   });
             });
       }
