@@ -6,6 +6,7 @@ import { storage, removeFile } from '../../../shared/utils/helpers/imageUpload.h
 import { handleMulterError } from '../../../shared/utils/helpers/multerError.helper';
 import { AppError } from '../../../shared/utils/error.utils';
 import { envConfig } from '../../../shared/config/env';
+import logger from '../../../shared/utils/logger.utils';
 import {
   ALLOWED_IMAGE_EXTENSIONS,
   ALLOWED_IMAGE_MIME_TYPES,
@@ -51,10 +52,10 @@ const formatSize = (bytes: number) =>
 /**
  * Handles the two independent, optional file fields accepted by
  * `PUT /api/site-settings` in one multipart request: the payment QR code
- * and the sponsorship proposal PDF. Both are uploaded to Cloudinary as
- * `resource_type: "image"` — Cloudinary accounts commonly have delivery of
- * "raw" PDFs disabled as an anti-abuse security setting, so the proposal
- * is stored the same way as the QR code to avoid that restriction.
+ * and the sponsorship proposal PDF. Both are always saved to local disk
+ * (served via the /public/assets static route) and additionally, best-effort,
+ * mirrored to Cloudinary — see uploadFile() below for why Cloudinary is
+ * optional rather than required.
  */
 export const siteSettingsUploadHandler =
   () => (req: Request, res: Response, next: NextFunction) => {
@@ -97,22 +98,34 @@ export const siteSettingsUploadHandler =
         const version = (req as any).version;
         const moduleName = (req as any).moduleName;
 
-        // Both fields upload as `resource_type: "image"` — Cloudinary's PDF
-        // delivery for "raw" assets is blocked by default on many accounts
-        // as an anti-abuse setting, so the proposal PDF avoids that entirely
-        // by being stored the same way as the QR code image.
+        // The local copy (served via the /public/assets static route) is always
+        // the source of truth for delivery. Cloudinary is best-effort only: many
+        // accounts block delivery of PDF assets by default as an anti-abuse
+        // setting, which previously made the proposal URL 401 even though the
+        // upload itself had succeeded. So a Cloudinary failure here must never
+        // block the save — we just fall back to local-only storage.
         const uploadFile = async (file: Express.Multer.File): Promise<UploadedFile> => {
-          const cloudResult = await cloudinary.uploader.upload(file.path, {
-            folder: `assets/${version}/${moduleName}`,
-            resource_type: 'image',
-          });
+          const localUrl = `${envConfig.BASE_URL}/public/assets/${version}/${moduleName}/${file.filename}`;
 
-          return {
-            localPath: file.path,
-            localUrl: `${envConfig.BASE_URL}/public/assets/${version}/${moduleName}/${file.filename}`,
-            cloudUrl: cloudResult.secure_url,
-            publicId: cloudResult.public_id,
-          };
+          let cloudUrl = '';
+          let publicId = '';
+          try {
+            const cloudResult = await cloudinary.uploader.upload(file.path, {
+              folder: `assets/${version}/${moduleName}`,
+              resource_type: 'image',
+            });
+            cloudUrl = cloudResult.secure_url;
+            publicId = cloudResult.public_id;
+          } catch (cloudError) {
+            logger.warn(
+              `Cloudinary upload failed for ${file.fieldname}, continuing with local storage only: ${
+                cloudError instanceof Error ? cloudError.message : String(cloudError)
+              }`,
+              { module: 'SiteSettingsUpload' }
+            );
+          }
+
+          return { localPath: file.path, localUrl, cloudUrl, publicId };
         };
 
         if (qrCodeFile) {
