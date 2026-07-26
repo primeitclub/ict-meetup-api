@@ -153,6 +153,27 @@ export class EventRegistrationService {
             });
             return { items, meta: { total, page, limit: parsedLimit, totalPages: Math.ceil(total / parsedLimit) } };
       }
+      async getStatusCounts(query: any) {
+            const { versionId, eventId } = query;
+            const qb = this.eventRegistrationRepository
+                  .createQueryBuilder('registration')
+                  .select('registration.status', 'status')
+                  .addSelect('COUNT(*)', 'count')
+                  .groupBy('registration.status');
+            if (versionId) qb.andWhere('registration.versionId = :versionId', { versionId });
+            if (eventId) qb.andWhere('registration.eventId = :eventId', { eventId });
+
+            const rows = await qb.getRawMany<{ status: EventRegistrationStatus; count: string }>();
+            const counts: Record<EventRegistrationStatus, number> = {
+                  [EventRegistrationStatus.PENDING]: 0,
+                  [EventRegistrationStatus.APPROVED]: 0,
+                  [EventRegistrationStatus.REJECTED]: 0,
+            };
+            rows.forEach((row) => {
+                  if (row.status in counts) counts[row.status] = Number(row.count);
+            });
+            return counts;
+      }
       async findById(id: string) {
             const eventRegistration = await this.eventRegistrationRepository.findOne({
                   where: { id },

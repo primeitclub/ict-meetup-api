@@ -38,7 +38,7 @@ export const removeFile = async (filePath?: string) => {
 };
 
 /* Multer storage configuration */
-const storage = multer.diskStorage({
+export const storage = multer.diskStorage({
   destination: async (req, _file, cb) => {
     try {
       // Determine moduleName from the route (e.g. '/api/team-members' -> 'team-members')
@@ -121,23 +121,27 @@ const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
 
 
 type UploadOptions =
-  | { fieldName: string; multiple?: false; optional?: boolean }
-  | { fieldName: string; multiple: true; maxCount: number; optional?: boolean };
+  | { fieldName: string; multiple?: false; optional?: boolean; maxFileSize?: number }
+  | { fieldName: string; multiple: true; maxCount: number; optional?: boolean; maxFileSize?: number };
+
+const formatSize = (bytes: number) =>
+  bytes >= 1024 * 1024 ? `${bytes / (1024 * 1024)}MB` : `${Math.round(bytes / 1024)}KB`;
 
 /* Main middleware */
 export const imageUploadHandler =
   (options: UploadOptions) =>
     (req: Request, res: Response, next: NextFunction) => {
+      const maxFileSize = options.maxFileSize ?? MAX_IMAGE_SIZE;
       const upload = options.multiple
         ? multer({
           storage: storage,
           fileFilter,
-          limits: { fileSize: MAX_IMAGE_SIZE },
+          limits: { fileSize: maxFileSize },
         }).array(options.fieldName, options.maxCount)
         : multer({
           storage: storage,
           fileFilter,
-          limits: { fileSize: MAX_IMAGE_SIZE },
+          limits: { fileSize: maxFileSize },
         }).single(options.fieldName);
 
       upload(req, res, async (err) => {
@@ -152,7 +156,9 @@ export const imageUploadHandler =
           for (const file of files) {
             await removeFile(file.path);
           }
-          return next(handleMulterError(err));
+          return next(
+            handleMulterError(err, `Image size must not exceed ${formatSize(maxFileSize)}`)
+          );
         }
 
 

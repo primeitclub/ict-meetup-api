@@ -4,7 +4,7 @@ import { SiteSettingsController } from '../controllers/site-settings.controller'
 import { validateRequestBody } from '../../../shared/validators/request.validator';
 import { upsertSiteSettingsSchema } from '../validators/site-settings.validator';
 import { createAuthenticate } from '../../../shared/middlewares/auth.middleware';
-import { imageUploadHandler } from '../../../shared/utils/helpers/imageUpload.helper';
+import { siteSettingsUploadHandler } from '../middlewares/site-settings-upload.middleware';
 
 const createSiteSettingsRouter = (dataSource: DataSource) => {
   const router = Router();
@@ -42,6 +42,10 @@ const createSiteSettingsRouter = (dataSource: DataSource) => {
   *                 type: string
   *                 format: binary
   *                 description: Payment QR code image
+  *               proposalPdf:
+  *                 type: string
+  *                 format: binary
+  *                 description: Sponsorship proposal PDF
   *     responses:
   *       200:
   *         description: OK
@@ -49,7 +53,7 @@ const createSiteSettingsRouter = (dataSource: DataSource) => {
   router.put(
     '/',
     authenticate,
-    imageUploadHandler({ fieldName: 'qrCode', multiple: false, optional: true }),
+    siteSettingsUploadHandler(),
     validateRequestBody(upsertSiteSettingsSchema),
     controller.update
   );
@@ -65,6 +69,18 @@ const createSiteSettingsRouter = (dataSource: DataSource) => {
   *         description: OK
   */
   router.delete('/qrcode', authenticate, controller.removeQrCode);
+
+  /**
+  * @swagger
+  * /api/site-settings/proposal:
+  *   delete:
+  *     summary: Remove the sponsorship proposal PDF from the global club settings
+  *     tags: [SiteSettings]
+  *     responses:
+  *       200:
+  *         description: OK
+  */
+  router.delete('/proposal', authenticate, controller.removeProposal);
 
   return router;
 };

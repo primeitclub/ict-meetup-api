@@ -3,6 +3,7 @@ import { EventRegistrationController } from "../controllers/event-registration.c
 import { DataSource } from "typeorm";
 import { createAuthenticate } from "../../../shared/middlewares/auth.middleware";
 import { imageUploadHandler } from "../../../shared/utils/helpers/imageUpload.helper";
+import { MAX_PAYMENT_SCREENSHOT_SIZE } from "../../../shared/constants/upload.constants";
 import {
   validateRequestBody,
   validateRequestParams,
@@ -55,7 +56,12 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
    */
   router.post(
     "/",
-    imageUploadHandler({ fieldName: "image", multiple: false, optional: true }),
+    imageUploadHandler({
+      fieldName: "image",
+      multiple: false,
+      optional: true,
+      maxFileSize: MAX_PAYMENT_SCREENSHOT_SIZE,
+    }),
     (req, _res, next) => {
       if (req.body.imageUrl) {
         req.body.attachedPaymentScreenshot = req.body.imageUrl;
@@ -91,6 +97,31 @@ const createEventRegistrationRouter = (dataSource: DataSource) => {
     authenticate,
     validateRequestQuery(eventRegistrationQuerySchema),
     eventRegistrationController.getAll,
+  );
+  /**
+   * @swagger
+   * /api/event-registrations/stats:
+   *   get:
+   *     summary: Get event registration counts grouped by status
+   *     tags: [EventRegistration]
+   *     parameters:
+   *       - in: query
+   *         name: versionId
+   *         required: false
+   *         schema: { type: string }
+   *       - in: query
+   *         name: eventId
+   *         required: false
+   *         schema: { type: string }
+   *     responses:
+   *       200:
+   *         description: Registration counts by status
+   */
+  router.get(
+    "/stats",
+    authenticate,
+    validateRequestQuery(eventRegistrationQuerySchema),
+    eventRegistrationController.getStatusCounts,
   );
   /**
    * @swagger
