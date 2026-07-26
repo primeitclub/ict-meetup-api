@@ -25,4 +25,13 @@ export class SiteSettings extends BaseEntity {
 
   @Column({ name: 'qr_code_local_path', type: 'text', nullable: true })
   qrCodeLocalPath: string;
+
+  @Column({ name: 'proposal_url', type: 'text', nullable: true })
+  proposalUrl: string;
+
+  @Column({ name: 'proposal_path', type: 'text', nullable: true })
+  proposalPath: string;
+
+  @Column({ name: 'proposal_local_path', type: 'text', nullable: true })
+  proposalLocalPath: string;
 }

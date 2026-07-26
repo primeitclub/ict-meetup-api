@@ -54,6 +54,19 @@ export class EventRegistrationController extends BaseController {
             }
       };
 
+      getStatusCounts = async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                  const result = await this.eventRegistrationService.getStatusCounts(req.query as any);
+                  return responseHandler(res)(
+                        'Event registration status counts fetched successfully',
+                        result,
+                        200
+                  );
+            } catch (error) {
+                  next(error);
+            }
+      };
+
       getById = async (req: Request, res: Response, next: NextFunction) => {
             try {
                   const result = await this.eventRegistrationService.findById(req.params.id);

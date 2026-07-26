@@ -33,6 +33,10 @@ export const upsertSiteSettingsSchema = z.object({
   qrCodePath: z.string().trim().optional(),
   qrCodeLocalPath: z.string().trim().optional(),
   uploadedImages: z.any().optional(),
+  proposalUrl: z.string().trim().optional(),
+  proposalPath: z.string().trim().optional(),
+  proposalLocalPath: z.string().trim().optional(),
+  uploadedProposal: z.any().optional(),
 });
 
 export type UpsertSiteSettingsDto = z.infer<typeof upsertSiteSettingsSchema>;
