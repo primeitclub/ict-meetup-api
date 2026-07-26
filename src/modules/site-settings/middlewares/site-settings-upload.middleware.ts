@@ -105,7 +105,9 @@ export const siteSettingsUploadHandler =
         // upload itself had succeeded. So a Cloudinary failure here must never
         // block the save — we just fall back to local-only storage.
         const uploadFile = async (file: Express.Multer.File): Promise<UploadedFile> => {
-          const localUrl = `${envConfig.BASE_URL}/public/assets/${version}/${moduleName}/${file.filename}`;
+          // version/moduleName can contain spaces — must be percent-encoded per path
+          // segment or the URL is invalid outside a browser address bar.
+          const localUrl = `${envConfig.BASE_URL}/public/assets/${encodeURIComponent(version)}/${encodeURIComponent(moduleName)}/${file.filename}`;
 
           let cloudUrl = '';
           let publicId = '';

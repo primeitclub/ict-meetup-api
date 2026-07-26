@@ -1,10 +1,22 @@
-import { Router } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { DataSource } from "typeorm";
 import { FlagshipEventVersionController } from "../controllers/flagship-event.controller";
 import { validateRequestBody, validateRequestQuery } from "../../../shared/validators/request.validator";
 import { flagshipEventVersionSchema, updateFlagshipEventVersionSchema, flagshipEventQuerySchema } from "../validators/flagship-event.validator";
 import { createAuthenticate } from "../../../shared/middlewares/auth.middleware";
 import { imageUploadHandler } from "../../../shared/utils/helpers/imageUpload.helper";
+
+// imageUploadHandler sets req.body.imageUrl/imagePath, but validateRequestBody's
+// Zod schema strips any field it doesn't declare — logo/logoPath must be mapped
+// here, before validation runs, or they're silently dropped before the
+// controller ever sees them.
+const mapUploadedLogo = (req: Request, _res: Response, next: NextFunction) => {
+      if (req.body.imageUrl) {
+            req.body.logo = req.body.imageUrl;
+            req.body.logoPath = req.body.imagePath;
+      }
+      next();
+};
 
 const createVersionRouter = (dataSource: DataSource) => {
       const versionRouter = Router();
@@ -60,7 +72,7 @@ const createVersionRouter = (dataSource: DataSource) => {
        *       201:
        *         description: Created
        */
-      versionRouter.post("/", authenticate, imageUploadHandler({ fieldName: "logo", multiple: false, optional: true }), validateRequestBody(flagshipEventVersionSchema), controller.create);
+      versionRouter.post("/", authenticate, imageUploadHandler({ fieldName: "logo", multiple: false, optional: true }), mapUploadedLogo, validateRequestBody(flagshipEventVersionSchema), controller.create);
 
       /**
        * @swagger
@@ -183,7 +195,7 @@ const createVersionRouter = (dataSource: DataSource) => {
        *       200:
        *         description: OK
        */
-      versionRouter.patch("/:id", authenticate, imageUploadHandler({ fieldName: "logo", multiple: false, optional: true }), validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
+      versionRouter.patch("/:id", authenticate, imageUploadHandler({ fieldName: "logo", multiple: false, optional: true }), mapUploadedLogo, validateRequestBody(updateFlagshipEventVersionSchema), controller.update);
 
       /**
        * @swagger
