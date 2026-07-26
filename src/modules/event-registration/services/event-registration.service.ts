@@ -32,6 +32,7 @@ export class EventRegistrationService {
             return {
                   versionName: version?.version_name ?? "ICT Meetup",
                   logoUrl: version?.logo ?? null,
+                  logoPath: version?.logoPath ?? null,
                   heroTitle: hero?.heading ?? null,
                   heroDescription: hero?.paragraph ?? null,
                   clubEmail: siteSettings?.clubEmail ?? null,

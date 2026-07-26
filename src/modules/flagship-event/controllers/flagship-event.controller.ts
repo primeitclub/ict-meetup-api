@@ -16,10 +16,6 @@ export class FlagshipEventVersionController extends BaseController {
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId;
-      if (req.body.imageUrl) {
-        req.body.logo = req.body.imageUrl;
-        req.body.logoPath = req.body.imagePath;
-      }
       const result = await this.service.create(req.body, userId);
       await this.createAuditLog(
         AuditLogType.INFO,
@@ -123,10 +119,6 @@ export class FlagshipEventVersionController extends BaseController {
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.userId;
-      if (req.body.imageUrl) {
-        req.body.logo = req.body.imageUrl;
-        req.body.logoPath = req.body.imagePath;
-      }
       const result = await this.service.update(
         req.params.id,
         req.body,
