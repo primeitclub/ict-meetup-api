@@ -60,4 +60,23 @@ export class SiteSettingsController extends BaseController {
       next(error);
     }
   };
+
+  removeProposal = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.userId;
+      const result = await this.service.removeProposal(userId);
+      await this.createAuditLog(
+        AuditLogType.INFO,
+        AuditLogActionType.DELETE,
+        'Site settings proposal removed successfully',
+        null,
+        AuditLogScope.SITE_SETTINGS,
+        req.ip,
+        userId
+      );
+      return responseHandler(res)('Proposal removed successfully', result, 200);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
