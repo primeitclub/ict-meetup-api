@@ -46,10 +46,12 @@ export class SiteSettingsService {
       );
 
       Object.assign(existing, cleanData, {
-        qrCodeUrl: data.uploadedImages?.cloudUrl || data.qrCodeUrl || existing.qrCodeUrl,
+        // The local URL is the source of truth for delivery — Cloudinary is an
+        // optional backup copy only (see site-settings-upload.middleware.ts).
+        qrCodeUrl: data.uploadedImages?.localUrl || data.qrCodeUrl || existing.qrCodeUrl,
         qrCodePath: data.uploadedImages?.publicId || data.qrCodePath || existing.qrCodePath,
         qrCodeLocalPath: data.uploadedImages?.localPath || data.qrCodeLocalPath || existing.qrCodeLocalPath,
-        proposalUrl: data.uploadedProposal?.cloudUrl || data.proposalUrl || existing.proposalUrl,
+        proposalUrl: data.uploadedProposal?.localUrl || data.proposalUrl || existing.proposalUrl,
         proposalPath: data.uploadedProposal?.publicId || data.proposalPath || existing.proposalPath,
         proposalLocalPath:
           data.uploadedProposal?.localPath || data.proposalLocalPath || existing.proposalLocalPath,
@@ -63,10 +65,10 @@ export class SiteSettingsService {
     const { uploadedImages, uploadedProposal, ...rest } = data;
     const created = this.repository.create({
       ...rest,
-      qrCodeUrl: uploadedImages?.cloudUrl || data.qrCodeUrl,
+      qrCodeUrl: uploadedImages?.localUrl || data.qrCodeUrl,
       qrCodePath: uploadedImages?.publicId || data.qrCodePath,
       qrCodeLocalPath: uploadedImages?.localPath || data.qrCodeLocalPath,
-      proposalUrl: uploadedProposal?.cloudUrl || data.proposalUrl,
+      proposalUrl: uploadedProposal?.localUrl || data.proposalUrl,
       proposalPath: uploadedProposal?.publicId || data.proposalPath,
       proposalLocalPath: uploadedProposal?.localPath || data.proposalLocalPath,
       createdById: userId,
