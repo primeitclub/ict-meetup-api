@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src",
-    "build": "tsc && shx mkdir -p dist/modules/mail/templates && shx cp \"src/modules/mail/templates/*.mjml\" dist/modules/mail/templates/",
+    "build": "tsc && shx mkdir -p dist/modules/mail/templates dist/modules/mail/assets/social-icons && shx cp \"src/modules/mail/templates/*.mjml\" dist/modules/mail/templates/ && shx cp \"src/modules/mail/assets/social-icons/*.png\" dist/modules/mail/assets/social-icons/",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm": "tsx ./node_modules/typeorm/cli.js",

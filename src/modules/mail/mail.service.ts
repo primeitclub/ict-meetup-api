@@ -32,18 +32,18 @@ interface RegistrationStatusOptions {
       rejectionReason?: string;
 }
 
-const PLATFORM_META: Record<string, { color: string; label: string }> = {
-      linkedin:  { color: "#0A66C2", label: "in" },
-      facebook:  { color: "#1877F2", label: "fb" },
-      instagram: { color: "#E4405F", label: "ig" },
-      twitter:   { color: "#1DA1F2", label: "tw" },
-      x:         { color: "#000000", label: "X"  },
-      youtube:   { color: "#FF0000", label: "yt" },
-      tiktok:    { color: "#010101", label: "tt" },
-      discord:   { color: "#5865F2", label: "dc" },
-      telegram:  { color: "#2CA5E0", label: "tg" },
-      whatsapp:  { color: "#25D366", label: "wa" },
-      github:    { color: "#181717", label: "gh" },
+
+const SOCIAL_ICON_DIR = path.join(__dirname, "assets", "social-icons");
+const PLATFORM_ICON_FILE: Record<string, string> = {
+      facebook:  "facebook.png",
+      instagram: "instagram.png",
+      linkedin:  "linkedin.png",
+      x:         "x.png",
+      twitter:   "x.png",
+      tiktok:    "tiktok.png",
+      website:   "globe.png",
+      portfolio: "globe.png",
+      globe:     "globe.png",
 };
 
 function escapeHtml(str: string): string {
@@ -57,21 +57,15 @@ function escapeHtml(str: string): string {
 
 const LOGO_CID = "club-logo";
 
-// Email clients (Gmail especially) fetch remote <img> URLs through their own
-// proxy servers, which can never reach a localhost/internal BASE_URL and are
-// often blocked by default even for a reachable one. Embedding the logo as a
-// cid: attachment ships the image bytes inside the email itself, so nothing
-// needs to be fetched at read-time. Falls back to the remote URL only if the
-// local file is missing (e.g. deleted from disk, or a pre-existing record
-// that never had logoPath populated).
-function resolveLogoAttachment(logoPath?: string | null): { filename: string; path: string; cid: string } | null {
+
+function resolveLogoAttachment(logoPath?: string | null): { filename: string; path: string; cid: string; contentDisposition: "inline" } | null {
       if (!logoPath) return null;
       const resolvedPath = path.isAbsolute(logoPath) ? logoPath : path.join(process.cwd(), logoPath);
       if (!fs.existsSync(resolvedPath)) return null;
-      return { filename: path.basename(resolvedPath), path: resolvedPath, cid: LOGO_CID };
+      return { filename: path.basename(resolvedPath), path: resolvedPath, cid: LOGO_CID, contentDisposition: "inline" };
 }
 
-function buildLogoSection(club: ClubInfo): { html: string; attachment: { filename: string; path: string; cid: string } | null } {
+function buildLogoSection(club: ClubInfo): { html: string; attachment: { filename: string; path: string; cid: string; contentDisposition: "inline" } | null } {
       const attachment = resolveLogoAttachment(club.logoPath);
       const src = attachment ? `cid:${LOGO_CID}` : club.logoUrl;
       if (!src) return { html: "", attachment: null };
@@ -96,16 +90,30 @@ function buildClubContactBlock(club: ClubInfo): string {
       return `<mj-text font-size="13px" color="#64748b" padding-top="2px">${lines.join(" &nbsp;&middot;&nbsp; ")}</mj-text>`;
 }
 
-function buildSocialLinksBlock(links?: { platform: string; link: string }[] | null): string {
-      if (!links?.length) return "";
+function buildSocialLinksBlock(
+      links?: { platform: string; link: string }[] | null
+): { html: string; attachments: { filename: string; path: string; cid: string; contentDisposition: "inline" }[] } {
+      if (!links?.length) return { html: "", attachments: [] };
+
+      const attachments: { filename: string; path: string; cid: string; contentDisposition: "inline" }[] = [];
+      const seenCids = new Set<string>();
       const icons = links
             .map(({ platform, link }) => {
                   const key = platform.toLowerCase().trim().replace(/\s+/g, "");
-                  const meta = PLATFORM_META[key] ?? { color: "#475569", label: platform.slice(0, 2).toLowerCase() };
-                  return `<a href="${escapeHtml(link)}" target="_blank" style="display:inline-block;width:30px;height:30px;background:${meta.color};border-radius:50%;text-align:center;line-height:30px;color:#ffffff;font-size:11px;font-weight:bold;text-decoration:none;margin:0 5px;font-family:Arial,sans-serif;">${escapeHtml(meta.label)}</a>`;
+                  const iconFile = PLATFORM_ICON_FILE[key];
+                  if (!iconFile) return "";
+
+                  const cid = `social-${key}`;
+                  if (!seenCids.has(cid)) {
+                        seenCids.add(cid);
+                        attachments.push({ filename: iconFile, path: path.join(SOCIAL_ICON_DIR, iconFile), cid, contentDisposition: "inline" });
+                  }
+
+                  return `<a href="${escapeHtml(link)}" target="_blank" style="display:inline-block;width:30px;height:30px;margin:0 5px;text-decoration:none;"><img src="cid:${cid}" alt="${escapeHtml(platform)}" width="30" height="30" style="display:block;border-radius:50%;" /></a>`;
             })
             .join("");
-      return `<mj-text align="center" padding="0 0 8px">${icons}</mj-text>`;
+      if (!icons) return { html: "", attachments: [] };
+      return { html: `<mj-text align="center" padding="0 0 8px">${icons}</mj-text>`, attachments };
 }
 
 class MailService {
@@ -158,6 +166,7 @@ class MailService {
       sendRegistrationReceived({ to, username, eventTitle, trackingId, club }: RegistrationReceivedOptions): void {
             this.enqueue(async () => {
                   const logo = buildLogoSection(club);
+                  const social = buildSocialLinksBlock(club.socialMediaLinks);
                   const html = await this.compileTemplate("registration-received", {
                         username,
                         eventTitle,
@@ -167,14 +176,14 @@ class MailService {
                         heroTitle: club.heroTitle ?? club.versionName,
                         heroDescriptionSection: buildHeroDescriptionSection(club.heroDescription),
                         clubContactBlock: buildClubContactBlock(club),
-                        socialLinksBlock: buildSocialLinksBlock(club.socialMediaLinks),
+                        socialLinksBlock: social.html,
                   });
                   await this.transporter.sendMail({
                         from: `"ICT Meetup" <${envConfig.MAIL_FROM}>`,
                         to,
                         subject: `Registration Received — ${eventTitle}`,
                         html,
-                        attachments: logo.attachment ? [logo.attachment] : [],
+                        attachments: [...(logo.attachment ? [logo.attachment] : []), ...social.attachments],
                   });
             });
       }
@@ -182,6 +191,7 @@ class MailService {
       sendRegistrationApproved({ to, username, eventTitle, trackingId, club }: RegistrationStatusOptions): void {
             this.enqueue(async () => {
                   const logo = buildLogoSection(club);
+                  const social = buildSocialLinksBlock(club.socialMediaLinks);
                   const html = await this.compileTemplate("registration-approved", {
                         username,
                         eventTitle,
@@ -191,14 +201,14 @@ class MailService {
                         heroTitle: club.heroTitle ?? club.versionName,
                         heroDescriptionSection: buildHeroDescriptionSection(club.heroDescription),
                         clubContactBlock: buildClubContactBlock(club),
-                        socialLinksBlock: buildSocialLinksBlock(club.socialMediaLinks),
+                        socialLinksBlock: social.html,
                   });
                   await this.transporter.sendMail({
                         from: `"ICT Meetup" <${envConfig.MAIL_FROM}>`,
                         to,
                         subject: `Registration Confirmed — ${eventTitle}`,
                         html,
-                        attachments: logo.attachment ? [logo.attachment] : [],
+                        attachments: [...(logo.attachment ? [logo.attachment] : []), ...social.attachments],
                   });
             });
       }
@@ -209,6 +219,7 @@ class MailService {
                         ? `<mj-text padding="0"><div style="background:#fef2f2;border-left:3px solid #ef4444;padding:14px 18px;border-radius:3px;margin:8px 0 0;font-size:14px;color:#7f1d1d;"><strong>Reason:</strong> ${escapeHtml(rejectionReason)}</div></mj-text>`
                         : "";
                   const logo = buildLogoSection(club);
+                  const social = buildSocialLinksBlock(club.socialMediaLinks);
                   const html = await this.compileTemplate("registration-rejected", {
                         username,
                         eventTitle,
@@ -218,14 +229,14 @@ class MailService {
                         heroTitle: club.heroTitle ?? club.versionName,
                         heroDescriptionSection: buildHeroDescriptionSection(club.heroDescription),
                         clubContactBlock: buildClubContactBlock(club),
-                        socialLinksBlock: buildSocialLinksBlock(club.socialMediaLinks),
+                        socialLinksBlock: social.html,
                   });
                   await this.transporter.sendMail({
                         from: `"ICT Meetup" <${envConfig.MAIL_FROM}>`,
                         to,
                         subject: `Registration Update — ${eventTitle}`,
                         html,
-                        attachments: logo.attachment ? [logo.attachment] : [],
+                        attachments: [...(logo.attachment ? [logo.attachment] : []), ...social.attachments],
                   });
             });
       }
