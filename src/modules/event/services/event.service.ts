@@ -104,6 +104,7 @@ export class EventService {
                         displayOrder: true,
                         isHighlighted: true,
                         eventType: true,
+                        minParticipants: true,
                         maxParticipants: true,
                         registerLink: true,
                         flagshipEvent: {
@@ -197,6 +198,7 @@ export class EventService {
                   displayOrder: rest.displayOrder,
                   isHighlighted: event.isHighlighted ?? false,
                   eventType: event.eventType,
+                  minParticipants: event.minParticipants ?? null,
                   maxParticipants: event.maxParticipants ?? null,
                   registerLink: event.registerLink ?? null,
                   versionId,
@@ -251,6 +253,7 @@ export class EventService {
                   displayOrder: true,
                   isHighlighted: true,
                   eventType: true,
+                  minParticipants: true,
                   maxParticipants: true,
                   registerLink: true,
                   flagshipEvent: {
@@ -363,6 +366,7 @@ export class EventService {
                   ...(data.displayOrder !== undefined && { displayOrder: data.displayOrder }),
                   ...(data.isHighlighted !== undefined && { isHighlighted: data.isHighlighted }),
                   ...(data.eventType !== undefined && { eventType: data.eventType }),
+                  ...(data.minParticipants !== undefined && { minParticipants: data.minParticipants }),
                   ...(data.maxParticipants !== undefined && { maxParticipants: data.maxParticipants }),
                   ...(data.registerLink !== undefined && { registerLink: data.registerLink }),
                   ...(data.imagePath !== undefined && { imagePath: data.imagePath }),
