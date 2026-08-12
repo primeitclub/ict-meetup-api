@@ -59,6 +59,10 @@ export const baseEventSchema = z.object({
     .preprocess((v) => v === "true" || v === true, z.boolean())
     .optional(),
   eventType: z.enum([EventType.SINGLE, EventType.GROUP]).optional().default(EventType.SINGLE),
+  minParticipants: z.preprocess(
+    (val) => (val === "" || val === undefined || val === null ? undefined : Number(val)),
+    z.number().int().min(1).max(20).optional()
+  ),
   maxParticipants: z.preprocess(
     (val) => (val === "" || val === undefined || val === null ? undefined : Number(val)),
     z.number().int().min(1).max(20).optional()
@@ -150,6 +154,29 @@ export const createEventSchema = baseEventSchema.superRefine((data, ctx) => {
         path: ["maxParticipants"],
       });
     }
+
+    if (data.minParticipants === undefined || data.minParticipants === null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Minimum participants limit is required for group events",
+        path: ["minParticipants"],
+      });
+    } else {
+      if (data.minParticipants < 1 || data.minParticipants > 20) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Minimum participants must be between 1 and 20",
+          path: ["minParticipants"],
+        });
+      }
+      if (data.maxParticipants !== undefined && data.maxParticipants !== null && data.minParticipants > data.maxParticipants) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Minimum participants cannot be greater than maximum participants",
+          path: ["minParticipants"],
+        });
+      }
+    }
   }
 });
 
@@ -222,6 +249,29 @@ export const updateEventSchema = baseEventSchema
           message: "Maximum participants must be between 1 and 20",
           path: ["maxParticipants"],
         });
+      }
+
+      if (data.minParticipants === undefined || data.minParticipants === null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Minimum participants limit is required for group events",
+          path: ["minParticipants"],
+        });
+      } else {
+        if (data.minParticipants < 1 || data.minParticipants > 20) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Minimum participants must be between 1 and 20",
+            path: ["minParticipants"],
+          });
+        }
+        if (data.maxParticipants !== undefined && data.maxParticipants !== null && data.minParticipants > data.maxParticipants) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Minimum participants cannot be greater than maximum participants",
+            path: ["minParticipants"],
+          });
+        }
       }
     }
   });

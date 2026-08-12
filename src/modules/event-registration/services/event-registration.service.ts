@@ -83,6 +83,11 @@ export class EventRegistrationService {
                   if (data.participants.length > maxAllowed) {
                         throw new AppError(`Number of participants exceeds the limit of ${maxAllowed} configured for this event`, 400);
                   }
+                  if (eventExists.minParticipants !== undefined && eventExists.minParticipants !== null) {
+                        if (data.participants.length < eventExists.minParticipants) {
+                              throw new AppError(`A minimum of ${eventExists.minParticipants} participants is required for this event`, 400);
+                        }
+                  }
             } else {
                   // Ensure single events don't get populated with group details
                   (data as any).teamName = null;

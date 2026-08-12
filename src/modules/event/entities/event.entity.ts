@@ -25,6 +25,9 @@ export class Event extends BaseEntity {
       @Column({ name: 'event_type', type: "enum", enum: EventType, default: EventType.SINGLE })
       eventType: EventType;
 
+      @Column({ name: 'min_participants', type: 'int', nullable: true })
+      minParticipants: number | null;
+
       @Column({ name: 'max_participants', type: 'int', nullable: true })
       maxParticipants: number | null;
 
