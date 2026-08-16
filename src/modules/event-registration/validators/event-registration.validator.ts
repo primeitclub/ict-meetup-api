@@ -30,6 +30,8 @@ const createEventRegistrationBaseSchema = z.object({
                         fullName: z.string().trim().min(1, "Full name is required"),
                         email: z.string().trim().email("Invalid email address"),
                         phoneNumber: z.string().trim().optional().nullable(),
+                        inGameName: z.string().trim().optional().nullable(),
+                        inGameId: z.string().trim().optional().nullable(),
                   })
             ).optional().nullable()
       ),
