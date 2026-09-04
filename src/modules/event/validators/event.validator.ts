@@ -130,10 +130,10 @@ export const createEventSchema = baseEventSchema.superRefine((data, ctx) => {
   // 3. Registration Deadline Validation
   if (data.date && data.registrationDeadline) {
     const eventDate = new Date(data.date);
-    if (data.registrationDeadline >= eventDate) {
+    if (data.registrationDeadline > eventDate) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Registration deadline must be before the event date",
+        message: "Registration deadline cannot be after the event date",
         path: ["registrationDeadline"],
       });
     }
@@ -226,10 +226,10 @@ export const updateEventSchema = baseEventSchema
     // 3. Registration Deadline Validation
     if (data.date && data.registrationDeadline) {
       const eventDate = new Date(data.date);
-      if (data.registrationDeadline >= eventDate) {
+      if (data.registrationDeadline > eventDate) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Registration deadline must be before the event date",
+          message: "Registration deadline cannot be after the event date",
           path: ["registrationDeadline"],
         });
       }
